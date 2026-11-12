@@ -1,5 +1,6 @@
 """Connector tests: every engine path that can run offline, plus a mock HTTP API for all pagination/auth styles."""
 import base64
+import importlib.util
 import io
 import json
 import sqlite3
@@ -207,15 +208,17 @@ def test_file_formats(tmp_path):
     assert read_bytes("t.jsonl", b'{"a":1}\n{"a":2}\n')["t"].shape == (2, 1)
     assert read_bytes("t.json", json.dumps({"orders": [{"x": 1}], "users": [{"y": 2}]}).encode()).keys() == {"orders", "users"}
     assert read_bytes("t.xml", b"<r><row><a>1</a></row><row><a>2</a></row></r>")["t"]["a"].tolist() == [1, 2]
-    assert read_bytes("t.yaml", b"- a: 1\n- a: 2\n")["t"].shape == (2, 1)
+    if importlib.util.find_spec("yaml"):
+        assert read_bytes("t.yaml", b"- a: 1\n- a: 2\n")["t"].shape == (2, 1)
     buf = io.BytesIO()
     with pd.ExcelWriter(buf) as w:
         df.to_excel(w, sheet_name="One", index=False)
         df.to_excel(w, sheet_name="Two", index=False)
     assert set(read_bytes("book.xlsx", buf.getvalue())) == {"One", "Two"}
-    ods = io.BytesIO()
-    df.to_excel(ods, engine="odf", index=False)
-    assert read_bytes("t.ods", ods.getvalue())["t"].shape == (2, 2)
+    if importlib.util.find_spec("odf"):
+        ods = io.BytesIO()
+        df.to_excel(ods, engine="odf", index=False)
+        assert read_bytes("t.ods", ods.getvalue())["t"].shape == (2, 2)
     st = io.BytesIO()
     df.to_stata(st, write_index=False)
     assert read_bytes("t.dta", st.getvalue())["t"].shape == (2, 2)
