@@ -1,0 +1,27 @@
+name: 🔌 Connector request / connector bug
+description: Ask for a new data source, or report a connector that fails with a real account
+labels: [connector]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Data source
+      placeholder: e.g. Zoho Books, Oracle NetSuite, Google Ads
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Request type
+      options: [New connector, Existing connector fails, Existing connector missing data]
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Link to the API / driver documentation
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Error message, endpoint, authentication method. Never paste real passwords or tokens.

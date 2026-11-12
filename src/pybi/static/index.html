@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Muhammad Rafay Shaikh, from Pakistan">
+<title>PyBI Studio</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="app">
+  <div class="titlebar">
+    <div class="brand"><span class="logo">▮▮▮</span>PyBI <span style="font-weight:400;opacity:.6;font-size:12px">Studio</span></div>
+    <div class="doc"><input id="docTitle" title="Report title" spellcheck="false"></div>
+    <div class="ask" title="Ask a question, e.g. 'revenue by region as pie' or 'top 5 products by profit'">✨<input id="askBox" placeholder="Ask your data… e.g. profit by region as pie"></div>
+    <div class="right"><span id="saveState">Saved</span><button class="share" id="shareBtn">⇪ Share</button></div>
+  </div>
+  <div class="ribbon" id="ribbon"></div>
+  <div class="workspace">
+    <div class="rail">
+      <button data-view="report" class="on" title="Report view">▦</button>
+      <button data-view="data" title="Table view">⊞</button>
+      <button data-view="model" title="Model view">⛓</button>
+    </div>
+    <div class="center">
+      <div id="reportView" class="stage"><div class="stage-inner"><div class="canvas-holder edit" id="holder"><div id="canvas" class="canvas"></div></div></div></div>
+      <div id="dataView" class="dataview hidden"></div>
+      <div id="modelView" class="modelview hidden"></div>
+      <div class="pagebar" id="pagebar"></div>
+    </div>
+    <div class="panes">
+      <div class="pane" id="filtersPane"></div>
+      <div class="pane" id="vizPane"></div>
+      <div class="pane" id="dataPane"></div>
+    </div>
+  </div>
+</div>
+<script src="/static/d3.min.js"></script>
+<script src="/static/engine.js"></script>
+<script src="/static/visuals.js"></script>
+<script src="/static/runtime.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
