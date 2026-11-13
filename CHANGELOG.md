@@ -4,6 +4,12 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+- Windows installer (`PyBI-Setup.exe`): Next → Next → Install, bundled Python and dependencies, no admin rights, ر app icon, desktop and Start-menu shortcuts.
+- PyBI desktop launcher: starts the studio on localhost, opens the browser, single instance, logs, start/stop/restart.
+- Automatic updates from GitHub Releases with SHA-256 verification and silent in-place upgrade; pre-release opt-in.
+- `Windows installer` workflow: builds, smoke-tests and attaches the installer to each `v*` release.
+
 ## [0.1.0] - 2026-11-13
 
 First public release.

@@ -70,4 +70,7 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --title "PyBI $GITHUB_REF_NAME" --generate-notes
+        # The "Windows installer" workflow may have created this release already; then just add the files.
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* --title "PyBI $GITHUB_REF_NAME" --generate-notes \
+            || gh release upload "$GITHUB_REF_NAME" dist/* --clobber

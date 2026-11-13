@@ -1,0 +1,19 @@
+{
+  "app_name": "PyBI",
+  "host": "127.0.0.1",
+  "port": 8050,
+  "command": [
+    "{python}",
+    "-m",
+    "pybi",
+    "run",
+    "--port",
+    "{port}",
+    "--no-browser"
+  ],
+  "start_timeout": 120,
+  "open_browser_on_start": true,
+  "check_interval_hours": 6,
+  "include_prereleases": false,
+  "asset_pattern": "^PyBI-Setup.*\\.exe$"
+}
