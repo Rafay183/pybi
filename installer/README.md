@@ -13,7 +13,7 @@ This folder builds **PyBI-Setup.exe**, a normal Windows setup wizard:
 .github/workflows/build-installer.yml   CI: test → build → smoke-test → publish to Releases
 installer/
   pybi.iss                 Inno Setup wizard script (AppId must never change)
-  build/build.ps1          builds runtime + PyBI.exe + setup (Windows, PowerShell 7)
+  scripts/build.ps1          builds runtime + PyBI.exe + setup (Windows, PowerShell 7)
   launcher/                the PyBI.exe desktop app (Python + Tk)
     main.py                entry point
     launcher.json          start command, port, update settings
@@ -58,7 +58,7 @@ Placeholders are `{python}`, `{port}`, `{host}` and `{workspace}`. `{port}` is 8
 Requirements: Windows 10/11 x64, Python 3.11 on PATH, PowerShell 7 (`pwsh`). Inno Setup is installed automatically through Chocolatey if it is missing.
 
 ```powershell
-pwsh .\installer\build\build.ps1 -Version 1.3.0 -Repo Rafay183/pybi
+pwsh .\installer\scripts\build.ps1 -Version 1.3.0 -Repo Rafay183/pybi
 # → dist\PyBI-Setup.exe and dist\PyBI-Setup.exe.sha256
 ```
 

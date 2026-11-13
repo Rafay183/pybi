@@ -87,7 +87,7 @@ jobs:
         shell: pwsh
         env:
           PYBI_SIGN_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
-        run: ./installer/build/build.ps1 -Version '${{ steps.v.outputs.version }}' -Repo '${{ github.repository }}'
+        run: ./installer/scripts/build.ps1 -Version '${{ steps.v.outputs.version }}' -Repo '${{ github.repository }}'
 
       - name: Smoke test (silent install, import, uninstall)
         shell: pwsh
