@@ -1,0 +1,125 @@
+# Builds the Windows installer and publishes it to GitHub Releases.
+#
+#   Release:     git tag v1.2.0 && git push origin v1.2.0
+#   Test build:  any push to main that changes installer/** (artifact only, no release),
+#                or Actions tab → "Windows installer" → Run workflow
+#
+# Every installed PyBI checks this repo's Releases and offers the update to its users.
+# Tags with a pre-release label (v1.3.0rc1, v1.3.0-beta.1) become GitHub pre-releases,
+# which only reach users who opted in to pre-releases.
+
+name: Windows installer
+
+on:
+  push:
+    tags: ["v*"]
+    branches: [main]
+    paths: ["installer/**", ".github/workflows/build-installer.yml"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version for a test build, e.g. 1.2.0 (leave empty for 0.0.0-dev)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: installer-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  launcher-tests:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check pytest
+      - run: python -m pytest -q installer/launcher/tests
+
+  build:
+    needs: launcher-tests
+    runs-on: windows-latest
+    env:
+      HAS_CERT: ${{ secrets.WINDOWS_CERT_PFX_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve version
+        id: v
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_TYPE -eq 'tag') { $v = $env:GITHUB_REF_NAME -replace '^[vV]', '' }
+          elseif ('${{ inputs.version }}') { $v = '${{ inputs.version }}' }
+          else { $v = "0.0.0-dev.${{ github.run_number }}" }
+          $pre = if ($v -match '(?i)(a|b|rc|alpha|beta|dev|pre|preview)[-_.]?\d*$|-') { 'true' } else { 'false' }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "prerelease=$pre" >> $env:GITHUB_OUTPUT
+          Write-Host "Version $v (prerelease: $pre)"
+
+      - name: Check tag matches the package version
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        run: |
+          $v = '${{ steps.v.outputs.version }}'
+          if (Test-Path pyproject.toml) {
+            $m = Select-String -Path pyproject.toml -Pattern '^\s*version\s*=\s*"([^"]+)"' | Select-Object -First 1
+            if ($m -and $m.Matches[0].Groups[1].Value -ne $v) {
+              Write-Host "::warning::Tag is $v but pyproject.toml says $($m.Matches[0].Groups[1].Value). Bump pyproject.toml before tagging."
+            }
+          }
+
+      - name: Decode signing certificate
+        if: env.HAS_CERT == 'true'
+        shell: pwsh
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP "sign.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String('${{ secrets.WINDOWS_CERT_PFX_BASE64 }}'))
+          "PYBI_SIGN_PFX=$pfx" >> $env:GITHUB_ENV
+
+      - name: Build installer
+        shell: pwsh
+        env:
+          PYBI_SIGN_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: ./installer/build/build.ps1 -Version '${{ steps.v.outputs.version }}' -Repo '${{ github.repository }}'
+
+      - name: Smoke test (silent install, import, uninstall)
+        shell: pwsh
+        run: |
+          $dir = "C:\pybi-smoke"
+          $p = Start-Process dist\PyBI-Setup.exe -Wait -PassThru -ArgumentList `
+               '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/NOLAUNCH=1', "/DIR=$dir", '/CURRENTUSER', '/LOG=smoke-install.log'
+          if ($p.ExitCode -ne 0) { Get-Content smoke-install.log -Tail 40; throw "Installer exit code $($p.ExitCode)" }
+          foreach ($f in 'PyBI.exe', 'runtime\python.exe', 'launcher.json', 'settings.ini') {
+            if (-not (Test-Path (Join-Path $dir $f))) { throw "Missing after install: $f" }
+          }
+          & "$dir\runtime\python.exe" -c "import pybi, sys; print('pybi OK on', sys.version)"
+          if ($LASTEXITCODE -ne 0) { throw "pybi does not import in the installed runtime" }
+          Get-Content "$dir\launcher.json"
+          $u = Start-Process "$dir\unins000.exe" -Wait -PassThru -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'
+          if ($u.ExitCode -ne 0) { throw "Uninstaller exit code $($u.ExitCode)" }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PyBI-Setup-${{ steps.v.outputs.version }}
+          path: |
+            dist/PyBI-Setup.exe
+            dist/PyBI-Setup.exe.sha256
+
+      - name: Publish to GitHub Releases
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: PyBI ${{ steps.v.outputs.version }}
+          prerelease: ${{ steps.v.outputs.prerelease == 'true' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            dist/PyBI-Setup.exe
+            dist/PyBI-Setup.exe.sha256

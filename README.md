@@ -12,6 +12,8 @@ pybi run          # opens PyBI Studio at http://127.0.0.1:8050
 pybi demo         # opens with a ready-made 3-page sales dashboard
 ```
 
+**On Windows without Python?** Download **[PyBI-Setup.exe](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe)** and click Next → Next → Install. It includes its own Python and every library, needs no admin rights, adds a PyBI icon to your desktop and Start menu, and updates itself when a new version is released. ([How the installer works](installer/README.md))
+
 Created by **Muhammad Rafay Shaikh, from Pakistan**.
 
 ![PyBI Studio with the demo dashboard](https://raw.githubusercontent.com/rafay183/pybi/main/docs/images/dashboard.png)
