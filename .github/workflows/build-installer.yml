@@ -1,7 +1,7 @@
 # Builds the Windows installer and publishes it to GitHub Releases.
 #
 #   Release:     git tag v1.2.0 && git push origin v1.2.0
-#   Test build:  any push to main that changes installer/** (artifact only, no release),
+#   Test build:  any branch push that changes installer/** (artifact only, no release),
 #                or Actions tab → "Windows installer" → Run workflow
 #
 # Every installed PyBI checks this repo's Releases and offers the update to its users.
@@ -13,7 +13,7 @@ name: Windows installer
 on:
   push:
     tags: ["v*"]
-    branches: [main]
+    branches: ["**"]          # branch pushes: test build only, when installer files change
     paths: ["installer/**", ".github/workflows/build-installer.yml"]
   workflow_dispatch:
     inputs:
