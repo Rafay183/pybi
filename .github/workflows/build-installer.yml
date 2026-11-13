@@ -105,7 +105,7 @@ jobs:
           $u = Start-Process "$dir\unins000.exe" -Wait -PassThru -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'
           if ($u.ExitCode -ne 0) { throw "Uninstaller exit code $($u.ExitCode)" }
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: PyBI-Setup-${{ steps.v.outputs.version }}
           path: |
