@@ -12,7 +12,15 @@ pybi run          # opens PyBI Studio at http://127.0.0.1:8050
 pybi demo         # opens with a ready-made 3-page sales dashboard
 ```
 
-**On Windows without Python?** Download **[PyBI-Setup.exe](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe)** and click Next → Next → Install. It includes its own Python and every library, needs no admin rights, adds a PyBI icon to your desktop and Start menu, and updates itself when a new version is released. ([How the installer works](installer/README.md))
+### Download for Windows
+
+[![Download PyBI for Windows](https://img.shields.io/badge/Download-PyBI%20for%20Windows-0a6c6c?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe)
+[![Latest release](https://img.shields.io/github/v/release/rafay183/pybi?style=for-the-badge&label=version&color=d99a00)](https://github.com/rafay183/pybi/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/rafay183/pybi/total?style=for-the-badge&color=555)](https://github.com/rafay183/pybi/releases)
+
+No Python needed. Download **PyBI-Setup.exe**, click **Next → Next → Install**, then open PyBI from the ر icon on your desktop. It includes its own Python and every library, needs no admin rights, and updates itself when a new version is released. Windows 10/11, 64-bit. ([How the installer works](installer/README.md) · [All versions](https://github.com/rafay183/pybi/releases))
+
+> If Windows shows *"Windows protected your PC"*, click **More info → Run anyway**.
 
 Created by **Muhammad Rafay Shaikh, from Pakistan**.
 

@@ -4,6 +4,8 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-14
+
 ### Added
 - Windows installer (`PyBI-Setup.exe`): Next → Next → Install, bundled Python and dependencies, no admin rights, ر app icon, desktop and Start-menu shortcuts.
 - PyBI desktop launcher: starts the studio on localhost, opens the browser, single instance, logs, start/stop/restart.
@@ -25,5 +27,6 @@ First public release.
 - Live read-only network sharing (`/view`).
 - Exports: PNG, PowerPoint, PDF, interactive offline HTML, `.pybi` project files.
 
-[Unreleased]: https://github.com/rafay183/pybi/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/rafay183/pybi/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/rafay183/pybi/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/rafay183/pybi/releases/tag/v0.1.0
