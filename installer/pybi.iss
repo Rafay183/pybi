@@ -1,5 +1,5 @@
 ; PyBI Windows installer (Inno Setup 6.3+).
-; Built by installer\build\build.ps1, which passes AppVersion, NumVersion, StageDir, OutputDir, AppRepo.
+; Built by installer\scripts\build.ps1, which passes AppVersion, NumVersion, StageDir, OutputDir, AppRepo.
 ;
 ; * Installs per user into %LOCALAPPDATA%\Programs\PyBI: no admin rights, no UAC prompt.
 ; * Ships its own Python and every dependency: works offline, never touches a system Python.

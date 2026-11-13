@@ -1,4 +1,4 @@
-"""PyBI launcher entry point (frozen into PyBI.exe by installer/build/build.ps1).
+"""PyBI launcher entry point (frozen into PyBI.exe by installer/scripts/build.ps1).
 
     PyBI.exe                  start PyBI and open it in the browser
     PyBI.exe --no-browser     start without opening a browser tab
