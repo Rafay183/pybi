@@ -1,7 +1,9 @@
 # Builds the Windows installer and publishes it to GitHub Releases.
 #
-#   Release:     git tag v1.2.0 && git push origin v1.2.0
-#   Test build:  any branch push that changes installer/** (artifact only, no release),
+#   Release:     bump the version in pyproject.toml and push to main. If no GitHub
+#                release exists for that version yet, this workflow builds the installer
+#                and publishes release vX.Y.Z with it. Pushing a tag vX.Y.Z works too.
+#   Test build:  any other branch push that changes installer/** (artifact only),
 #                or Actions tab → "Windows installer" → Run workflow
 #
 # Every installed PyBI checks this repo's Releases and offers the update to its users.
@@ -14,7 +16,7 @@ on:
   push:
     tags: ["v*"]
     branches: ["**"]          # branch pushes: test build only, when installer files change
-    paths: ["installer/**", ".github/workflows/build-installer.yml"]
+    paths: ["installer/**", ".github/workflows/build-installer.yml", "pyproject.toml", "src/pybi/__init__.py"]
   workflow_dispatch:
     inputs:
       version:
@@ -51,17 +53,28 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Resolve version
+      - name: Resolve version and mode
         id: v
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if ($env:GITHUB_REF_TYPE -eq 'tag') { $v = $env:GITHUB_REF_NAME -replace '^[vV]', '' }
-          elseif ('${{ inputs.version }}') { $v = '${{ inputs.version }}' }
-          else { $v = "0.0.0-dev.${{ github.run_number }}" }
+          $pkg = (Select-String -Path pyproject.toml -Pattern '^\s*version\s*=\s*"([^"]+)"' | Select-Object -First 1).Matches[0].Groups[1].Value
+          $mode = 'test'
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            $v = $env:GITHUB_REF_NAME -replace '^[vV]', ''; $mode = 'release'
+          } elseif ($env:GITHUB_REF -eq 'refs/heads/main') {
+            gh release view "v$pkg" --repo $env:GITHUB_REPOSITORY *> $null
+            if ($LASTEXITCODE -ne 0) { $v = $pkg; $mode = 'release' }   # new version on main: publish it
+            else { $v = "$pkg-dev.${{ github.run_number }}" }
+            $global:LASTEXITCODE = 0
+          } elseif ('${{ inputs.version }}') { $v = '${{ inputs.version }}' }
+          else { $v = "$pkg-dev.${{ github.run_number }}" }
           $pre = if ($v -match '(?i)(a|b|rc|alpha|beta|dev|pre|preview)[-_.]?\d*$|-') { 'true' } else { 'false' }
           "version=$v" >> $env:GITHUB_OUTPUT
+          "mode=$mode" >> $env:GITHUB_OUTPUT
           "prerelease=$pre" >> $env:GITHUB_OUTPUT
-          Write-Host "Version $v (prerelease: $pre)"
+          Write-Host "Version $v  mode $mode  prerelease $pre"
 
       - name: Check tag matches the package version
         if: github.ref_type == 'tag'
@@ -111,15 +124,30 @@ jobs:
           path: |
             dist/PyBI-Setup.exe
             dist/PyBI-Setup.exe.sha256
+            dist/PyBI-Setup.zip
 
       - name: Publish to GitHub Releases
-        if: github.ref_type == 'tag'
+        if: steps.v.outputs.mode == 'release'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.v.outputs.version }}
+          target_commitish: ${{ github.sha }}
           name: PyBI ${{ steps.v.outputs.version }}
           prerelease: ${{ steps.v.outputs.prerelease == 'true' }}
+          make_latest: ${{ steps.v.outputs.prerelease != 'true' }}
           generate_release_notes: true
           fail_on_unmatched_files: true
+          body: |
+            ## Download for Windows
+
+            **[PyBI-Setup.exe](https://github.com/${{ github.repository }}/releases/download/v${{ steps.v.outputs.version }}/PyBI-Setup.exe)** · Windows 10/11, 64-bit · no Python or admin rights needed
+
+            Open it and click **Next → Next → Install**, then start PyBI from the ر icon on your desktop. Already installed? PyBI offers this update by itself.
+
+            `PyBI-Setup.zip` contains the same installer plus its SHA-256 checksum. If Windows shows "Windows protected your PC", click **More info → Run anyway**.
+
+            Python users: `pip install --upgrade pybi-ray`
           files: |
             dist/PyBI-Setup.exe
             dist/PyBI-Setup.exe.sha256
+            dist/PyBI-Setup.zip

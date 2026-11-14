@@ -164,5 +164,8 @@ Sign $setup
 
 $hash = (Get-FileHash -Algorithm SHA256 $setup).Hash.ToLower()
 [IO.File]::WriteAllText("$setup.sha256", "$hash  PyBI-Setup.exe`n", [Text.Encoding]::ASCII)
+$zip = Join-Path $Dist "PyBI-Setup.zip"
+Remove-Item -Force $zip -ErrorAction SilentlyContinue
+Compress-Archive -Path $setup, "$setup.sha256" -DestinationPath $zip -CompressionLevel Optimal
 $size = "{0:N1} MB" -f ((Get-Item $setup).Length / 1MB)
 Step "Done: $setup ($size)  sha256 $hash"
