@@ -4,6 +4,10 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+- Desktop apps for macOS (Apple Silicon and Intel `.dmg`), Linux (`.AppImage` for any distro, `.deb` for Debian/Ubuntu) and ChromeOS (`.deb` in the Linux environment), each with its own Python, the ر icon and automatic updates.
+- The launcher runs without a window when no display is available and stops PyBI cleanly on logout or shutdown.
+
 ## [0.1.1] - 2026-11-14
 
 ### Added

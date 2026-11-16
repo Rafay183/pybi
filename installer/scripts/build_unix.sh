@@ -5,7 +5,7 @@
 #
 # macOS  (arm64 / x86_64) → dist/PyBI-macOS-<arch>.dmg        PyBI.app, drag to Applications
 # Linux  (x86_64 / aarch64) → dist/PyBI-Linux-<arch>.AppImage any distro, no install
-#                           → dist/pybi_<ver>_<amd64|arm64>.deb Debian, Ubuntu, ChromeOS
+#                           → dist/PyBI-Linux-<amd64|arm64>.deb Debian, Ubuntu, ChromeOS
 # Each file gets a .sha256 next to it, which the in-app updater verifies.
 #
 # Python comes from python-build-standalone (relocatable CPython incl. tkinter), so the
@@ -184,7 +184,7 @@ fi
 step "Assemble the .deb package"
 DEB="$BUILD/deb"; mkdir -p "$DEB/DEBIAN" "$DEB/opt/pybi" "$DEB/usr/bin" "$DEB/usr/share/applications"
 copy_app "$DEB/opt/pybi"
-write_cfg "$DEB/opt/pybi/launcher.json" "^pybi_.*_${DEBARCH}\\.deb\$" deb
+write_cfg "$DEB/opt/pybi/launcher.json" "^PyBI-Linux-${DEBARCH}\\.deb\$" deb
 cat > "$DEB/usr/bin/pybi-desktop" <<'EOF'
 #!/bin/sh
 export PYBI_APP_DIR=/opt/pybi
@@ -224,7 +224,7 @@ exit 0
 EOF
 cp "$DEB/DEBIAN/postinst" "$DEB/DEBIAN/postrm"
 chmod 755 "$DEB/DEBIAN/postinst" "$DEB/DEBIAN/postrm"
-DEB_OUT="$DIST/pybi_${DEBVER}_${DEBARCH}.deb"; rm -f "$DEB_OUT"
+DEB_OUT="$DIST/PyBI-Linux-${DEBARCH}.deb"   # fixed name: stable "latest" download link; rm -f "$DEB_OUT"
 dpkg-deb --build --root-owner-group -Zxz "$DEB" "$DEB_OUT"
 sha "$DEB_OUT"
 

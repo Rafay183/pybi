@@ -12,15 +12,32 @@ pybi run          # opens PyBI Studio at http://127.0.0.1:8050
 pybi demo         # opens with a ready-made 3-page sales dashboard
 ```
 
-### Download for Windows
+### Download the desktop app
 
-[![Download PyBI for Windows](https://img.shields.io/badge/Download-PyBI%20for%20Windows-0a6c6c?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe)
-[![Latest release](https://img.shields.io/github/v/release/rafay183/pybi?style=for-the-badge&label=version&color=d99a00)](https://github.com/rafay183/pybi/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/rafay183/pybi/total?style=for-the-badge&color=555)](https://github.com/rafay183/pybi/releases)
+[![Windows](https://img.shields.io/badge/Windows-0a6c6c?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe)
+[![macOS Apple chip](https://img.shields.io/badge/macOS%20Apple%20chip-0a6c6c?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg)
+[![macOS Intel](https://img.shields.io/badge/macOS%20Intel-0a6c6c?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg)
+[![Chromebook](https://img.shields.io/badge/Chromebook-0a6c6c?style=for-the-badge&logo=googlechrome&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb)
+[![Linux AppImage](https://img.shields.io/badge/Linux%20AppImage-0a6c6c?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-x86_64.AppImage)
+[![Ubuntu Debian](https://img.shields.io/badge/Ubuntu%20Debian-0a6c6c?style=for-the-badge&logo=ubuntu&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb)
 
-No Python needed. Download **PyBI-Setup.exe**, click **Next → Next → Install**, then open PyBI from the ر icon on your desktop. It includes its own Python and every library, needs no admin rights, and updates itself when a new version is released. Windows 10/11, 64-bit. ([How the installer works](installer/README.md) · [All versions](https://github.com/rafay183/pybi/releases))
+[![Latest release](https://img.shields.io/github/v/release/rafay183/pybi?style=flat-square&label=version&color=d99a00)](https://github.com/rafay183/pybi/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/rafay183/pybi/total?style=flat-square&color=555)](https://github.com/rafay183/pybi/releases)
 
-> If Windows shows *"Windows protected your PC"*, click **More info → Run anyway**.
+No Python needed: every download includes its own Python and libraries, opens PyBI in your browser from the ر icon, and updates itself when a new version is released.
+
+| Computer | File | Install |
+|---|---|---|
+| Windows 10/11 | [`PyBI-Setup.exe`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe) ([zip](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.zip)) | Open it, **Next → Next → Install**. No admin rights. |
+| Mac, Apple chip (M1–M4) | [`PyBI-macOS-arm64.dmg`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg) | Open it, drag **PyBI** to **Applications**. |
+| Mac, Intel chip | [`PyBI-macOS-x86_64.dmg`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg) | Same as above. |
+| Chromebook | [`PyBI-Linux-amd64.deb`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb) · ARM Chromebook: [`PyBI-Linux-arm64.deb`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-arm64.deb) | Turn on **Settings → Advanced → Developers → Linux**, then double-click the file and choose **Install**. PyBI appears in the launcher. |
+| Ubuntu, Debian, Mint | [`PyBI-Linux-amd64.deb`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb) · ARM: [`PyBI-Linux-arm64.deb`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-arm64.deb) | Double-click, or `sudo apt install ./PyBI-Linux-amd64.deb` |
+| Any other Linux | [`PyBI-Linux-x86_64.AppImage`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-x86_64.AppImage) · ARM: [`PyBI-Linux-aarch64.AppImage`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-aarch64.AppImage) | `chmod +x PyBI-*.AppImage`, then double-click. |
+
+> **First launch.** Windows may say *"Windows protected your PC"*: click **More info → Run anyway**. On a Mac, if PyBI "cannot be opened", go to **System Settings → Privacy & Security** and click **Open Anyway**. Not sure which Mac you have? Apple menu → **About This Mac** shows *Chip: Apple M…* or *Processor: Intel*.
+
+([How the apps are built and updated](installer/README.md) · [All versions](https://github.com/rafay183/pybi/releases))
 
 Created by **Muhammad Rafay Shaikh, from Pakistan**.
 
