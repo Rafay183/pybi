@@ -69,6 +69,11 @@ else
   for f in "$RT"/bin/*; do
     if [ -f "$f" ] && [ ! -L "$f" ] && head -c 2 "$f" | grep -q '#!'; then rm -f "$f"; fi
   done
+  # ...and links that pointed at them (dangling links make macOS codesign fail)
+  for f in "$RT"/bin/*; do
+    if [ -L "$f" ] && [ ! -e "$f" ]; then rm -f "$f"; fi
+  done
+  ls -l "$RT/bin"
 
 fi
 
