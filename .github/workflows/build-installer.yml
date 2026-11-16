@@ -4,7 +4,7 @@
 #   macOS Apple Silicon    PyBI-macOS-arm64.dmg          drag PyBI.app to Applications
 #   macOS Intel            PyBI-macOS-x86_64.dmg
 #   Linux x86_64 / ARM64   PyBI-Linux-<arch>.AppImage    any distro, no install
-#   Debian/Ubuntu/ChromeOS pybi_<ver>_<amd64|arm64>.deb
+#   Debian/Ubuntu/ChromeOS PyBI-Linux-<amd64|arm64>.deb
 #   Every file has a .sha256 that the in-app updater verifies.
 #
 #   Release:     bump the version in pyproject.toml and src/pybi/__init__.py, push to main.
@@ -175,7 +175,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           set -e
-          sudo apt-get install -y ./dist/pybi_*.deb
+          sudo apt-get install -y ./dist/PyBI-Linux-*.deb
           /opt/pybi/runtime/bin/python3 -c "import pybi, sys; print('pybi OK on', sys.version)"
           desktop-file-validate /usr/share/applications/pybi.desktop || true
           # headless launcher: no DISPLAY, so it runs PyBI and prints the address
@@ -227,8 +227,9 @@ jobs:
             | **Windows 10/11** | [PyBI-Setup.exe](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Setup.exe) | Open it, click Next → Next → Install |
             | **Mac with Apple chip** (M1–M4) | [PyBI-macOS-arm64.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-macOS-arm64.dmg) | Open it, drag PyBI to Applications |
             | **Mac with Intel chip** | [PyBI-macOS-x86_64.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-macOS-x86_64.dmg) | Open it, drag PyBI to Applications |
-            | **Chromebook** | `pybi_…_amd64.deb` (most) or `pybi_…_arm64.deb` (ARM) below | Turn on Linux, then double-click the file |
-            | **Ubuntu / Debian** | `pybi_…_amd64.deb` below | Double-click, or `sudo apt install ./pybi_*.deb` |
+            | **Chromebook** (Intel/AMD) | [PyBI-Linux-amd64.deb](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-amd64.deb) | Turn on Linux, then double-click the file |
+            | **Chromebook** (ARM) | [PyBI-Linux-arm64.deb](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-arm64.deb) | Turn on Linux, then double-click the file |
+            | **Ubuntu / Debian** | [PyBI-Linux-amd64.deb](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-amd64.deb) | Double-click, or `sudo apt install ./PyBI-Linux-amd64.deb` |
             | **Any Linux** | [PyBI-Linux-x86_64.AppImage](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-x86_64.AppImage) | Make it executable, double-click |
 
             Every download includes its own Python, so nothing else needs installing. PyBI opens in your browser and updates itself when a new version is released. Each file has a `.sha256` checksum next to it.

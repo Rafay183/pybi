@@ -1,0 +1,161 @@
+CustomerID,Customer,City,Region,Segment
+1001,Ali Traders 1,London,International,Consumer
+1002,Sara Outdoors 2,Peshawar,North,Government
+1003,Usman & Co 3,Peshawar,North,Corporate
+1004,Ayesha Store 4,Dubai,International,Consumer
+1005,Bilal Group 5,Islamabad,North,Small Business
+1006,Fatima Sports 6,Quetta,West,Corporate
+1007,Hamza Cycles 7,Dubai,International,Corporate
+1008,Zainab Enterprises 8,Lahore,Central,Consumer
+1009,Omar Traders 9,Karachi,South,Consumer
+1010,Hira Outdoors 10,Faisalabad,Central,Consumer
+1011,Imran & Co 11,Lahore,Central,Consumer
+1012,Mehwish Store 12,Dubai,International,Small Business
+1013,Ali Group 13,London,International,Corporate
+1014,Sara Sports 14,Karachi,South,Corporate
+1015,Usman Cycles 15,Multan,Central,Consumer
+1016,Ayesha Enterprises 16,Dubai,International,Small Business
+1017,Bilal Traders 17,Hyderabad,South,Consumer
+1018,Fatima Outdoors 18,Quetta,West,Consumer
+1019,Hamza & Co 19,Hyderabad,South,Consumer
+1020,Zainab Store 20,Multan,Central,Consumer
+1021,Omar Group 21,Dubai,International,Government
+1022,Hira Sports 22,Faisalabad,Central,Corporate
+1023,Imran Cycles 23,Faisalabad,Central,Consumer
+1024,Mehwish Enterprises 24,Lahore,Central,Corporate
+1025,Ali Traders 25,Quetta,West,Small Business
+1026,Sara Outdoors 26,Lahore,Central,Consumer
+1027,Usman & Co 27,London,International,Corporate
+1028,Ayesha Store 28,Multan,Central,Corporate
+1029,Bilal Group 29,Multan,Central,Consumer
+1030,Fatima Sports 30,Islamabad,North,Corporate
+1031,Hamza Cycles 31,Islamabad,North,Small Business
+1032,Zainab Enterprises 32,Islamabad,North,Small Business
+1033,Omar Traders 33,Islamabad,North,Consumer
+1034,Hira Outdoors 34,London,International,Government
+1035,Imran & Co 35,Dubai,International,Consumer
+1036,Mehwish Store 36,Quetta,West,Small Business
+1037,Ali Group 37,Quetta,West,Small Business
+1038,Sara Sports 38,Peshawar,North,Consumer
+1039,Usman Cycles 39,Faisalabad,Central,Consumer
+1040,Ayesha Enterprises 40,London,International,Small Business
+1041,Bilal Traders 41,Multan,Central,Consumer
+1042,Fatima Outdoors 42,Lahore,Central,Corporate
+1043,Hamza & Co 43,Dubai,International,Small Business
+1044,Zainab Store 44,Hyderabad,South,Corporate
+1045,Omar Group 45,Dubai,International,Small Business
+1046,Hira Sports 46,Peshawar,North,Consumer
+1047,Imran Cycles 47,Hyderabad,South,Consumer
+1048,Mehwish Enterprises 48,Karachi,South,Consumer
+1049,Ali Traders 49,Multan,Central,Consumer
+1050,Sara Outdoors 50,Karachi,South,Consumer
+1051,Usman & Co 51,Hyderabad,South,Government
+1052,Ayesha Store 52,Islamabad,North,Corporate
+1053,Bilal Group 53,London,International,Consumer
+1054,Fatima Sports 54,Multan,Central,Consumer
+1055,Hamza Cycles 55,Dubai,International,Government
+1056,Zainab Enterprises 56,London,International,Consumer
+1057,Omar Traders 57,Dubai,International,Government
+1058,Hira Outdoors 58,Peshawar,North,Corporate
+1059,Imran & Co 59,Multan,Central,Corporate
+1060,Mehwish Store 60,Islamabad,North,Small Business
+1061,Ali Group 61,Lahore,Central,Small Business
+1062,Sara Sports 62,Multan,Central,Corporate
+1063,Usman Cycles 63,Faisalabad,Central,Consumer
+1064,Ayesha Enterprises 64,Lahore,Central,Small Business
+1065,Bilal Traders 65,London,International,Consumer
+1066,Fatima Outdoors 66,Karachi,South,Government
+1067,Hamza & Co 67,Karachi,South,Consumer
+1068,Zainab Store 68,Hyderabad,South,Consumer
+1069,Omar Group 69,London,International,Corporate
+1070,Hira Sports 70,Peshawar,North,Government
+1071,Imran Cycles 71,Dubai,International,Consumer
+1072,Mehwish Enterprises 72,Lahore,Central,Small Business
+1073,Ali Traders 73,Quetta,West,Corporate
+1074,Sara Outdoors 74,Faisalabad,Central,Small Business
+1075,Usman & Co 75,Multan,Central,Corporate
+1076,Ayesha Store 76,Karachi,South,Government
+1077,Bilal Group 77,Peshawar,North,Consumer
+1078,Fatima Sports 78,Dubai,International,Consumer
+1079,Hamza Cycles 79,Peshawar,North,Consumer
+1080,Zainab Enterprises 80,Hyderabad,South,Consumer
+1081,Omar Traders 81,Islamabad,North,Consumer
+1082,Hira Outdoors 82,Lahore,Central,Small Business
+1083,Imran & Co 83,London,International,Small Business
+1084,Mehwish Store 84,Dubai,International,Consumer
+1085,Ali Group 85,Hyderabad,South,Corporate
+1086,Sara Sports 86,Islamabad,North,Corporate
+1087,Usman Cycles 87,London,International,Corporate
+1088,Ayesha Enterprises 88,Dubai,International,Corporate
+1089,Bilal Traders 89,Quetta,West,Consumer
+1090,Fatima Outdoors 90,Peshawar,North,Government
+1091,Hamza & Co 91,Karachi,South,Corporate
+1092,Zainab Store 92,Quetta,West,Corporate
+1093,Omar Group 93,Multan,Central,Corporate
+1094,Hira Sports 94,Karachi,South,Consumer
+1095,Imran Cycles 95,Lahore,Central,Consumer
+1096,Mehwish Enterprises 96,Islamabad,North,Consumer
+1097,Ali Traders 97,Quetta,West,Small Business
+1098,Sara Outdoors 98,Islamabad,North,Small Business
+1099,Usman & Co 99,Peshawar,North,Small Business
+1100,Ayesha Store 100,Dubai,International,Consumer
+1101,Bilal Group 101,Peshawar,North,Small Business
+1102,Fatima Sports 102,Faisalabad,Central,Small Business
+1103,Hamza Cycles 103,Peshawar,North,Small Business
+1104,Zainab Enterprises 104,Islamabad,North,Corporate
+1105,Omar Traders 105,Hyderabad,South,Small Business
+1106,Hira Outdoors 106,Karachi,South,Consumer
+1107,Imran & Co 107,Peshawar,North,Consumer
+1108,Mehwish Store 108,Faisalabad,Central,Consumer
+1109,Ali Group 109,Islamabad,North,Consumer
+1110,Sara Sports 110,Faisalabad,Central,Consumer
+1111,Usman Cycles 111,Lahore,Central,Consumer
+1112,Ayesha Enterprises 112,Hyderabad,South,Corporate
+1113,Bilal Traders 113,Faisalabad,Central,Consumer
+1114,Fatima Outdoors 114,Dubai,International,Corporate
+1115,Hamza & Co 115,Multan,Central,Consumer
+1116,Zainab Store 116,Faisalabad,Central,Corporate
+1117,Omar Group 117,Islamabad,North,Consumer
+1118,Hira Sports 118,London,International,Consumer
+1119,Imran Cycles 119,Faisalabad,Central,Government
+1120,Mehwish Enterprises 120,Islamabad,North,Corporate
+1121,Ali Traders 121,Multan,Central,Small Business
+1122,Sara Outdoors 122,Peshawar,North,Corporate
+1123,Usman & Co 123,Multan,Central,Corporate
+1124,Ayesha Store 124,Peshawar,North,Consumer
+1125,Bilal Group 125,Islamabad,North,Corporate
+1126,Fatima Sports 126,Peshawar,North,Consumer
+1127,Hamza Cycles 127,London,International,Small Business
+1128,Zainab Enterprises 128,Hyderabad,South,Government
+1129,Omar Traders 129,Islamabad,North,Small Business
+1130,Hira Outdoors 130,Multan,Central,Consumer
+1131,Imran & Co 131,Faisalabad,Central,Consumer
+1132,Mehwish Store 132,Lahore,Central,Consumer
+1133,Ali Group 133,Karachi,South,Consumer
+1134,Sara Sports 134,Multan,Central,Corporate
+1135,Usman Cycles 135,Dubai,International,Small Business
+1136,Ayesha Enterprises 136,Karachi,South,Consumer
+1137,Bilal Traders 137,Multan,Central,Small Business
+1138,Fatima Outdoors 138,London,International,Small Business
+1139,Hamza & Co 139,London,International,Consumer
+1140,Zainab Store 140,Lahore,Central,Small Business
+1141,Omar Group 141,Karachi,South,Small Business
+1142,Hira Sports 142,Peshawar,North,Consumer
+1143,Imran Cycles 143,Karachi,South,Corporate
+1144,Mehwish Enterprises 144,Faisalabad,Central,Corporate
+1145,Ali Traders 145,Multan,Central,Corporate
+1146,Sara Outdoors 146,Dubai,International,Consumer
+1147,Usman & Co 147,Karachi,South,Corporate
+1148,Ayesha Store 148,Peshawar,North,Corporate
+1149,Bilal Group 149,Islamabad,North,Small Business
+1150,Fatima Sports 150,Hyderabad,South,Small Business
+1151,Hamza Cycles 151,Dubai,International,Consumer
+1152,Zainab Enterprises 152,Dubai,International,Small Business
+1153,Omar Traders 153,Multan,Central,Small Business
+1154,Hira Outdoors 154,London,International,Small Business
+1155,Imran & Co 155,Peshawar,North,Consumer
+1156,Mehwish Store 156,London,International,Consumer
+1157,Ali Group 157,London,International,Corporate
+1158,Sara Sports 158,Islamabad,North,Consumer
+1159,Usman Cycles 159,Lahore,Central,Corporate
+1160,Ayesha Enterprises 160,Hyderabad,South,Government

@@ -1,0 +1,17 @@
+ProductID,Product,Category,Subcategory,ListPrice,UnitCost
+1,Trail Bike X1,Bikes,Mountain,1450,820
+2,Road Racer R5,Bikes,Road,1890,1100
+3,City Cruiser,Bikes,Urban,690,380
+4,E-Bike Volt,Bikes,Electric,2650,1650
+5,Kids Sprint,Bikes,Kids,320,170
+6,Pro Helmet,Accessories,Safety,120,48
+7,LED Light Set,Accessories,Safety,45,16
+8,Bottle Cage,Accessories,Gear,18,6
+9,Saddle Bag,Accessories,Gear,55,22
+10,Rider Jersey,Clothing,Tops,75,30
+11,Winter Gloves,Clothing,Gloves,38,14
+12,Cycling Shorts,Clothing,Bottoms,65,26
+13,Rain Jacket,Clothing,Tops,140,62
+14,Tube Repair Kit,Components,Repair,25,9
+15,Carbon Wheelset,Components,Wheels,980,560
+16,Disc Brake Set,Components,Brakes,210,105
