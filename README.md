@@ -33,10 +33,12 @@ No Python needed: every download includes its own Python and libraries, opens Py
 | Windows 10/11 | [`PyBI-Setup.exe`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe) ([zip](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.zip)) | Open it, **Next → Next → Install**. No admin rights. |
 | Mac, Apple chip (M1–M4) | [`PyBI-macOS-arm64.dmg`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg) | Open it, drag **PyBI** to **Applications**. |
 | Mac, Intel chip | [`PyBI-macOS-x86_64.dmg`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg) | Same as above. |
-| Chromebook | One command, no file to download | Turn on **Linux** (Settings → About ChromeOS → Developers), open the **Terminal**, paste `curl -fsSL https://rafay183.github.io/pybi/install.sh \| bash`. PyBI appears in the launcher. ([Step by step](https://rafay183.github.io/pybi/#chromebook)) |
+| Chromebook (all ChromeOS versions, incl. 145+) | One command, no file to download | Turn on **Linux** (Settings → About ChromeOS → Developers), open the **Terminal**, paste `curl -fsSL https://rafay183.github.io/pybi/install.sh \| bash`. PyBI appears in the launcher. ([Step by step](https://rafay183.github.io/pybi/#chromebook)) |
 | Ubuntu, Debian, Mint | [`PyBI-Linux-amd64.deb`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb) · ARM: [`PyBI-Linux-arm64.deb`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-arm64.deb) | Double-click, or run `curl -fsSL https://rafay183.github.io/pybi/install.sh \| bash` |
 | Any other Linux | [`PyBI-Linux-x86_64.AppImage`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-x86_64.AppImage) · ARM: [`PyBI-Linux-aarch64.AppImage`](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-aarch64.AppImage) | `chmod +x PyBI-*.AppImage`, then double-click. |
 
+> **Chromebook note.** ChromeOS 145 and later no longer install `.deb` files by double-clicking ("Debian package is no longer supported"). Use the one-line Terminal command above; it works on every ChromeOS version and on Intel/AMD and ARM Chromebooks.
+>
 > **First launch.** Windows may say *"Windows protected your PC"*: click **More info → Run anyway**. On a Mac, if PyBI "cannot be opened", go to **System Settings → Privacy & Security** and click **Open Anyway**. Not sure which Mac you have? Apple menu → **About This Mac** shows *Chip: Apple M…* or *Processor: Intel*.
 
 ([How the apps are built and updated](installer/README.md) · [All versions](https://github.com/rafay183/pybi/releases))
