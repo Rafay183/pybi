@@ -255,6 +255,23 @@ def _manual(downloaded: Path) -> tuple[str, Path]:
         return "manual", downloaded
 
 
+def _can_sudo() -> bool:
+    """True when sudo works without a password prompt (default in ChromeOS's Linux)."""
+    try:
+        return subprocess.run(["sudo", "-n", "true"], capture_output=True, timeout=10).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+def install_deb(deb: Path, log_dir: Path) -> bool:
+    os.chmod(deb, 0o644)  # apt's sandbox user must be able to read it
+    env = dict(os.environ, DEBIAN_FRONTEND="noninteractive")
+    with open(log_dir / "update-install.log", "a", encoding="utf-8") as logf:
+        r = subprocess.run(["sudo", "-n", "apt-get", "install", "-y", str(deb)],
+                           stdout=logf, stderr=subprocess.STDOUT, env=env, timeout=900)
+    return r.returncode == 0
+
+
 def apply_update(downloaded: Path, cfg: Config, log_dir: Path) -> tuple[str, Path]:
     """Install a downloaded update. Returns ("restart", path) when this launcher must now exit,
     or ("manual", path) when the user has to open the file (deb packages, read-only installs)."""
@@ -282,4 +299,11 @@ def apply_update(downloaded: Path, cfg: Config, log_dir: Path) -> tuple[str, Pat
             return "manual", downloaded
         _relaunch_later(["/usr/bin/open", "-n", str(bundle)])
         return "restart", bundle
+    if kind == "deb" and _can_sudo():
+        try:
+            if install_deb(downloaded, log_dir):
+                _relaunch_later(["/usr/bin/pybi-desktop"])
+                return "restart", downloaded
+        except (OSError, subprocess.SubprocessError):
+            log.exception("apt install of the update failed")
     return _manual(downloaded)

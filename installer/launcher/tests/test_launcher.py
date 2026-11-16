@@ -303,6 +303,7 @@ def test_deb_update_goes_to_downloads(isolated, monkeypatch):
     monkeypatch.setattr(Path, "home", classmethod(lambda cls: isolated / "home"))
     f = isolated / "1.3.0-PyBI-Linux-amd64.deb"
     f.write_bytes(b"deb")
+    monkeypatch.setattr(U, "_can_sudo", lambda: False)
     result, where = U.apply_update(f, C.Config(install_kind="deb"), isolated)
     assert result == "manual" and where == isolated / "home" / "Downloads" / "PyBI-Linux-amd64.deb"
     assert where.read_bytes() == b"deb"
@@ -339,3 +340,18 @@ def test_stop_kills_child_processes(isolated, monkeypatch):
             except ProcessLookupError:
                 return False
     assert not alive(child)
+
+
+def test_deb_update_installs_itself_with_passwordless_sudo(isolated, monkeypatch):
+    f = isolated / "1.3.0-PyBI-Linux-amd64.deb"
+    f.write_bytes(b"deb")
+    calls, launched = [], []
+    monkeypatch.setattr(U, "_can_sudo", lambda: True)
+    monkeypatch.setattr(U, "install_deb", lambda deb, log_dir: calls.append(deb) or True)
+    monkeypatch.setattr(U, "_relaunch_later", lambda argv: launched.append(argv))
+    result, _ = U.apply_update(f, C.Config(install_kind="deb"), isolated)
+    assert result == "restart" and calls == [f] and launched == [["/usr/bin/pybi-desktop"]]
+    # apt failing falls back to the manual route
+    monkeypatch.setattr(U, "install_deb", lambda deb, log_dir: False)
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: isolated / "home"))
+    assert U.apply_update(f, C.Config(install_kind="deb"), isolated)[0] == "manual"

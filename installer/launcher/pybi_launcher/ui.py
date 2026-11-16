@@ -370,7 +370,8 @@ class LauncherApp:
             where = a[0]
             self.progress.stop()
             self.progress.pack_forget()
-            hint = ("Double-click it to install (on a Chromebook: right-click → Install with Linux)."
+            hint = ("To install it, open the Terminal and run:\n"
+                    "curl -fsSL https://rafay183.github.io/pybi/install.sh | bash"
                     if str(where).endswith(".deb") else "Open it to finish the update.")
             self.banner_text.config(text=f"PyBI {self.release.version} is downloaded to\n{where}\n{hint}")
             for w in self.banner_btns.winfo_children():

@@ -301,7 +301,7 @@ footer.site p{color:var(--muted); margin:6px 0}
 <div class="layout">
 <aside class="side" id="sidebar" aria-label="Documentation">
   <div class="group"><p class="gtitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Getting started</p>
-    <a href="#overview">Introduction</a><a href="#download">Download the app</a><a href="#pip">Install with pip</a><a href="#quickstart">Quickstart</a><a href="#tour">Tour of the studio</a>
+    <a href="#overview">Introduction</a><a href="#download">Download the app</a><a href="#chromebook">Install on a Chromebook</a><a href="#pip">Install with pip</a><a href="#quickstart">Quickstart</a><a href="#tour">Tour of the studio</a>
   </div>
   <div class="group"><p class="gtitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Learn BI step by step</p>
     <div class="course"><b>Your course progress</b><div class="bar"><i id="sideFill"></i></div><small id="sideLabel">0 of 12 steps done</small></div>
@@ -325,7 +325,7 @@ footer.site p{color:var(--muted); margin:6px 0}
       <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe"><b>Windows</b><span>10 / 11 · .exe</span></a>
       <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg"><b>Mac · Apple chip</b><span>M1–M4 · .dmg</span></a>
       <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg"><b>Mac · Intel</b><span>.dmg</span></a>
-      <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb"><b>Chromebook</b><span>.deb</span></a>
+      <a href="#chromebook"><b>Chromebook</b><span>1 command in Linux</span></a>
       <a class="alt" href="#download"><b>Linux &amp; more</b><span>AppImage, .deb, pip</span></a>
     </div>
     <div class="meta"><span><b>Free</b> · MIT licence</span><span><b>214</b> connectors</span><span><b>25</b> visuals</span><span>Windows · macOS · Linux · ChromeOS</span></div>
@@ -348,7 +348,7 @@ footer.site p{color:var(--muted); margin:6px 0}
     <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe"><b>Windows</b><span>10 / 11 · .exe installer</span></a>
     <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg"><b>Mac · Apple chip</b><span>M1–M4 · .dmg</span></a>
     <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg"><b>Mac · Intel</b><span>.dmg</span></a>
-    <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb"><b>Chromebook</b><span>Intel / AMD · .deb</span></a>
+    <a class="dl" href="#chromebook"><b>Chromebook</b><span>1 command in Linux</span></a>
     <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb"><b>Ubuntu / Debian</b><span>.deb package</span></a>
     <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-x86_64.AppImage"><b>Any Linux</b><span>.AppImage</span></a>
   </div>
@@ -358,11 +358,24 @@ footer.site p{color:var(--muted); margin:6px 0}
     <tbody>
       <tr><td><b>Windows</b></td><td>Open <code>PyBI-Setup.exe</code> and click <b>Next → Next → Install</b>. No admin rights needed. If Windows says "Windows protected your PC", click <b>More info → Run anyway</b>.</td></tr>
       <tr><td><b>Mac</b></td><td>Open the <code>.dmg</code> and drag <b>PyBI</b> to <b>Applications</b>. The first time, if the Mac says PyBI "cannot be opened", go to <b>System Settings → Privacy &amp; Security → Open Anyway</b>. Apple menu → <b>About This Mac</b> shows whether you have an Apple chip or Intel.</td></tr>
-      <tr><td><b>Chromebook</b></td><td>Turn on Linux in <b>Settings → Advanced → Developers → Linux development environment</b>. Open the downloaded <code>.deb</code> in the Files app and choose <b>Install</b>. PyBI appears in your app launcher.</td></tr>
-      <tr><td><b>Ubuntu / Debian / Mint</b></td><td>Double-click the <code>.deb</code>, or run <code>sudo apt install ./PyBI-Linux-amd64.deb</code>. Start it from your app menu or with <code>pybi-desktop</code>.</td></tr>
+      <tr><td><b>Chromebook</b></td><td>Turn on Linux, then paste one command into the Terminal. <a href="#chromebook">Step-by-step below</a>.</td></tr>
+      <tr><td><b>Ubuntu / Debian / Mint</b></td><td>Run <code>curl -fsSL https://rafay183.github.io/pybi/install.sh | bash</code>, or double-click the downloaded <code>.deb</code>. Start it from your app menu or with <code>pybi-desktop</code>.</td></tr>
       <tr><td><b>Other Linux</b></td><td>Run <code>chmod +x PyBI-Linux-x86_64.AppImage</code>, then double-click it.</td></tr>
     </tbody>
   </table></div>
+
+  <h3 id="chromebook">Install on a Chromebook</h3>
+  <p>PyBI runs in your Chromebook's built-in Linux. Recent ChromeOS versions no longer install <code>.deb</code> files by double-clicking, so use this one command instead. It picks the right version for Intel/AMD or ARM Chromebooks, checks the download and installs it.</p>
+  <ol class="steps-list">
+    <li><b>Turn on Linux (one time):</b> Settings → <b>About ChromeOS</b> → <b>Developers</b> → <b>Linux development environment</b> → <b>Turn on</b>. Accept the defaults and wait a few minutes. On older ChromeOS it is under Settings → Advanced → Developers.</li>
+    <li><b>Open the Terminal:</b> open the app launcher, search for <b>Terminal</b>, and click <b>penguin</b>.</li>
+    <li><b>Paste this command</b> (Ctrl+Shift+V in the Terminal) and press Enter:</li>
+  </ol>
+  <div class="code" data-lang="bash"><pre><code>curl -fsSL https://rafay183.github.io/pybi/install.sh | bash</code></pre></div>
+  <ol class="steps-list" start="4">
+    <li><b>Open PyBI:</b> search for <b>PyBI</b> in the app launcher (it is in the <b>Linux apps</b> folder). It opens in Chrome.</li>
+  </ol>
+  <p>To update later, PyBI installs new versions by itself, or you can run the same command again. School or work Chromebooks may have Linux turned off by the administrator; then ask them to allow it, or use PyBI on another computer and open its <a href="#share">network link</a> in Chrome.</p>
   <div class="callout"><div><p class="t">What the app does</p><p>A small PyBI window shows the status, with <b>Open PyBI</b>, <b>Restart</b> and <b>Stop</b>. Your projects live in <code>Documents/PyBI</code>. When a new version is out, the window offers <b>Update now</b>, verifies the download and keeps your projects and settings.</p></div></div>
 </section>
 
@@ -385,7 +398,7 @@ pip install "pybi-ray[all]"</code></pre></div>
   <p class="eyebrow">Getting started</p>
   <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span>Quickstart in 2 minutes</h2>
   <ol class="steps-list">
-    <li>Open PyBI (the app, or <code>pybi run</code>). The studio opens in your browser.</li>
+    <li>Open PyBI (the <a href="#download">desktop app</a>, or <code>pybi run</code>). The studio opens in your browser.</li>
     <li>In the ribbon, click <b>Data → Sample</b>. PyBI loads a demo dataset and a 3-page dashboard.</li>
     <li>Click any bar or slice: every other visual filters to it. Ctrl+click to select several.</li>
     <li>Type a question in the <b>Ask your data</b> box at the top, for example <code>top 5 products by profit as bar</code>, and press Enter.</li>
@@ -858,7 +871,8 @@ pybi.run(Sales=sales, Products=products)   # opens the studio with these tables<
   <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM5.6 5.6l3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></svg></span>Troubleshooting</h2>
   <details><summary>Windows: "Windows protected your PC"</summary><p>The installer is not code-signed yet. Click <b>More info → Run anyway</b>.</p></details>
   <details><summary>Mac: "PyBI cannot be opened" or "Apple could not verify"</summary><p>Open <b>System Settings → Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>. You only need to do this once.</p></details>
-  <details><summary>Chromebook: the .deb does not install</summary><p>Turn on Linux first (Settings → Advanced → Developers → Linux development environment), then open the file from the Files app. ARM Chromebooks need the ARM64 file.</p></details>
+  <details><summary>Chromebook: "Debian package is no longer supported" or the .deb does not install</summary><p>Recent ChromeOS versions removed installing <code>.deb</code> files from the Files app. Install with one command in the Linux Terminal instead: <code>curl -fsSL https://rafay183.github.io/pybi/install.sh | bash</code>. See <a href="#chromebook">Install on a Chromebook</a>.</p></details>
+  <details><summary>Chromebook: PyBI opened but Chrome cannot reach the page</summary><p>Open <code>http://penguin.linux.test:8050</code> in Chrome instead of 127.0.0.1. If it still does not load, add port 8050 under Settings → Developers → Linux → <b>Port forwarding</b>.</p></details>
   <details><summary>Linux: the AppImage does not start</summary><p>Make it executable with <code>chmod +x</code>. On very old systems, use the .deb instead.</p></details>
   <details><summary>Colleagues cannot open the Share link</summary><p>They must be on the same network, and your firewall must allow PyBI. Guest Wi-Fi often blocks device-to-device traffic. If you started with <code>--private</code>, sharing is off.</p></details>
   <details><summary>A chart shows the same number on every bar</summary><p>The table you group by is not related to the fact table. Check Model view and add the relationship; both key columns need the same type.</p></details>

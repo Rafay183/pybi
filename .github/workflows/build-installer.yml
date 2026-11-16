@@ -227,9 +227,8 @@ jobs:
             | **Windows 10/11** | [PyBI-Setup.exe](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Setup.exe) | Open it, click Next → Next → Install |
             | **Mac with Apple chip** (M1–M4) | [PyBI-macOS-arm64.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-macOS-arm64.dmg) | Open it, drag PyBI to Applications |
             | **Mac with Intel chip** | [PyBI-macOS-x86_64.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-macOS-x86_64.dmg) | Open it, drag PyBI to Applications |
-            | **Chromebook** (Intel/AMD) | [PyBI-Linux-amd64.deb](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-amd64.deb) | Turn on Linux, then double-click the file |
-            | **Chromebook** (ARM) | [PyBI-Linux-arm64.deb](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-arm64.deb) | Turn on Linux, then double-click the file |
-            | **Ubuntu / Debian** | [PyBI-Linux-amd64.deb](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-amd64.deb) | Double-click, or `sudo apt install ./PyBI-Linux-amd64.deb` |
+            | **Chromebook** | One command, no download | Turn on Linux, open the Terminal and run `curl -fsSL https://rafay183.github.io/pybi/install.sh \| bash` ([steps](https://rafay183.github.io/pybi/#chromebook)) |
+            | **Ubuntu / Debian** | [PyBI-Linux-amd64.deb](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-amd64.deb) | Double-click, or `curl -fsSL https://rafay183.github.io/pybi/install.sh \| bash` |
             | **Any Linux** | [PyBI-Linux-x86_64.AppImage](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-x86_64.AppImage) | Make it executable, double-click |
 
             Every download includes its own Python, so nothing else needs installing. PyBI opens in your browser and updates itself when a new version is released. Each file has a `.sha256` checksum next to it.
