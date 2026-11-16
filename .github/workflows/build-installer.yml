@@ -1,38 +1,75 @@
-# Builds the Windows installer and publishes it to GitHub Releases.
+# Builds the PyBI desktop apps for every platform and publishes them to GitHub Releases.
 #
-#   Release:     bump the version in pyproject.toml and push to main. If no GitHub
-#                release exists for that version yet, this workflow builds the installer
-#                and publishes release vX.Y.Z with it. Pushing a tag vX.Y.Z works too.
-#   Test build:  any other branch push that changes installer/** (artifact only),
-#                or Actions tab → "Windows installer" → Run workflow
+#   Windows x64            PyBI-Setup.exe (+ .zip)       Inno Setup wizard, no admin rights
+#   macOS Apple Silicon    PyBI-macOS-arm64.dmg          drag PyBI.app to Applications
+#   macOS Intel            PyBI-macOS-x86_64.dmg
+#   Linux x86_64 / ARM64   PyBI-Linux-<arch>.AppImage    any distro, no install
+#   Debian/Ubuntu/ChromeOS pybi_<ver>_<amd64|arm64>.deb
+#   Every file has a .sha256 that the in-app updater verifies.
 #
-# Every installed PyBI checks this repo's Releases and offers the update to its users.
-# Tags with a pre-release label (v1.3.0rc1, v1.3.0-beta.1) become GitHub pre-releases,
-# which only reach users who opted in to pre-releases.
+#   Release:     bump the version in pyproject.toml and src/pybi/__init__.py, push to main.
+#                If no GitHub release exists for that version yet, everything is built,
+#                smoke-tested and published as release vX.Y.Z. Pushing a tag vX.Y.Z works too.
+#   Test build:  any other branch push that changes installer/** (artifacts only),
+#                or Actions tab → "Desktop apps" → Run workflow.
 
-name: Windows installer
+name: Desktop apps
 
 on:
   push:
     tags: ["v*"]
-    branches: ["**"]          # branch pushes: test build only, when installer files change
+    branches: ["**"]
     paths: ["installer/**", ".github/workflows/build-installer.yml", "pyproject.toml", "src/pybi/__init__.py"]
   workflow_dispatch:
     inputs:
       version:
-        description: "Version for a test build, e.g. 1.2.0 (leave empty for 0.0.0-dev)"
+        description: "Version for a test build, e.g. 1.2.0 (leave empty for <current>-dev)"
         required: false
 
 permissions:
   contents: write
 
 concurrency:
-  group: installer-${{ github.ref }}
+  group: desktop-apps-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      mode: ${{ steps.v.outputs.mode }}
+      prerelease: ${{ steps.v.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve version and mode
+        id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          pkg=$(grep -m1 -E '^\s*version\s*=\s*"' pyproject.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          mode=test
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            v="${GITHUB_REF_NAME#[vV]}"; mode=release
+            [ "$v" = "$pkg" ] || echo "::warning::Tag is $v but pyproject.toml says $pkg."
+          elif [ "$GITHUB_REF" = refs/heads/main ] && ! gh release view "v$pkg" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            v="$pkg"; mode=release            # new version on main: publish it
+          elif [ -n "$INPUT_VERSION" ]; then
+            v="$INPUT_VERSION"
+          else
+            v="$pkg-dev.$GITHUB_RUN_NUMBER"
+          fi
+          if echo "$v" | grep -qiE '(a|b|rc|alpha|beta|dev|pre|preview)[-_.]?[0-9]*$|-'; then pre=true; else pre=false; fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"; echo "mode=$mode" >> "$GITHUB_OUTPUT"; echo "prerelease=$pre" >> "$GITHUB_OUTPUT"
+          echo "Version $v  mode $mode  prerelease $pre"
+
   launcher-tests:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-14, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,52 +78,17 @@ jobs:
       - run: python -m pip install --disable-pip-version-check pytest
       - run: python -m pytest -q installer/launcher/tests
 
-  build:
-    needs: launcher-tests
+  windows:
+    needs: [meta, launcher-tests]
     runs-on: windows-latest
     env:
       HAS_CERT: ${{ secrets.WINDOWS_CERT_PFX_BASE64 != '' }}
+      VERSION: ${{ needs.meta.outputs.version }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Resolve version and mode
-        id: v
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          $pkg = (Select-String -Path pyproject.toml -Pattern '^\s*version\s*=\s*"([^"]+)"' | Select-Object -First 1).Matches[0].Groups[1].Value
-          $mode = 'test'
-          if ($env:GITHUB_REF_TYPE -eq 'tag') {
-            $v = $env:GITHUB_REF_NAME -replace '^[vV]', ''; $mode = 'release'
-          } elseif ($env:GITHUB_REF -eq 'refs/heads/main') {
-            gh release view "v$pkg" --repo $env:GITHUB_REPOSITORY *> $null
-            if ($LASTEXITCODE -ne 0) { $v = $pkg; $mode = 'release' }   # new version on main: publish it
-            else { $v = "$pkg-dev.${{ github.run_number }}" }
-            $global:LASTEXITCODE = 0
-          } elseif ('${{ inputs.version }}') { $v = '${{ inputs.version }}' }
-          else { $v = "$pkg-dev.${{ github.run_number }}" }
-          $pre = if ($v -match '(?i)(a|b|rc|alpha|beta|dev|pre|preview)[-_.]?\d*$|-') { 'true' } else { 'false' }
-          "version=$v" >> $env:GITHUB_OUTPUT
-          "mode=$mode" >> $env:GITHUB_OUTPUT
-          "prerelease=$pre" >> $env:GITHUB_OUTPUT
-          Write-Host "Version $v  mode $mode  prerelease $pre"
-
-      - name: Check tag matches the package version
-        if: github.ref_type == 'tag'
-        shell: pwsh
-        run: |
-          $v = '${{ steps.v.outputs.version }}'
-          if (Test-Path pyproject.toml) {
-            $m = Select-String -Path pyproject.toml -Pattern '^\s*version\s*=\s*"([^"]+)"' | Select-Object -First 1
-            if ($m -and $m.Matches[0].Groups[1].Value -ne $v) {
-              Write-Host "::warning::Tag is $v but pyproject.toml says $($m.Matches[0].Groups[1].Value). Bump pyproject.toml before tagging."
-            }
-          }
 
       - name: Decode signing certificate
         if: env.HAS_CERT == 'true'
@@ -100,7 +102,7 @@ jobs:
         shell: pwsh
         env:
           PYBI_SIGN_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
-        run: ./installer/scripts/build.ps1 -Version '${{ steps.v.outputs.version }}' -Repo '${{ github.repository }}'
+        run: ./installer/scripts/build.ps1 -Version $env:VERSION -Repo '${{ github.repository }}'
 
       - name: Smoke test (silent install, import, uninstall)
         shell: pwsh
@@ -120,34 +122,117 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PyBI-Setup-${{ steps.v.outputs.version }}
+          name: build-Windows-x64
           path: |
             dist/PyBI-Setup.exe
             dist/PyBI-Setup.exe.sha256
             dist/PyBI-Setup.zip
 
+  unix:
+    needs: [meta, launcher-tests]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: macOS-arm64,   os: macos-14,         optional: false }
+          - { name: macOS-x86_64,  os: macos-15-intel,   optional: true }
+          - { name: Linux-x86_64,  os: ubuntu-22.04,     optional: false }
+          - { name: Linux-aarch64, os: ubuntu-22.04-arm, optional: true }
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.optional }}
+    timeout-minutes: 45
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build
+        run: bash installer/scripts/build_unix.sh --version "$VERSION" --repo "$GITHUB_REPOSITORY"
+
+      - name: Smoke test (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          set -e
+          mnt=$(mktemp -d)
+          hdiutil attach -nobrowse -readonly -mountpoint "$mnt" dist/PyBI-*.dmg
+          cp -R "$mnt/PyBI.app" /tmp/PyBI.app
+          hdiutil detach "$mnt"
+          codesign --verify --deep --strict /tmp/PyBI.app
+          /tmp/PyBI.app/Contents/MacOS/PyBI --version
+          cat /tmp/PyBI.app/Contents/Resources/launcher.json
+          RT=/tmp/PyBI.app/Contents/Resources/runtime/bin/python3
+          "$RT" -c "import pybi, sys; print('pybi OK on', sys.version)"
+          "$RT" -m pybi run --port 8765 --no-browser --private > /tmp/srv.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS -o /dev/null http://127.0.0.1:8765/ && break; sleep 1; done
+          curl -fsS -o /dev/null -w "studio HTTP %{http_code}\n" http://127.0.0.1:8765/ || { cat /tmp/srv.log; exit 1; }
+          kill %1 || true
+
+      - name: Smoke test (Linux .deb + AppImage)
+        if: runner.os == 'Linux'
+        run: |
+          set -e
+          sudo apt-get install -y ./dist/pybi_*.deb
+          /opt/pybi/runtime/bin/python3 -c "import pybi, sys; print('pybi OK on', sys.version)"
+          desktop-file-validate /usr/share/applications/pybi.desktop || true
+          # headless launcher: no DISPLAY, so it runs PyBI and prints the address
+          env -u DISPLAY timeout 90 pybi-desktop --no-browser > /tmp/launch.log 2>&1 &
+          for i in $(seq 1 60); do grep -q "running at" /tmp/launch.log && break; sleep 1; done
+          cat /tmp/launch.log
+          url=$(grep -oE 'http://[0-9.:]+/' /tmp/launch.log | head -1)
+          curl -fsS -o /dev/null -w "studio HTTP %{http_code}\n" "$url"
+          pkill -TERM -f /opt/pybi/launcher/main.py; sleep 3
+          ! pgrep -f "pybi run" || { echo "server left running"; exit 1; }
+          sudo apt-get remove -y pybi
+          chmod +x dist/PyBI-*.AppImage
+          APPIMAGE_EXTRACT_AND_RUN=1 ./dist/PyBI-*.AppImage --version
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+          path: dist/*
+
+  publish:
+    needs: [meta, windows, unix]
+    if: always() && needs.meta.outputs.mode == 'release' && needs.windows.result == 'success' && needs.unix.result == 'success'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: build-*
+          path: dist
+          merge-multiple: true
+      - run: ls -lh dist
       - name: Publish to GitHub Releases
-        if: steps.v.outputs.mode == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.v.outputs.version }}
+          tag_name: v${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
-          name: PyBI ${{ steps.v.outputs.version }}
-          prerelease: ${{ steps.v.outputs.prerelease == 'true' }}
-          make_latest: ${{ steps.v.outputs.prerelease != 'true' }}
+          name: PyBI ${{ env.VERSION }}
+          prerelease: ${{ needs.meta.outputs.prerelease == 'true' }}
+          make_latest: ${{ needs.meta.outputs.prerelease != 'true' }}
           generate_release_notes: true
-          fail_on_unmatched_files: true
+          fail_on_unmatched_files: false
+          files: dist/*
           body: |
-            ## Download for Windows
+            ## Download PyBI
 
-            **[PyBI-Setup.exe](https://github.com/${{ github.repository }}/releases/download/v${{ steps.v.outputs.version }}/PyBI-Setup.exe)** · Windows 10/11, 64-bit · no Python or admin rights needed
+            | Your computer | Download | How to install |
+            |---|---|---|
+            | **Windows 10/11** | [PyBI-Setup.exe](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Setup.exe) | Open it, click Next → Next → Install |
+            | **Mac with Apple chip** (M1–M4) | [PyBI-macOS-arm64.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-macOS-arm64.dmg) | Open it, drag PyBI to Applications |
+            | **Mac with Intel chip** | [PyBI-macOS-x86_64.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-macOS-x86_64.dmg) | Open it, drag PyBI to Applications |
+            | **Chromebook** | `pybi_…_amd64.deb` (most) or `pybi_…_arm64.deb` (ARM) below | Turn on Linux, then double-click the file |
+            | **Ubuntu / Debian** | `pybi_…_amd64.deb` below | Double-click, or `sudo apt install ./pybi_*.deb` |
+            | **Any Linux** | [PyBI-Linux-x86_64.AppImage](https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/PyBI-Linux-x86_64.AppImage) | Make it executable, double-click |
 
-            Open it and click **Next → Next → Install**, then start PyBI from the ر icon on your desktop. Already installed? PyBI offers this update by itself.
+            Every download includes its own Python, so nothing else needs installing. PyBI opens in your browser and updates itself when a new version is released. Each file has a `.sha256` checksum next to it.
 
-            `PyBI-Setup.zip` contains the same installer plus its SHA-256 checksum. If Windows shows "Windows protected your PC", click **More info → Run anyway**.
+            **First launch:** Windows may say "Windows protected your PC": click **More info → Run anyway**. On a Mac, if it says PyBI "cannot be opened", go to **System Settings → Privacy & Security → Open Anyway**.
 
             Python users: `pip install --upgrade pybi-ray`
-          files: |
-            dist/PyBI-Setup.exe
-            dist/PyBI-Setup.exe.sha256
-            dist/PyBI-Setup.zip

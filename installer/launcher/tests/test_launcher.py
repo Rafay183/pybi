@@ -248,3 +248,85 @@ def test_single_instance():
         time.sleep(0.05)
     assert hits == [1]
     a.release()
+
+
+# ---------------- cross-platform updates ----------------
+def test_install_kind_detection(monkeypatch):
+    monkeypatch.delenv("APPIMAGE", raising=False)
+    assert C.detect_install_kind() in ("source", "inno")
+    if C.IS_LINUX:
+        monkeypatch.setenv("APPIMAGE", "/tmp/PyBI.AppImage")
+        assert C.detect_install_kind() == "appimage"
+        monkeypatch.delenv("APPIMAGE")
+        monkeypatch.setenv("PYBI_APP_DIR", "/opt/pybi")
+        assert C.detect_install_kind() == "deb"
+
+
+def test_pick_release_per_platform():
+    assets = ("PyBI-Setup.exe", "PyBI-Setup.exe.sha256", "PyBI-macOS-arm64.dmg", "PyBI-macOS-arm64.dmg.sha256",
+              "PyBI-Linux-x86_64.AppImage", "PyBI-Linux-x86_64.AppImage.sha256",
+              "pybi_1.2.0_amd64.deb", "pybi_1.2.0_amd64.deb.sha256")
+    payload = [_rel("v1.2.0", assets=assets)]
+    for pattern, name in ((r"^PyBI-Setup.*\.exe$", "PyBI-Setup.exe"),
+                          (r"^PyBI-macOS-arm64\.dmg$", "PyBI-macOS-arm64.dmg"),
+                          (r"^PyBI-Linux-x86_64\.AppImage$", "PyBI-Linux-x86_64.AppImage"),
+                          (r"^pybi_.*_amd64\.deb$", "pybi_1.2.0_amd64.deb")):
+        r = U.pick_release(payload, pattern, False)
+        assert r.asset_name == name and r.sha256_url.endswith(name + ".sha256")
+
+
+@pytest.mark.skipif(not C.IS_LINUX, reason="AppImage is Linux only")
+def test_appimage_self_replace(isolated, monkeypatch):
+    target = isolated / "PyBI-Linux-x86_64.AppImage"
+    target.write_bytes(b"old")
+    new = isolated / "1.3.0-PyBI-Linux-x86_64.AppImage"
+    new.write_bytes(b"new version")
+    monkeypatch.setenv("APPIMAGE", str(target))
+    launched = []
+    monkeypatch.setattr(U, "_relaunch_later", lambda argv: launched.append(argv))
+    result, where = U.apply_update(new, C.Config(install_kind="appimage"), isolated)
+    assert result == "restart" and target.read_bytes() == b"new version"
+    assert os.access(target, os.X_OK) and launched == [[str(target)]]
+
+
+def test_deb_update_goes_to_downloads(isolated, monkeypatch):
+    monkeypatch.setenv("HOME", str(isolated / "home"))
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: isolated / "home"))
+    f = isolated / "1.3.0-pybi_1.3.0_amd64.deb"
+    f.write_bytes(b"deb")
+    result, where = U.apply_update(f, C.Config(install_kind="deb"), isolated)
+    assert result == "manual" and where == isolated / "home" / "Downloads" / "pybi_1.3.0_amd64.deb"
+    assert where.read_bytes() == b"deb"
+
+
+@pytest.mark.skipif(C.IS_WINDOWS, reason="process groups are POSIX")
+def test_stop_kills_child_processes(isolated, monkeypatch):
+    monkeypatch.setenv("PYBI_PYTHON", sys.executable)
+    ws = C.workspace_dir()
+    (ws / "pybi").mkdir()
+    (ws / "pybi" / "__init__.py").write_text("")
+    (ws / "pybi" / "__main__.py").write_text(textwrap.dedent('''
+        import subprocess, sys, os
+        child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+        open(os.path.join(os.getcwd(), "child.pid"), "w").write(str(child.pid))
+    ''') + FAKE_PYBI)
+    srv = S.Server(C.Config(port=18090, start_timeout=20))
+    srv.start()
+    srv.wait_ready()
+    child = int((ws / "child.pid").read_text())
+    srv.stop()
+    time.sleep(0.5)
+
+    def alive(pid):  # a killed child may linger as an unreaped zombie in containers
+        try:
+            with open(f"/proc/{pid}/status") as f:
+                return "\tZ" not in next(line for line in f if line.startswith("State:"))
+        except FileNotFoundError:
+            return False
+        except OSError:
+            try:
+                os.kill(pid, 0)
+                return True
+            except ProcessLookupError:
+                return False
+    assert not alive(child)
