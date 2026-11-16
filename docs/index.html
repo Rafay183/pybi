@@ -1061,9 +1061,10 @@ pybi demo</code></pre></div>
     results = !q ? index.filter(function(it){ return it.where === "Section"; }) : index.map(function(it){
       var t = it.title.toLowerCase(), score = 0;
       for(var i = 0; i < words.length; i++){
-        if(t.indexOf(words[i]) !== -1) score += 3; else if(it.text.indexOf(words[i]) !== -1) score += 1; else return null;
+        var hits = it.text.split(words[i]).length - 1;
+        if(t.indexOf(words[i]) !== -1) score += 5; else if(hits) score += 1 + Math.min(hits, 6) * 0.3; else return null;
       }
-      return { it: it, score: score + (it.where === "Section" ? 0.5 : 0) };
+      return { it: it, score: score - (it.where === "Section" ? 1.5 : 0) };
     }).filter(Boolean).sort(function(a, b){ return b.score - a.score; }).map(function(r){ return r.it; });
     results = results.slice(0, 40); sel = 0;
     list.innerHTML = results.length ? results.map(function(it, i){
