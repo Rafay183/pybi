@@ -16,15 +16,15 @@ pybi demo         # opens with a ready-made 3-page sales dashboard
 
 ### Download the desktop app
 
-[![Windows](https://img.shields.io/badge/Windows-0a6c6c?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe)
-[![macOS Apple chip](https://img.shields.io/badge/macOS%20Apple%20chip-0a6c6c?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg)
-[![macOS Intel](https://img.shields.io/badge/macOS%20Intel-0a6c6c?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg)
-[![Chromebook](https://img.shields.io/badge/Chromebook-0a6c6c?style=for-the-badge&logo=googlechrome&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb)
-[![Linux AppImage](https://img.shields.io/badge/Linux%20AppImage-0a6c6c?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-x86_64.AppImage)
-[![Ubuntu Debian](https://img.shields.io/badge/Ubuntu%20Debian-0a6c6c?style=for-the-badge&logo=ubuntu&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb)
+[![Download PyBI for Windows](https://img.shields.io/badge/Download-PyBI%20for%20Windows-0a6c6c?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe)
+[![Download PyBI for macOS (Apple chip)](https://img.shields.io/badge/Download-PyBI%20for%20macOS%20%28Apple%20chip%29-0a6c6c?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg)
+[![Download PyBI for macOS (Intel)](https://img.shields.io/badge/Download-PyBI%20for%20macOS%20%28Intel%29-0a6c6c?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg)
+[![Download PyBI for Chromebook](https://img.shields.io/badge/Download-PyBI%20for%20Chromebook-0a6c6c?style=for-the-badge&logo=googlechrome&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb)
+[![Download PyBI for Linux](https://img.shields.io/badge/Download-PyBI%20for%20Linux-0a6c6c?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-x86_64.AppImage)
+[![Download PyBI for Ubuntu, Debian](https://img.shields.io/badge/Download-PyBI%20for%20Ubuntu%2C%20Debian-0a6c6c?style=for-the-badge&logo=ubuntu&logoColor=white)](https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb)
 
-[![Latest release](https://img.shields.io/github/v/release/rafay183/pybi?style=flat-square&label=version&color=d99a00)](https://github.com/rafay183/pybi/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/rafay183/pybi/total?style=flat-square&color=555)](https://github.com/rafay183/pybi/releases)
+[![Latest release](https://img.shields.io/github/v/release/rafay183/pybi?style=for-the-badge&label=version&color=d99a00)](https://github.com/rafay183/pybi/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/rafay183/pybi/total?style=for-the-badge&color=555)](https://github.com/rafay183/pybi/releases)
 
 No Python needed: every download includes its own Python and libraries, opens PyBI in your browser from the ر icon, and updates itself when a new version is released.
 
