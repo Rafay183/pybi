@@ -8,293 +8,341 @@
 <meta property="og:title" content="PyBI Documentation">
 <meta property="og:description" content="Open-source business intelligence studio: get data, model, DAX measures, interactive dashboards. Free for Windows, Mac, Chromebook and Linux.">
 <meta property="og:image" content="https://rafay183.github.io/pybi/images/dashboard.png">
+<meta name="theme-color" content="#0a6c6c">
 <link rel="icon" href="images/pybi-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("pybi-theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <style>
-/* Layout: sticky left nav + one reading column; Learn steps are numbered cards with a progress bar. */
+/* PyBI docs — layout: sticky top bar; left nav · content · right "on this page"; drawer on mobile.
+   Palette taken from the ر app icon: deep teal + amber. */
 :root{
-  --bg:#f5f7f8; --surface:#ffffff; --ink:#13202a; --muted:#566573; --line:#dbe1e6;
-  --accent:#0a6c6c; --accent-soft:#e2f1f0; --amber:#d99a00; --amber-soft:#fbf1d6;
-  --code-bg:#0f1a21; --code-ink:#dfe8ee; --good:#1f8a4c; --warn:#b26a00;
-  --font-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --font-body:"Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-mono:"JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
-  --radius:10px; color-scheme:light;
+  --bg:#f6f8f9; --surface:#ffffff; --surface-2:#eef3f4; --ink:#0f1d24; --muted:#5a6a75; --line:#dde4e8;
+  --accent:#0a6c6c; --accent-2:#0e8c7f; --accent-soft:#e1f2f0; --accent-ink:#ffffff;
+  --amber:#d99a00; --amber-soft:#fcf3da; --warn:#b4610a; --warn-soft:#fdf0e3; --good:#1f8a4c;
+  --code-bg:#0e171d; --code-ink:#dde7ec; --code-line:#1d2a32;
+  --shadow:0 1px 2px rgba(15,29,36,.05), 0 6px 24px rgba(15,29,36,.06);
+  --shadow-lg:0 18px 50px rgba(8,60,62,.22);
+  --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"Manrope","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+  --top:64px; --radius:12px; color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0d1418; --surface:#141d23; --ink:#e4ebef; --muted:#93a3b0; --line:#25323b;
-    --accent:#3fc2b6; --accent-soft:#16302f; --amber:#f0bb3a; --amber-soft:#33290f;
-    --code-bg:#091015; --code-ink:#dbe5ea; --good:#4cc781; --warn:#f0a940; color-scheme:dark;
+    --bg:#0b1216; --surface:#111b21; --surface-2:#16232a; --ink:#e3ebef; --muted:#93a4b0; --line:#22323b;
+    --accent:#3fc2b6; --accent-2:#2aa79a; --accent-soft:#132e2c; --accent-ink:#06201e;
+    --amber:#f0bb3a; --amber-soft:#2e2510; --warn:#f0a940; --warn-soft:#2d2112; --good:#4cc781;
+    --code-bg:#081015; --code-line:#18252d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 24px rgba(0,0,0,.25); --shadow-lg:0 18px 50px rgba(0,0,0,.45);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0d1418; --surface:#141d23; --ink:#e4ebef; --muted:#93a3b0; --line:#25323b;
-  --accent:#3fc2b6; --accent-soft:#16302f; --amber:#f0bb3a; --amber-soft:#33290f;
-  --code-bg:#091015; --code-ink:#dbe5ea; --good:#4cc781; --warn:#f0a940; color-scheme:dark;
+  --bg:#0b1216; --surface:#111b21; --surface-2:#16232a; --ink:#e3ebef; --muted:#93a4b0; --line:#22323b;
+  --accent:#3fc2b6; --accent-2:#2aa79a; --accent-soft:#132e2c; --accent-ink:#06201e;
+  --amber:#f0bb3a; --amber-soft:#2e2510; --warn:#f0a940; --warn-soft:#2d2112; --good:#4cc781;
+  --code-bg:#081015; --code-line:#18252d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 24px rgba(0,0,0,.25); --shadow-lg:0 18px 50px rgba(0,0,0,.45);
+  color-scheme:dark;
 }
+
 *{box-sizing:border-box}
-html{scroll-behavior:smooth; scroll-padding-top:76px}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.65}
-a{color:var(--accent); text-underline-offset:3px}
-a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
-h1,h2,h3,h4{font-family:var(--font-display); line-height:1.2; text-wrap:balance; margin:0}
-h1{font-size:clamp(2rem,4vw,2.7rem)}
-h2{font-size:1.75rem; margin-top:8px}
-h3{font-size:1.2rem; margin-top:28px; margin-bottom:8px}
-h4{font-size:1rem; margin-top:18px; margin-bottom:6px}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--top) + 16px)}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{transition:none !important}}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased}
+a{color:var(--accent); text-underline-offset:3px; text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
+h1,h2,h3,h4{font-family:var(--font-display); line-height:1.18; text-wrap:balance; margin:0; letter-spacing:-.01em}
+h2{font-size:clamp(1.6rem,2.6vw,2.05rem)}
+h3{font-size:1.25rem; margin:32px 0 10px}
+h4{font-size:1.02rem; margin:22px 0 8px}
 p{margin:10px 0}
-code{font-family:var(--font-mono); font-size:.86em; background:var(--accent-soft); padding:.1em .35em; border-radius:4px}
-pre code{background:none; padding:0; font-size:inherit}
+code{font-family:var(--font-mono); font-size:.85em; background:var(--surface-2); border:1px solid var(--line); padding:.08em .38em; border-radius:6px}
+pre code{background:none; border:0; padding:0; font-size:inherit}
+svg.i{width:18px; height:18px; flex:none; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 
-/* Header */
-.topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:16px; padding:12px 20px; background:var(--surface); border-bottom:1px solid var(--line)}
-.brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:1.15rem; color:var(--ink); text-decoration:none}
-.brand svg{flex:none}
-.brand small{font-family:var(--font-mono); font-weight:400; font-size:.75rem; color:var(--muted); border:1px solid var(--line); padding:1px 6px; border-radius:20px}
-.topbar .spacer{flex:1}
-.topbar nav{display:flex; gap:16px; flex-wrap:wrap}
-.topbar nav a{color:var(--muted); text-decoration:none; font-weight:600; font-size:.92rem}
-.topbar nav a:hover{color:var(--ink)}
-.menu-btn{display:none; font:inherit; background:none; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:4px 10px; cursor:pointer}
+/* ---------------- top bar ---------------- */
+.topbar{position:sticky; top:0; z-index:40; height:var(--top); display:flex; align-items:center; gap:14px; padding:0 20px;
+  background:color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter:saturate(1.4) blur(12px); -webkit-backdrop-filter:saturate(1.4) blur(12px); border-bottom:1px solid var(--line)}
+.brand{display:flex; align-items:center; gap:10px; color:var(--ink); text-decoration:none; font-family:var(--font-display); font-weight:700; font-size:1.2rem}
+.brand img{border-radius:8px; box-shadow:0 2px 6px rgba(10,108,108,.35)}
+.pill{font-family:var(--font-mono); font-size:.72rem; font-weight:500; color:var(--accent); background:var(--accent-soft); border-radius:20px; padding:2px 8px}
+.searchbtn{flex:0 1 340px; margin-left:18px; display:flex; align-items:center; gap:10px; height:38px; padding:0 10px 0 12px; border:1px solid var(--line); border-radius:10px;
+  background:var(--surface); color:var(--muted); font:inherit; font-size:.9rem; cursor:pointer; text-align:left}
+.searchbtn:hover{border-color:var(--accent)}
+.searchbtn span{flex:1}
+kbd{font-family:var(--font-mono); font-size:.72rem; border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; background:var(--surface-2); color:var(--muted)}
+.topnav{margin-left:auto; display:flex; align-items:center; gap:4px}
+.topnav a.link{color:var(--muted); text-decoration:none; font-weight:600; font-size:.92rem; padding:8px 10px; border-radius:8px}
+.topnav a.link:hover{color:var(--ink); background:var(--surface-2)}
+.iconbtn{display:grid; place-items:center; width:38px; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer}
+.iconbtn:hover{border-color:var(--accent); color:var(--accent)}
+.menu-btn{display:none}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:10px; font-weight:700; font-size:.95rem; text-decoration:none;
+  border:1px solid var(--line); color:var(--ink); background:var(--surface); transition:transform .15s, box-shadow .15s, border-color .15s}
+.btn:hover{border-color:var(--accent); transform:translateY(-1px)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); box-shadow:0 4px 14px rgba(10,108,108,.28)}
+.btn.primary:hover{background:var(--accent-2)}
+.btn.sm{padding:7px 12px; font-size:.86rem}
 
-/* Shell */
-.shell{display:grid; grid-template-columns:270px minmax(0,1fr); max-width:1240px; margin:0 auto}
-.side{position:sticky; top:57px; align-self:start; height:calc(100vh - 57px); overflow-y:auto; padding:20px 16px 40px; border-right:1px solid var(--line)}
-.side input{width:100%; font:inherit; font-size:.9rem; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink)}
-.side .group{margin-top:18px}
-.side .group-title{font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700; margin:0 0 6px 8px}
-.side a{display:block; padding:5px 8px; border-radius:6px; color:var(--ink); text-decoration:none; font-size:.92rem}
-.side a:hover{background:var(--accent-soft)}
+/* ---------------- layout ---------------- */
+.layout{display:grid; grid-template-columns:280px minmax(0,1fr) 230px; max-width:1480px; margin:0 auto}
+.side{position:sticky; top:var(--top); align-self:start; height:calc(100vh - var(--top)); overflow-y:auto; padding:22px 14px 40px 20px; border-right:1px solid var(--line); scrollbar-width:thin}
+.side .group{margin-bottom:18px}
+.side .gtitle{display:flex; align-items:center; gap:8px; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:800; margin:0 0 6px 8px}
+.side .gtitle svg{width:15px; height:15px}
+.side a{position:relative; display:flex; align-items:center; gap:8px; padding:6px 10px; margin:1px 0; border-radius:8px; color:var(--ink); text-decoration:none; font-size:.92rem; line-height:1.35}
+.side a:hover{background:var(--surface-2)}
 .side a.active{background:var(--accent-soft); color:var(--accent); font-weight:700}
-.side a .n{display:inline-block; width:22px; font-family:var(--font-mono); font-size:.78rem; color:var(--muted)}
-.side .empty{display:none; color:var(--muted); font-size:.85rem; margin:12px 8px}
-main{padding:32px clamp(16px,4vw,56px) 80px; min-width:0}
-.col{max-width:800px}
-section{padding-top:28px; margin-top:28px; border-top:1px solid var(--line)}
-section:first-of-type{border-top:none; margin-top:0; padding-top:0}
-.eyebrow{font-family:var(--font-mono); font-size:.78rem; color:var(--accent); font-weight:500; letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px}
-.lead{font-size:1.12rem; color:var(--muted); max-width:65ch}
+.side a.active::before{content:""; position:absolute; left:-12px; top:6px; bottom:6px; width:3px; border-radius:3px; background:var(--accent)}
+.side a .n{font-family:var(--font-mono); font-size:.72rem; color:var(--muted); width:20px}
+.side a .tick{margin-left:auto; color:var(--good); font-size:.8rem; visibility:hidden}
+.side a.done .tick{visibility:visible}
+.side .course{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px; margin:0 0 18px}
+.side .course b{font-size:.86rem}
+.side .course .bar{height:6px; background:var(--line); border-radius:6px; margin:8px 0 4px; overflow:hidden}
+.side .course .bar i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--amber)); transition:width .3s}
+.side .course small{color:var(--muted); font-size:.78rem}
+main{min-width:0; padding:0 clamp(18px,4vw,56px) 80px}
+.col{max-width:820px; margin:0 auto}
+.toc{position:sticky; top:var(--top); align-self:start; max-height:calc(100vh - var(--top)); overflow-y:auto; padding:28px 18px 40px 6px; font-size:.86rem}
+.toc .t{font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:800; margin:0 0 10px}
+.toc a{display:block; color:var(--muted); text-decoration:none; padding:4px 0 4px 12px; border-left:2px solid var(--line); line-height:1.35}
+.toc a:hover{color:var(--ink)}
+.toc a.on{color:var(--accent); border-left-color:var(--accent); font-weight:700}
+.toc .edit{display:block; margin-top:18px; color:var(--muted); font-size:.82rem}
 
-/* Hero */
-.hero{display:grid; gap:18px}
-.hero .actions{display:flex; flex-wrap:wrap; gap:10px}
-.btn{display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:8px; font-weight:700; text-decoration:none; border:1px solid var(--line); color:var(--ink); background:var(--surface); font-size:.95rem}
-.btn.primary{background:var(--accent); color:var(--surface); border-color:var(--accent)}
-.feature-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:18px}
-.feature{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px}
-.feature b{display:block; font-family:var(--font-display); font-size:1.02rem; margin-bottom:2px}
+/* ---------------- hero ---------------- */
+.hero{position:relative; margin:28px 0 8px; border-radius:22px; padding:clamp(28px,5vw,52px); color:#eafaf7; overflow:hidden;
+  background:radial-gradient(120% 140% at 100% 0%, #13a08f 0%, rgba(19,160,143,0) 55%), radial-gradient(90% 120% at 0% 100%, #d99a0055 0%, rgba(217,154,0,0) 50%), linear-gradient(135deg,#064b4c 0%,#0a6c6c 55%,#0b5d63 100%)}
+.hero::after{content:"ر"; position:absolute; right:40px; top:-30px; font-size:300px; line-height:1; color:rgba(255,255,255,.06); font-family:serif; pointer-events:none}
+.hero .eyebrow{color:#ffd37a}
+.hero h1{font-size:clamp(2.2rem,5vw,3.4rem); color:#fff; max-width:16ch}
+.hero .lead{color:#cdeee9; font-size:1.12rem; max-width:60ch; margin:14px 0 22px}
+.hero .os{display:flex; flex-wrap:wrap; gap:10px}
+.hero .os a{display:flex; flex-direction:column; min-width:150px; padding:11px 16px; border-radius:12px; text-decoration:none; color:#06302f; background:#fff; box-shadow:0 6px 18px rgba(0,0,0,.18); transition:transform .15s}
+.hero .os a:hover{transform:translateY(-2px)}
+.hero .os a b{font-family:var(--font-display); font-size:1rem}
+.hero .os a span{font-size:.78rem; color:#4e6a6a}
+.hero .os a.alt{background:rgba(255,255,255,.12); color:#fff; box-shadow:none; border:1px solid rgba(255,255,255,.28)}
+.hero .os a.alt span{color:#cdeee9}
+.hero .meta{display:flex; flex-wrap:wrap; gap:18px; margin-top:20px; font-size:.86rem; color:#bfe5df}
+.hero .meta b{color:#fff}
+.frame{margin:-6px 0 0; position:relative; z-index:1; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:var(--shadow-lg); transform:translateY(-14px); margin-left:clamp(0px,3vw,32px); margin-right:clamp(0px,3vw,32px)}
+.frame .chrome{display:flex; align-items:center; gap:6px; padding:9px 12px; background:var(--surface-2); border-bottom:1px solid var(--line)}
+.frame .chrome i{width:10px; height:10px; border-radius:50%; background:var(--line)}
+.frame .chrome span{margin-left:10px; font-family:var(--font-mono); font-size:.74rem; color:var(--muted); background:var(--surface); border-radius:6px; padding:2px 10px}
+.frame img{display:block; width:100%; height:auto}
+.eyebrow{font-family:var(--font-mono); font-size:.76rem; color:var(--accent); font-weight:500; letter-spacing:.06em; text-transform:uppercase; margin:0 0 8px}
+.lead{font-size:1.1rem; color:var(--muted); max-width:66ch}
+
+/* ---------------- sections ---------------- */
+section{padding-top:48px}
+section > h2{display:flex; align-items:center; gap:12px}
+section > h2 .ic{display:grid; place-items:center; width:40px; height:40px; border-radius:12px; background:var(--accent-soft); color:var(--accent); flex:none}
+section > h2 .ic svg{width:21px; height:21px}
+.pager{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:34px}
+.pager a{display:block; padding:12px 16px; border:1px solid var(--line); border-radius:12px; text-decoration:none; color:var(--ink); background:var(--surface)}
+.pager a:hover{border-color:var(--accent)}
+.pager a small{display:block; color:var(--muted); font-size:.78rem}
+.pager a b{font-size:.95rem}
+.pager .next{text-align:right; grid-column:2}
+
+.features{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin:22px 0 6px}
+.feature{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow)}
+.feature .ic{display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--accent-soft); color:var(--accent); margin-bottom:10px}
+.feature b{display:block; font-family:var(--font-display); font-size:1.05rem; margin-bottom:2px}
 .feature span{color:var(--muted); font-size:.92rem}
 
-/* Downloads */
-.dl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 0}
-.dl{display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:10px; text-decoration:none; background:var(--accent); color:var(--surface); border:1px solid var(--accent)}
-.dl b{font-family:var(--font-display); font-size:1.02rem}
-.dl span{font-size:.82rem; opacity:.85}
-.dl:hover{filter:brightness(1.08)}
+.dl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:16px 0}
+.dl{display:flex; flex-direction:column; gap:2px; padding:14px 16px; border-radius:12px; text-decoration:none; background:var(--surface); color:var(--ink); border:1px solid var(--line); box-shadow:var(--shadow); transition:transform .15s,border-color .15s}
+.dl:hover{transform:translateY(-2px); border-color:var(--accent)}
+.dl b{font-family:var(--font-display); font-size:1.04rem; display:flex; align-items:center; gap:8px}
+.dl b::before{content:"↓"; display:grid; place-items:center; width:22px; height:22px; border-radius:7px; background:var(--accent); color:var(--accent-ink); font-size:.8rem}
+.dl span{font-size:.82rem; color:var(--muted); padding-left:30px}
 
-/* Code */
-.code{position:relative; margin:14px 0; border-radius:var(--radius); background:var(--code-bg); overflow:hidden; border:1px solid var(--line)}
-.code .bar{display:flex; justify-content:space-between; align-items:center; padding:6px 10px 6px 14px; font-family:var(--font-mono); font-size:.75rem; color:#8fa3b0; border-bottom:1px solid #1f2c35}
-.code button{font:inherit; font-size:.75rem; background:#1c2a33; color:#cfdbe2; border:1px solid #2c3d48; border-radius:6px; padding:3px 9px; cursor:pointer}
-.code button:hover{background:#26404a}
-.code pre{margin:0; padding:14px 16px; overflow-x:auto; color:var(--code-ink); font-family:var(--font-mono); font-size:.84rem; line-height:1.6}
-.tk-k{color:#ff9e7a}.tk-s{color:#a6e3a1}.tk-c{color:#7f939f; font-style:italic}.tk-n{color:#f5c26b}.tk-f{color:#7cc7ff}
+.shot{margin:18px 0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--surface); box-shadow:var(--shadow)}
+.shot img{display:block; width:100%; height:auto}
+.shot figcaption{font-size:.82rem; color:var(--muted); padding:9px 14px; border-top:1px solid var(--line)}
+.files{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px}
 
-/* Callouts */
-.callout{display:grid; grid-template-columns:4px 1fr; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px 12px 0; margin:16px 0; overflow:hidden}
-.callout::before{content:""; background:var(--accent); border-radius:0 3px 3px 0}
-.callout.bi::before{background:var(--amber)}
-.callout.warn::before{background:var(--warn)}
-.callout .t{font-weight:800; font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
-.callout p{margin:4px 0}
+/* code */
+.code{position:relative; margin:16px 0; border-radius:var(--radius); background:var(--code-bg); overflow:hidden; border:1px solid var(--code-line); box-shadow:var(--shadow)}
+.code .bar{display:flex; justify-content:space-between; align-items:center; padding:7px 10px 7px 14px; font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; color:#7f96a3; border-bottom:1px solid var(--code-line)}
+.code button{font:inherit; text-transform:none; letter-spacing:0; font-size:.75rem; background:#18262e; color:#cfdbe2; border:1px solid #2a3c47; border-radius:6px; padding:3px 10px; cursor:pointer}
+.code button:hover{background:#21414a}
+.code pre{margin:0; padding:15px 18px; overflow-x:auto; color:var(--code-ink); font-family:var(--font-mono); font-size:.84rem; line-height:1.65}
+.tk-k{color:#ff9e7a}.tk-s{color:#a6e3a1}.tk-c{color:#748b98; font-style:italic}.tk-n{color:#f5c26b}.tk-f{color:#7cc7ff}.tk-d{color:#7cc7ff; font-weight:500}.tk-m{color:#f5c26b}
 
-/* Tables */
-.tbl{overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface)}
+/* callouts */
+.callout{display:flex; gap:12px; background:var(--accent-soft); border:1px solid color-mix(in srgb, var(--accent) 22%, transparent); border-radius:var(--radius); padding:14px 16px; margin:16px 0}
+.callout::before{content:"i"; flex:none; display:grid; place-items:center; width:24px; height:24px; border-radius:50%; background:var(--accent); color:var(--accent-ink); font-weight:800; font-family:var(--font-display); font-size:.85rem; margin-top:2px}
+.callout.bi{background:var(--amber-soft); border-color:color-mix(in srgb, var(--amber) 35%, transparent)}
+.callout.bi::before{content:"★"; background:var(--amber); color:#2b1f00}
+.callout.warn{background:var(--warn-soft); border-color:color-mix(in srgb, var(--warn) 35%, transparent)}
+.callout.warn::before{content:"!"; background:var(--warn); color:#fff}
+.callout .t{font-weight:800; font-size:.76rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin:2px 0 0}
+.callout p{margin:3px 0}
+
+/* tables */
+.tbl{overflow-x:auto; margin:16px 0; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow)}
 table{border-collapse:collapse; width:100%; font-size:.9rem}
-th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
-th{font-size:.76rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); background:var(--bg)}
+th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-size:.74rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); background:var(--surface-2)}
 tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:color-mix(in srgb, var(--accent-soft) 45%, transparent)}
 td code{white-space:nowrap}
 .num{text-align:right; font-variant-numeric:tabular-nums}
+ol.steps-list,ul.tight{padding-left:22px; margin:10px 0}
+ol.steps-list li,ul.tight li{margin:6px 0}
+ol.steps-list li::marker{font-weight:800; color:var(--accent)}
 
-/* Learn */
-.progress{display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin:18px 0}
+/* learn */
+.progress{display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin:20px 0; box-shadow:var(--shadow)}
 .progress .track{flex:1; height:8px; background:var(--line); border-radius:8px; overflow:hidden}
-.progress .fill{height:100%; width:0; background:var(--accent); transition:width .3s}
-.progress .label{font-variant-numeric:tabular-nums; font-weight:700; font-size:.9rem; white-space:nowrap}
-.path{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin:14px 0; padding:0; list-style:none; counter-reset:p}
-.path li{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:.86rem}
-.path li a{color:var(--ink); text-decoration:none; font-weight:600}
-.path li .n{font-family:var(--font-mono); color:var(--accent); font-size:.75rem; display:block}
+.progress .fill{height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--amber)); transition:width .3s}
+.progress .label{font-variant-numeric:tabular-nums; font-weight:800; font-size:.9rem; white-space:nowrap}
+.path{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:14px 0 22px; padding:0; list-style:none}
+.path li{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:.85rem; transition:border-color .15s}
+.path li:hover{border-color:var(--accent)}
+.path li a{color:var(--ink); text-decoration:none; font-weight:700}
+.path li .n{font-family:var(--font-mono); color:var(--accent); font-size:.72rem; display:block}
 .path li.done{border-color:var(--accent); background:var(--accent-soft)}
-.step{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:22px clamp(16px,3vw,28px); margin:22px 0}
-.step.done{border-color:var(--accent)}
+.step{position:relative; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:24px clamp(18px,3vw,30px); margin:26px 0 26px 26px; box-shadow:var(--shadow)}
+.step::before{content:""; position:absolute; left:-27px; top:-27px; bottom:-27px; width:2px; background:var(--line)}
+.step.done{border-color:color-mix(in srgb, var(--accent) 55%, var(--line))}
 .step-head{display:flex; gap:14px; align-items:flex-start}
-.step-num{flex:none; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); font-family:var(--font-display); font-weight:700; font-size:1.1rem}
-.step.done .step-num{background:var(--accent); color:var(--surface)}
-.step-head h3{margin:2px 0 2px}
-.step-meta{color:var(--muted); font-size:.86rem}
-.goal{background:var(--bg); border-radius:8px; padding:10px 14px; margin:14px 0; font-size:.94rem}
+.step-num{position:absolute; left:-46px; top:20px; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:var(--surface); border:2px solid var(--accent); color:var(--accent); font-family:var(--font-display); font-weight:700; font-size:1.05rem; box-shadow:0 0 0 5px var(--bg)}
+.step.done .step-num{background:var(--accent); color:var(--accent-ink)}
+.step-head h3{margin:0 0 3px; font-size:1.3rem}
+.step-meta{color:var(--muted); font-size:.85rem; font-weight:600}
+.goal{background:var(--surface-2); border-radius:10px; padding:10px 14px; margin:16px 0; font-size:.94rem}
 .goal b{color:var(--accent)}
-.check{background:var(--amber-soft); border-radius:8px; padding:10px 14px; margin:14px 0; font-size:.93rem}
-.check b{color:var(--warn)}
-.done-toggle{display:flex; align-items:center; gap:8px; margin-top:16px; font-weight:700; font-size:.92rem; cursor:pointer; width:max-content}
+.check{display:flex; gap:10px; background:color-mix(in srgb, var(--good) 10%, var(--surface)); border:1px solid color-mix(in srgb, var(--good) 30%, transparent); border-radius:10px; padding:11px 14px; margin:16px 0; font-size:.93rem}
+.check b{color:var(--good)}
+.done-toggle{display:inline-flex; align-items:center; gap:9px; margin-top:12px; padding:8px 14px; border:1px solid var(--line); border-radius:10px; font-weight:700; font-size:.9rem; cursor:pointer; background:var(--surface)}
+.done-toggle:hover{border-color:var(--accent)}
 .done-toggle input{width:18px; height:18px; accent-color:var(--accent)}
-ol.steps-list, ul.tight{padding-left:22px; margin:8px 0}
-ol.steps-list li, ul.tight li{margin:4px 0}
 
-/* Dashboard preview */
-.dash{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:14px; margin:18px 0}
-.dash-top{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px}
-.dash-top b{font-family:var(--font-display); font-size:1.05rem}
-.chips{display:flex; flex-wrap:wrap; gap:6px}
-.chip{font-size:.78rem; font-weight:600; border:1px solid var(--line); background:var(--surface); border-radius:20px; padding:3px 10px; color:var(--muted)}
-.chip.on{border-color:var(--accent); color:var(--accent)}
-.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px}
-.kpi{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px}
-.kpi .k{font-size:.78rem; color:var(--muted); font-weight:600}
-.kpi .v{font-family:var(--font-display); font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums}
-.kpi .d{font-size:.78rem; font-weight:700; font-variant-numeric:tabular-nums}
-.kpi .d.flat{color:var(--muted)} .kpi .d.up{color:var(--good)}
-.panels{display:grid; grid-template-columns:1.5fr 1fr; gap:10px; margin-top:10px}
-.panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px; min-width:0}
-.panel h5{margin:0 0 8px; font-size:.86rem; font-family:var(--font-body)}
-.panel svg{width:100%; height:auto; display:block}
-.hbar{display:grid; grid-template-columns:110px 1fr 52px; gap:8px; align-items:center; font-size:.8rem; margin:5px 0}
-.hbar .b{height:12px; background:var(--line); border-radius:4px; overflow:hidden}
-.hbar .b i{display:block; height:100%; background:var(--accent); border-radius:4px}
-.hbar .val{text-align:right; font-variant-numeric:tabular-nums; color:var(--muted)}
-.caption{font-size:.82rem; color:var(--muted); margin-top:8px}
-
-/* API */
-.sig{font-family:var(--font-mono); font-size:.88rem; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:6px; padding:8px 12px; margin:18px 0 6px; overflow-x:auto; white-space:nowrap}
-details{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:10px 16px; margin:10px 0}
+details{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; margin:10px 0}
 details summary{cursor:pointer; font-weight:700}
-details[open] summary{margin-bottom:6px}
-footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:.88rem}
+details[open]{box-shadow:var(--shadow)}
+details[open] summary{margin-bottom:6px; color:var(--accent)}
 
-@media (max-width: 900px){
-  .shell{grid-template-columns:1fr}
-  .side{position:static; height:auto; border-right:none; border-bottom:1px solid var(--line); display:none}
-  .side.open{display:block}
-  .menu-btn{display:inline-block}
-  .topbar nav{display:none}
-  .panels{grid-template-columns:1fr}
+footer.site{margin-top:70px; border-top:1px solid var(--line); padding:34px 0 10px; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:24px; font-size:.9rem}
+footer.site h5{margin:0 0 8px; font-size:.78rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+footer.site a{display:block; color:var(--ink); text-decoration:none; margin:4px 0}
+footer.site a:hover{color:var(--accent)}
+footer.site p{color:var(--muted); margin:6px 0}
+
+/* search palette */
+.palette{position:fixed; inset:0; z-index:60; display:none; align-items:flex-start; justify-content:center; padding:12vh 16px 16px; background:rgba(5,15,18,.55); backdrop-filter:blur(3px)}
+.palette.open{display:flex}
+.palette .box{width:min(640px,100%); background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow-lg); overflow:hidden}
+.palette input{width:100%; border:0; border-bottom:1px solid var(--line); padding:16px 18px; font:inherit; font-size:1.05rem; background:transparent; color:var(--ink); outline:none}
+.palette ul{list-style:none; margin:0; padding:6px; max-height:52vh; overflow-y:auto}
+.palette li a{display:flex; flex-direction:column; padding:9px 12px; border-radius:10px; color:var(--ink); text-decoration:none}
+.palette li a small{color:var(--muted); font-size:.78rem}
+.palette li a.sel, .palette li a:hover{background:var(--accent-soft)}
+.palette .foot{display:flex; gap:14px; padding:9px 14px; border-top:1px solid var(--line); color:var(--muted); font-size:.78rem}
+.palette .empty{padding:18px; color:var(--muted)}
+
+.scrim{display:none}
+
+/* ---------------- responsive ---------------- */
+@media (max-width:1240px){
+  .layout{grid-template-columns:270px minmax(0,1fr)}
+  .toc{display:none}
 }
-@media (max-width: 420px){ .hbar{grid-template-columns:90px 1fr 46px} }
-
-/* Screenshots and learn files */
-.shot{margin:16px 0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)}
-.shot img{display:block; width:100%; height:auto}
-.shot figcaption{font-size:.82rem; color:var(--muted); padding:8px 12px; border-top:1px solid var(--line)}
-.files{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px}
-.tk-d{color:#7cc7ff; font-weight:500}.tk-m{color:#f5c26b}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .menu-btn{display:grid}
+  .side{position:fixed; z-index:55; top:0; left:0; bottom:0; height:100%; width:min(310px,86vw); background:var(--surface); transform:translateX(-102%); transition:transform .25s ease; box-shadow:var(--shadow-lg); padding-top:18px}
+  .side.open{transform:none}
+  .scrim{position:fixed; inset:0; z-index:50; background:rgba(5,15,18,.45)}
+  .scrim.open{display:block}
+  .searchbtn{flex:1; margin-left:6px}
+  .searchbtn span,.searchbtn kbd{display:none}
+  .searchbtn{flex:0 0 38px; padding:0; justify-content:center}
+  .topnav a.link{display:none}
+  .step{margin-left:0} .step::before{display:none} .step-num{position:static; box-shadow:none; flex:none}
+  footer.site{grid-template-columns:1fr 1fr}
+}
+@media (max-width:520px){
+  .topnav .btn.primary{display:none}
+  .hero .os a{min-width:calc(50% - 5px)}
+  .pager{grid-template-columns:1fr} .pager .next{grid-column:1}
+}
 </style>
 </head>
 <body>
-
 <header class="topbar">
-  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sidebar">Menu</button>
-  <a class="brand" href="#overview">
-    <img src="images/pybi-icon.png" width="28" height="28" alt="" style="border-radius:7px">
-    PyBI <small id="verTag">pybi-ray</small>
-  </a>
-  <span class="spacer"></span>
-  <nav aria-label="Top">
-    <a href="#download">Download</a>
-    <a href="#learn">Learn</a>
-    <a href="#guides">Guides</a>
-    <a href="#dax">DAX</a>
-    <a href="https://github.com/rafay183/pybi">GitHub</a>
-    <a class="btn primary" style="padding:5px 12px;font-size:.85rem" href="#download">Download</a>
+  <button class="iconbtn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="#overview"><img src="images/pybi-icon.png" width="30" height="30" alt="">PyBI <span class="pill">docs</span></a>
+  <button class="searchbtn" id="searchBtn" aria-label="Search the documentation"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg><span>Search the docs…</span><kbd>Ctrl K</kbd></button>
+  <nav class="topnav" aria-label="Top">
+    <a class="link" href="#learn">Learn</a>
+    <a class="link" href="#guides">Guides</a>
+    <a class="link" href="#dax">DAX</a>
+    <a class="link" href="https://github.com/rafay183/pybi">GitHub</a>
+    <button class="iconbtn" id="themeBtn" aria-label="Switch light or dark theme"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+    <a class="btn primary sm" href="#download"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>Download</a>
   </nav>
 </header>
-
-<div class="shell">
+<div class="scrim" id="scrim"></div>
+<div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Search the documentation">
+  <div class="box"><input id="palInput" type="search" placeholder="Search: slicer, CALCULATE, Chromebook, export…" aria-label="Search">
+    <ul id="palList"></ul>
+    <div class="foot"><span><kbd>↑</kbd> <kbd>↓</kbd> to move</span><span><kbd>Enter</kbd> to open</span><span><kbd>Esc</kbd> to close</span></div></div>
+</div>
+<div class="layout">
 <aside class="side" id="sidebar" aria-label="Documentation">
-  <label for="navSearch" class="group-title" style="display:block;margin-left:2px">Search the docs</label>
-  <input id="navSearch" type="search" placeholder="e.g. slicer, CALCULATE, export">
-  <p class="empty" id="navEmpty">No section matches that word.</p>
-
-  <div class="group"><p class="group-title">Getting started</p>
-    <a href="#overview">Overview</a>
-    <a href="#download">Download the app</a>
-    <a href="#pip">Install with pip</a>
-    <a href="#quickstart">Quickstart</a>
-    <a href="#tour">Tour of the studio</a>
+  <div class="group"><p class="gtitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Getting started</p>
+    <a href="#overview">Introduction</a><a href="#download">Download the app</a><a href="#pip">Install with pip</a><a href="#quickstart">Quickstart</a><a href="#tour">Tour of the studio</a>
   </div>
-  <div class="group"><p class="group-title">Learn: BI step by step</p>
+  <div class="group"><p class="gtitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>Learn BI step by step</p>
+    <div class="course"><b>Your course progress</b><div class="bar"><i id="sideFill"></i></div><small id="sideLabel">0 of 12 steps done</small></div>
     <a href="#learn">Course overview</a>
-    <a href="#step-1"><span class="n">01</span>Frame the questions</a>
-    <a href="#step-2"><span class="n">02</span>Open PyBI, get the data</a>
-    <a href="#step-3"><span class="n">03</span>Load data</a>
-    <a href="#step-4"><span class="n">04</span>Clean in the query editor</a>
-    <a href="#step-5"><span class="n">05</span>Build the model</a>
-    <a href="#step-6"><span class="n">06</span>Calculated columns</a>
-    <a href="#step-7"><span class="n">07</span>Measures (KPIs)</a>
-    <a href="#step-8"><span class="n">08</span>Visuals</a>
-    <a href="#step-9"><span class="n">09</span>Interactivity</a>
-    <a href="#step-10"><span class="n">10</span>Pages, design, smart tools</a>
-    <a href="#step-11"><span class="n">11</span>Share and export</a>
-    <a href="#step-12"><span class="n">12</span>Turn it into decisions</a>
+    <a href="#step-1" data-step-link="1"><span class="n">01</span>Frame the questions<span class="tick">✓</span></a><a href="#step-2" data-step-link="2"><span class="n">02</span>Open PyBI, get the data<span class="tick">✓</span></a><a href="#step-3" data-step-link="3"><span class="n">03</span>Load data<span class="tick">✓</span></a><a href="#step-4" data-step-link="4"><span class="n">04</span>Clean in the query editor<span class="tick">✓</span></a><a href="#step-5" data-step-link="5"><span class="n">05</span>Build the model<span class="tick">✓</span></a><a href="#step-6" data-step-link="6"><span class="n">06</span>Calculated columns<span class="tick">✓</span></a><a href="#step-7" data-step-link="7"><span class="n">07</span>Measures (KPIs)<span class="tick">✓</span></a><a href="#step-8" data-step-link="8"><span class="n">08</span>Visuals<span class="tick">✓</span></a><a href="#step-9" data-step-link="9"><span class="n">09</span>Interactivity<span class="tick">✓</span></a><a href="#step-10" data-step-link="10"><span class="n">10</span>Pages, design, smart tools<span class="tick">✓</span></a><a href="#step-11" data-step-link="11"><span class="n">11</span>Share and export<span class="tick">✓</span></a><a href="#step-12" data-step-link="12"><span class="n">12</span>Turn it into decisions<span class="tick">✓</span></a>
   </div>
-  <div class="group"><p class="group-title">Guides</p>
-    <a href="#guides">Get data &amp; connectors</a>
-    <a href="#query">Query editor steps</a>
-    <a href="#model">Model view</a>
-    <a href="#dax">DAX formulas</a>
-    <a href="#visuals">Visuals</a>
-    <a href="#filters">Filters &amp; interactivity</a>
-    <a href="#smart">Smart features</a>
-    <a href="#share">Share on your network</a>
-    <a href="#export">Export</a>
+  <div class="group"><p class="gtitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/></svg>Guides</p>
+    <a href="#guides">Get data &amp; connectors</a><a href="#query">Query editor</a><a href="#model">Model view</a><a href="#dax">DAX formulas</a><a href="#visuals">Visuals</a><a href="#filters">Filters &amp; interactivity</a><a href="#smart">Smart features</a><a href="#share">Share on your network</a><a href="#export">Export</a>
   </div>
-  <div class="group"><p class="group-title">Reference</p>
-    <a href="#cli">Command line</a>
-    <a href="#python">Python &amp; Jupyter</a>
-    <a href="#how">How it works</a>
-    <a href="#security">Security</a>
-    <a href="#troubleshooting">Troubleshooting</a>
-    <a href="#contributing">Contributing</a>
+  <div class="group"><p class="gtitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6l6 6-6 6M12 19h8"/></svg>Reference</p>
+    <a href="#cli">Command line</a><a href="#python">Python &amp; Jupyter</a><a href="#how">How it works</a><a href="#security">Security</a><a href="#troubleshooting">Troubleshooting</a><a href="#contributing">Contributing</a>
   </div>
 </aside>
-
-<main>
-<div class="col">
-
-<!-- ============ OVERVIEW ============ -->
-<section id="overview">
+<main id="content"><div class="col">
+<section id="overview" class="intro">
   <div class="hero">
     <p class="eyebrow">Open-source business intelligence</p>
-    <h1>PyBI documentation</h1>
-    <p class="lead">PyBI is a Power BI–style business intelligence studio that runs on your own computer. Connect data, shape it in a visual query editor, build a model, write DAX-style measures, design interactive dashboards, share a live link on your network, and export to PNG, PowerPoint, PDF or an interactive HTML file.</p>
-    <div class="actions">
-      <a class="btn primary" href="#download">&#8681; Download the app</a>
-      <a class="btn" href="#learn">Start the BI course</a>
-      <a class="btn" href="https://github.com/rafay183/pybi">GitHub</a>
-      <a class="btn" href="https://pypi.org/project/pybi-ray/">PyPI: pybi-ray</a>
+    <h1>Power BI–style dashboards on your own computer</h1>
+    <p class="lead">Connect data, shape it, model it with DAX, and build interactive dashboards. Share a live link on your network, or export to PNG, PowerPoint, PDF and interactive HTML. Free, and nothing to sign up for.</p>
+    <div class="os">
+      <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe"><b>Windows</b><span>10 / 11 · .exe</span></a>
+      <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg"><b>Mac · Apple chip</b><span>M1–M4 · .dmg</span></a>
+      <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg"><b>Mac · Intel</b><span>.dmg</span></a>
+      <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb"><b>Chromebook</b><span>.deb</span></a>
+      <a class="alt" href="#download"><b>Linux &amp; more</b><span>AppImage, .deb, pip</span></a>
     </div>
+    <div class="meta"><span><b>Free</b> · MIT licence</span><span><b>214</b> connectors</span><span><b>25</b> visuals</span><span>Windows · macOS · Linux · ChromeOS</span></div>
   </div>
-  <figure class="shot"><img src="images/dashboard.png" alt="PyBI Studio showing the demo sales dashboard with KPI cards, a revenue trend and breakdown charts"><figcaption>PyBI Studio with the demo dashboard (<code>pybi demo</code>)</figcaption></figure>
-  <div class="feature-grid">
-    <div class="feature"><b>214 connectors</b><span>Excel, CSV, Parquet, 50 databases, cloud storage, 70+ SaaS apps, public data, REST, GraphQL and Python.</span></div>
-    <div class="feature"><b>Query editor</b><span>Power Query–style applied steps with live preview: types, filters, splits, merges, appends, group by, unpivot.</span></div>
-    <div class="feature"><b>Model and DAX</b><span>Star-schema relationships, a date table, and measures with CALCULATE, FILTER, time intelligence and iterators.</span></div>
-    <div class="feature"><b>25 visuals</b><span>Charts, cards, KPI, gauge, waterfall, treemap, tables, matrices and slicers, all cross-filtering each other.</span></div>
-    <div class="feature"><b>Smart tools</b><span>Ask your data in plain English, build a full insight page with Auto dashboard, add a smart narrative.</span></div>
-    <div class="feature"><b>Share and export</b><span>A live read-only link for your network; export to PNG, PowerPoint, PDF or one offline interactive HTML file.</span></div>
+  <figure class="frame"><div class="chrome"><i></i><i></i><i></i><span>127.0.0.1:8050 · PyBI Studio</span></div>
+    <img src="images/dashboard.png" alt="PyBI Studio showing the demo sales dashboard with KPI cards, a revenue trend and breakdown charts"></figure>
+  <div class="features">
+    <div class="feature"><div class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/></svg></div><b>214 connectors</b><span>Excel, CSV, Parquet, 50 databases, cloud storage, 70+ SaaS apps, public data, REST, GraphQL and Python.</span></div><div class="feature"><div class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 9v6l-4 2v-8z"/></svg></div><b>Query editor</b><span>Power Query–style applied steps with live preview: types, filters, splits, merges, appends, group by.</span></div><div class="feature"><div class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM18 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM12 16a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7.5 7.5l3.5 8.5M16.5 7.5L13 16M8 6h8"/></svg></div><b>Model and DAX</b><span>Star-schema relationships, a date table, and measures with CALCULATE, time intelligence and iterators.</span></div><div class="feature"><div class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"/></svg></div><b>25 visuals</b><span>Charts, cards, KPI, gauge, waterfall, treemap, tables, matrices and slicers that cross-filter.</span></div><div class="feature"><div class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"/></svg></div><b>Smart tools</b><span>Ask your data in plain English, build a page with Auto dashboard, add a smart narrative.</span></div><div class="feature"><div class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0M12 19.5h.01"/></svg></div><b>Share and export</b><span>A live read-only link for your network; PNG, PowerPoint, PDF or one offline interactive HTML file.</span></div>
   </div>
-  <p style="margin-top:14px">Created by <b>Muhammad Rafay Shaikh</b>, from Pakistan. MIT licensed.</p>
+  <p style="color:var(--muted)">Created by <b style="color:var(--ink)">Muhammad Rafay Shaikh</b>, from Pakistan. New to BI? Start with the <a href="#learn">12-step course</a>.</p>
 </section>
+
 
 <!-- ============ DOWNLOAD ============ -->
 <section id="download">
   <p class="eyebrow">Getting started</p>
-  <h2>Download the desktop app</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></span>Download the desktop app</h2>
   <p>The easiest way to use PyBI. Each download includes its own Python and every library, so there is nothing else to install. Open PyBI from the ر icon: it starts on your computer and opens in your browser. It updates itself when a new version is released.</p>
   <div class="dl-grid">
     <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe"><b>Windows</b><span>10 / 11 · .exe installer</span></a>
@@ -321,7 +369,7 @@ footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--line); colo
 <!-- ============ PIP ============ -->
 <section id="pip">
   <p class="eyebrow">Getting started</p>
-  <h2>Install with pip</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10"/></svg></span>Install with pip</h2>
   <p>For Python users, on any platform. Needs Python 3.10 or newer. The install name is <code>pybi-ray</code>, the command is <code>pybi</code>, and the import is <code>import pybi</code>.</p>
   <div class="code" data-lang="bash"><pre><code>pip install pybi-ray
 pybi run          # opens PyBI Studio at http://127.0.0.1:8050
@@ -335,7 +383,7 @@ pip install "pybi-ray[all]"</code></pre></div>
 <!-- ============ QUICKSTART ============ -->
 <section id="quickstart">
   <p class="eyebrow">Getting started</p>
-  <h2>Quickstart in 2 minutes</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span>Quickstart in 2 minutes</h2>
   <ol class="steps-list">
     <li>Open PyBI (the app, or <code>pybi run</code>). The studio opens in your browser.</li>
     <li>In the ribbon, click <b>Data → Sample</b>. PyBI loads a demo dataset and a 3-page dashboard.</li>
@@ -349,7 +397,7 @@ pip install "pybi-ray[all]"</code></pre></div>
 <!-- ============ TOUR ============ -->
 <section id="tour">
   <p class="eyebrow">Getting started</p>
-  <h2>Tour of the studio</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span>Tour of the studio</h2>
   <p>If you know Power BI Desktop, you will recognise the layout.</p>
   <div class="tbl"><table>
     <thead><tr><th>Ribbon group</th><th>Buttons</th></tr></thead>
@@ -372,7 +420,7 @@ pip install "pybi-ray[all]"</code></pre></div>
 <!-- ============ LEARN ============ -->
 <section id="learn">
   <p class="eyebrow">Learn</p>
-  <h2>Business intelligence with PyBI, step by step</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></span>Business intelligence with PyBI, step by step</h2>
   <p class="lead">You will build a complete sales dashboard for a bicycle company from four CSV files, the same way you would with your own company's data. Each step teaches one BI skill and exactly where to click in PyBI.</p>
   <div class="callout bi"><div><p class="t">The scenario</p><p>You are the analyst at a bike retailer selling Bikes, Accessories, Clothing and Components in five regions. Management asks: How much did we sell in 2025? Are we growing? Which regions and products drive profit? Are we on target? You have three years of order lines (9,069 rows) plus product, customer and target lists.</p></div></div>
 
@@ -652,7 +700,7 @@ RETURN yearly * years</code></pre></div>
 <!-- ============ GUIDES ============ -->
 <section id="guides">
   <p class="eyebrow">Guides</p>
-  <h2>Get data and connectors</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/></svg></span>Get data and connectors</h2>
   <p>Open <b>Data → Get data</b> to search the catalog. Each connector shows a form and a live preview; databases, workbooks, folders and buckets add a <b>Navigator</b> to pick tables. Sources remember how they were connected, so <b>Refresh</b> re-pulls fresh data while keeping your query steps.</p>
   <figure class="shot"><img src="images/navigator.png" alt="The Navigator listing tables in a source with a preview of the selected table"><figcaption>Navigator: tick the tables to load</figcaption></figure>
   <div class="tbl"><table>
@@ -753,7 +801,7 @@ Revenue YTD  = TOTALYTD([Total Revenue], 'Calendar'[Date])</code></pre></div>
 <!-- ============ CLI ============ -->
 <section id="cli">
   <p class="eyebrow">Reference</p>
-  <h2>Command line</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6l6 6-6 6M12 19h8"/></svg></span>Command line</h2>
   <div class="code" data-lang="bash"><pre><code>pybi run                      # start the studio (network view link enabled)
 pybi run sales.xlsx           # start with a data file loaded (csv, xlsx, json, parquet)
 pybi run my_report.pybi       # open a saved project
@@ -770,7 +818,7 @@ python -m pybi run            # same as pybi run</code></pre></div>
 <!-- ============ PYTHON ============ -->
 <section id="python">
   <p class="eyebrow">Reference</p>
-  <h2>Python and Jupyter</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg></span>Python and Jupyter</h2>
   <p>Open the studio with pandas DataFrames already loaded; each keyword becomes a table:</p>
   <div class="code" data-lang="python"><pre><code>import pandas as pd
 import pybi
@@ -783,7 +831,7 @@ pybi.run(Sales=sales, Products=products)   # opens the studio with these tables<
 <!-- ============ HOW ============ -->
 <section id="how">
   <p class="eyebrow">Reference</p>
-  <h2>How it works</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6zM9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span>How it works</h2>
   <ul class="tight">
     <li><b>Python</b> (Flask and pandas) serves the studio, loads and transforms data, saves <code>.pybi</code> projects (a zip of raw data, query steps and the report) and builds PPTX, PDF and HTML exports.</li>
     <li>The <b>analytics engine</b> (filter context, relationships, the DAX language) and the <b>d3 visuals</b> run in the browser, so the studio, the network view and exported HTML behave the same.</li>
@@ -795,7 +843,7 @@ pybi.run(Sales=sales, Products=products)   # opens the studio with these tables<
 <!-- ============ SECURITY ============ -->
 <section id="security">
   <p class="eyebrow">Reference</p>
-  <h2>Security</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg></span>Security</h2>
   <ul class="tight">
     <li>The studio listens on your network so the share link works. Other computers can only <b>view</b>; every editing API is limited to your own computer. <code>--private</code> turns network access off.</li>
     <li>The custom-column step evaluates pandas expressions. Only open <code>.pybi</code> files from people you trust.</li>
@@ -807,7 +855,7 @@ pybi.run(Sales=sales, Products=products)   # opens the studio with these tables<
 <!-- ============ TROUBLESHOOTING ============ -->
 <section id="troubleshooting">
   <p class="eyebrow">Reference</p>
-  <h2>Troubleshooting</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM5.6 5.6l3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></svg></span>Troubleshooting</h2>
   <details><summary>Windows: "Windows protected your PC"</summary><p>The installer is not code-signed yet. Click <b>More info → Run anyway</b>.</p></details>
   <details><summary>Mac: "PyBI cannot be opened" or "Apple could not verify"</summary><p>Open <b>System Settings → Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>. You only need to do this once.</p></details>
   <details><summary>Chromebook: the .deb does not install</summary><p>Turn on Linux first (Settings → Advanced → Developers → Linux development environment), then open the file from the Files app. ARM Chromebooks need the ARM64 file.</p></details>
@@ -822,7 +870,7 @@ pybi.run(Sales=sales, Products=products)   # opens the studio with these tables<
 <!-- ============ CONTRIBUTING ============ -->
 <section id="contributing">
   <p class="eyebrow">Community</p>
-  <h2>Contributing</h2>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM21 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>Contributing</h2>
   <p>PyBI is built in the open. Connectors tested against real accounts, visuals, DAX functions, docs and translations are all welcome.</p>
   <div class="code" data-lang="bash"><pre><code>git clone https://github.com/rafay183/pybi
 cd pybi
@@ -832,39 +880,41 @@ pybi demo</code></pre></div>
   <p>Read <a href="https://github.com/rafay183/pybi/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>, look for issues labelled <b>good first issue</b>, and bring questions to <a href="https://github.com/rafay183/pybi/discussions">Discussions</a>. Release history is in the <a href="https://github.com/rafay183/pybi/blob/main/CHANGELOG.md">changelog</a>.</p>
 </section>
 
-<footer>
-  PyBI · MIT © Muhammad Rafay Shaikh · <a href="https://github.com/rafay183/pybi">GitHub</a> · <a href="https://pypi.org/project/pybi-ray/">PyPI</a> · Not a Microsoft product; does not open .pbix files.
+<footer class="site">
+  <div><p style="display:flex;align-items:center;gap:10px;color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:1.1rem"><img src="images/pybi-icon.png" width="26" height="26" alt="" style="border-radius:7px">PyBI</p>
+    <p>Open-source business intelligence. MIT © Muhammad Rafay Shaikh.</p><p>Not a Microsoft product; does not open .pbix files.</p></div>
+  <div><h5>Get PyBI</h5><a href="#download">Desktop apps</a><a href="#pip">pip install</a><a href="https://github.com/rafay183/pybi/releases">All releases</a></div>
+  <div><h5>Learn</h5><a href="#quickstart">Quickstart</a><a href="#learn">BI course</a><a href="#dax">DAX formulas</a></div>
+  <div><h5>Project</h5><a href="https://github.com/rafay183/pybi">GitHub</a><a href="https://pypi.org/project/pybi-ray/">PyPI</a><a href="https://github.com/rafay183/pybi/blob/main/CHANGELOG.md">Changelog</a><a href="https://github.com/rafay183/pybi/discussions">Discussions</a></div>
 </footer>
-
+</div></main>
+<aside class="toc" id="toc" aria-label="On this page"></aside>
 </div>
-</main>
-</div>
-
 <script>
 (function(){
-  /* ---------- Syntax highlighting + copy buttons ---------- */
+  var $ = function(s, r){ return (r || document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function store(k, v){ try{ if(v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); }catch(e){ return null; } }
+
+  /* ---------- syntax highlighting + copy ---------- */
   var KW = /^(import|from|as|def|return|for|in|if|else|elif|True|False|None|with|and|or|not|lambda|class|print)$/;
-  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-  function highlightPy(src){
-    var re = /(#[^\n]*)|("""[\s\S]*?"""|f?"[^"\n]*"|f?'[^'\n]*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_][A-Za-z0-9_]*)\b(\s*\()?/g;
-    var out = "", last = 0, m;
+  function hlPy(src){
+    var re = /(#[^\n]*)|("""[\s\S]*?"""|f?"[^"\n]*"|f?'[^'\n]*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_][A-Za-z0-9_]*)\b(\s*\()?/g, out = "", last = 0, m;
     while((m = re.exec(src))){
       out += esc(src.slice(last, m.index));
       if(m[1]) out += '<span class="tk-c">'+esc(m[1])+'</span>';
       else if(m[2]) out += '<span class="tk-s">'+esc(m[2])+'</span>';
       else if(m[3]) out += '<span class="tk-n">'+m[3]+'</span>';
-      else if(m[4]){
-        if(KW.test(m[4])) out += '<span class="tk-k">'+m[4]+'</span>'+(m[5]?esc(m[5]):"");
-        else if(m[5]) out += '<span class="tk-f">'+m[4]+'</span>'+esc(m[5]);
-        else out += m[4];
-      }
+      else if(KW.test(m[4])) out += '<span class="tk-k">'+m[4]+'</span>'+(m[5]?esc(m[5]):"");
+      else if(m[5]) out += '<span class="tk-f">'+m[4]+'</span>'+esc(m[5]);
+      else out += m[4];
       last = re.lastIndex;
     }
     return out + esc(src.slice(last));
   }
-  function highlightDax(src){
-    var re = /(\/\/[^\n]*)|("[^"\n]*")|(\[[^\]\n]+\])|\b([A-Z][A-Z0-9.]*)(?=\s*\()|\b(VAR|RETURN)\b|\b(\d+(?:\.\d+)?)\b/g;
-    var out = "", last = 0, m;
+  function hlDax(src){
+    var re = /(\/\/[^\n]*)|("[^"\n]*")|(\[[^\]\n]+\])|\b([A-Z][A-Z0-9.]*)(?=\s*\()|\b(VAR|RETURN)\b|\b(\d+(?:\.\d+)?)\b/g, out = "", last = 0, m;
     while((m = re.exec(src))){
       out += esc(src.slice(last, m.index));
       if(m[1]) out += '<span class="tk-c">'+esc(m[1])+'</span>';
@@ -872,111 +922,176 @@ pybi demo</code></pre></div>
       else if(m[3]) out += '<span class="tk-m">'+esc(m[3])+'</span>';
       else if(m[4]) out += '<span class="tk-d">'+m[4]+'</span>';
       else if(m[5]) out += '<span class="tk-k">'+m[5]+'</span>';
-      else if(m[6]) out += '<span class="tk-n">'+m[6]+'</span>';
+      else out += '<span class="tk-n">'+m[6]+'</span>';
       last = re.lastIndex;
     }
     return out + esc(src.slice(last));
   }
-  function highlightComments(src){
+  function hlShell(src){
     return src.split("\n").map(function(line){
       var i = line.indexOf("#");
-      if(i === -1) return esc(line);
-      return esc(line.slice(0,i)) + '<span class="tk-c">'+esc(line.slice(i))+'</span>';
+      return i === -1 ? esc(line) : esc(line.slice(0, i)) + '<span class="tk-c">'+esc(line.slice(i))+'</span>';
     }).join("\n");
   }
-  document.querySelectorAll(".code").forEach(function(block){
-    var lang = block.getAttribute("data-lang") || "text";
-    var codeEl = block.querySelector("code");
-    var raw = codeEl.textContent;
-    if(lang === "python") codeEl.innerHTML = highlightPy(raw);
-    else if(lang === "dax") codeEl.innerHTML = highlightDax(raw);
-    else if(lang === "bash") codeEl.innerHTML = highlightComments(raw);
+  $$(".code").forEach(function(block){
+    var lang = block.getAttribute("data-lang") || "text", codeEl = $("code", block), raw = codeEl.textContent;
+    codeEl.innerHTML = lang === "python" ? hlPy(raw) : lang === "dax" ? hlDax(raw) : lang === "bash" ? hlShell(raw) : esc(raw);
     var bar = document.createElement("div"); bar.className = "bar";
     var label = document.createElement("span"); label.textContent = lang;
     var btn = document.createElement("button"); btn.type = "button"; btn.textContent = "Copy";
     btn.addEventListener("click", function(){
-      function ok(){ btn.textContent = "Copied"; setTimeout(function(){btn.textContent="Copy";},1500); }
+      function ok(){ btn.textContent = "Copied ✓"; setTimeout(function(){ btn.textContent = "Copy"; }, 1500); }
       function fallback(){
         var r = document.createRange(); r.selectNodeContents(codeEl);
         var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-        btn.textContent = "Selected: press Ctrl+C"; setTimeout(function(){btn.textContent="Copy";},2500);
+        btn.textContent = "Selected: press Ctrl+C"; setTimeout(function(){ btn.textContent = "Copy"; }, 2500);
       }
-      try{
-        if(navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(raw).then(ok, fallback);
-        } else fallback();
-      }catch(e){ fallback(); }
+      try{ navigator.clipboard.writeText(raw).then(ok, fallback); }catch(e){ fallback(); }
     });
-    bar.appendChild(label); bar.appendChild(btn);
-    block.insertBefore(bar, block.firstChild);
+    bar.appendChild(label); bar.appendChild(btn); block.insertBefore(bar, block.firstChild);
   });
 
-  /* ---------- Learn progress ---------- */
-  var KEY = "pybi-docs-progress-v2";
-  var done = {};
-  try{ done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }catch(e){ done = {}; }
-  var total = 12;
-  function render(){
+  /* ---------- course progress ---------- */
+  var KEY = "pybi-docs-progress-v2", TOTAL = 12, done = {};
+  try{ done = JSON.parse(store(KEY) || "{}") || {}; }catch(e){ done = {}; }
+  function renderProgress(){
     var count = 0;
-    for(var i=1;i<=total;i++){
+    for(var i = 1; i <= TOTAL; i++){
       var on = !!done[i]; if(on) count++;
-      var step = document.querySelector('.step[data-step="'+i+'"]');
-      var li = document.querySelector('#path li[data-step="'+i+'"]');
-      var cb = document.querySelector('input[data-done="'+i+'"]');
-      if(step) step.classList.toggle("done", on);
-      if(li) li.classList.toggle("done", on);
-      if(cb) cb.checked = on;
+      var el;
+      if((el = $('.step[data-step="'+i+'"]'))) el.classList.toggle("done", on);
+      if((el = $('#path li[data-step="'+i+'"]'))) el.classList.toggle("done", on);
+      if((el = $('input[data-done="'+i+'"]'))) el.checked = on;
+      if((el = $('[data-step-link="'+i+'"]'))) el.classList.toggle("done", on);
     }
-    document.getElementById("progLabel").textContent = count + " of " + total + " steps done";
-    document.getElementById("progFill").style.width = (count/total*100) + "%";
+    var pct = (count / TOTAL * 100) + "%", label = count + " of " + TOTAL + " steps done";
+    ["progFill", "sideFill"].forEach(function(id){ var e = document.getElementById(id); if(e) e.style.width = pct; });
+    ["progLabel", "sideLabel"].forEach(function(id){ var e = document.getElementById(id); if(e) e.textContent = label; });
   }
-  document.querySelectorAll("input[data-done]").forEach(function(cb){
-    cb.addEventListener("change", function(){
-      done[cb.getAttribute("data-done")] = cb.checked;
-      try{ localStorage.setItem(KEY, JSON.stringify(done)); }catch(e){}
-      render();
-    });
+  $$("input[data-done]").forEach(function(cb){
+    cb.addEventListener("change", function(){ done[cb.getAttribute("data-done")] = cb.checked; store(KEY, JSON.stringify(done)); renderProgress(); });
   });
-  render();
+  renderProgress();
 
-  /* ---------- Sidebar: search, active link, mobile menu ---------- */
-  var links = Array.prototype.slice.call(document.querySelectorAll(".side a"));
-  var search = document.getElementById("navSearch");
-  var index = links.map(function(a){
-    var el = document.querySelector(a.getAttribute("href"));
-    var text = a.textContent + " " + (el ? (el.closest("section, article") || el).textContent : "");
-    return text.toLowerCase();
-  });
-  search.addEventListener("input", function(){
-    var q = search.value.trim().toLowerCase(), shown = 0;
-    links.forEach(function(a,i){
-      var hit = !q || index[i].indexOf(q) !== -1;
-      a.style.display = hit ? "" : "none"; if(hit) shown++;
-    });
-    document.querySelectorAll(".side .group").forEach(function(gr){
-      var any = Array.prototype.some.call(gr.querySelectorAll("a"), function(a){return a.style.display !== "none";});
-      gr.style.display = any ? "" : "none";
-    });
-    document.getElementById("navEmpty").style.display = shown ? "none" : "block";
+  /* ---------- theme ---------- */
+  $("#themeBtn").addEventListener("click", function(){
+    var root = document.documentElement, cur = root.getAttribute("data-theme");
+    if(!cur) cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    var next = cur === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next); store("pybi-theme", next);
   });
 
-  var targets = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
-  function setActive(){
-    var y = window.scrollY + 120, cur = 0;
-    targets.forEach(function(t,i){ if(t && t.getBoundingClientRect().top + window.scrollY <= y) cur = i; });
-    links.forEach(function(a,i){ a.classList.toggle("active", i === cur); });
-  }
-  window.addEventListener("scroll", setActive, {passive:true}); setActive();
-
-  var menuBtn = document.getElementById("menuBtn"), side = document.getElementById("sidebar");
-  menuBtn.addEventListener("click", function(){
-    var open = side.classList.toggle("open");
+  /* ---------- mobile drawer ---------- */
+  var side = $("#sidebar"), scrim = $("#scrim"), menuBtn = $("#menuBtn");
+  function drawer(open){
+    side.classList.toggle("open", open); scrim.classList.toggle("open", open);
     menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  menuBtn.addEventListener("click", function(){ drawer(!side.classList.contains("open")); });
+  scrim.addEventListener("click", function(){ drawer(false); });
+  $$(".side a").forEach(function(a){ a.addEventListener("click", function(){ if(window.innerWidth <= 900) drawer(false); }); });
+
+  /* ---------- sections, pager, scroll spy, on-this-page ---------- */
+  var sideLinks = $$(".side a[href^='#']");
+  var sections = $$("main section[id]");
+  var navOrder = sections.map(function(s){
+    var a = $(".side a[href='#"+s.id+"']"), h = $("h1, h2", s);
+    return { id: s.id, title: a ? a.textContent.replace("✓", "").trim() : (h ? h.textContent.trim() : s.id) };
   });
-  links.forEach(function(a){ a.addEventListener("click", function(){
-    if(window.innerWidth <= 900){ side.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); }
-  });});
+  sections.forEach(function(s, i){
+    var prev = navOrder[i - 1], next = navOrder[i + 1];
+    if(!prev && !next) return;
+    var p = document.createElement("nav"); p.className = "pager"; p.setAttribute("aria-label", "Previous and next");
+    p.innerHTML = (prev ? '<a class="prev" href="#'+prev.id+'"><small>← Previous</small><b>'+esc(prev.title)+'</b></a>' : '') +
+                  (next ? '<a class="next" href="#'+next.id+'"><small>Next →</small><b>'+esc(next.title)+'</b></a>' : '');
+    s.appendChild(p);
+  });
+  var slug = function(t){ return t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); };
+  $$("main section h3, main section h4").forEach(function(h){
+    if(!h.id && !h.closest(".step")){ var id = slug(h.textContent); if(id && !document.getElementById(id)) h.id = id; }
+  });
+  var toc = $("#toc"), currentSec = null;
+  function buildToc(sec){
+    if(sec === currentSec) return; currentSec = sec;
+    var items = [];
+    if(sec.id === "learn") items = $$(".step", sec).map(function(st){ return { id: st.id, text: $("h3", st).textContent }; });
+    else items = $$("h3[id]", sec).map(function(h){ return { id: h.id, text: h.textContent }; });
+    var h2 = $("h1, h2", sec);
+    toc.innerHTML = '<p class="t">On this page</p>' + '<a href="#'+sec.id+'" data-target="'+sec.id+'">'+esc(h2 ? h2.textContent.trim() : sec.id)+'</a>' +
+      items.map(function(it){ return '<a href="#'+it.id+'" data-target="'+it.id+'">'+esc(it.text)+'</a>'; }).join("") +
+      '<a class="edit" href="https://github.com/rafay183/pybi/edit/main/docs/index.html">Suggest an edit on GitHub</a>';
+  }
+  function spy(){
+    var y = window.scrollY + 110, cur = sections[0];
+    sections.forEach(function(s){ if(s.offsetTop <= y) cur = s; });
+    buildToc(cur);
+    var anchors = $$("#toc a[data-target]"), active = anchors[0];
+    anchors.forEach(function(a){ var t = document.getElementById(a.getAttribute("data-target")); if(t && t.getBoundingClientRect().top + window.scrollY <= y) active = a; });
+    anchors.forEach(function(a){ a.classList.toggle("on", a === active); });
+    var id = active ? active.getAttribute("data-target") : cur.id, best = null;
+    sideLinks.forEach(function(a){ if(a.getAttribute("href") === "#" + id) best = a; });
+    if(!best) sideLinks.forEach(function(a){ if(a.getAttribute("href") === "#" + cur.id) best = a; });
+    sideLinks.forEach(function(a){ a.classList.toggle("active", a === best); });
+    if(best && window.innerWidth > 900){
+      var r = best.getBoundingClientRect(), sr = side.getBoundingClientRect();
+      if(r.top < sr.top + 40 || r.bottom > sr.bottom - 40) side.scrollTop += r.top - sr.top - sr.height / 3;
+    }
+  }
+  var ticking = false;
+  window.addEventListener("scroll", function(){ if(!ticking){ ticking = true; requestAnimationFrame(function(){ spy(); ticking = false; }); } }, { passive: true });
+  spy();
+
+  /* ---------- search palette ---------- */
+  var index = [];
+  function add(id, title, where, el){ if(id && title) index.push({ id: id, title: title.trim(), where: where, text: (el ? el.textContent : title).toLowerCase() }); }
+  sections.forEach(function(s){
+    var name = (navOrder.filter(function(n){ return n.id === s.id; })[0] || {}).title || s.id;
+    var h2 = $("h1, h2", s); add(s.id, h2 ? h2.textContent : name, "Section", s);
+    $$(".step", s).forEach(function(st){ add(st.id, $("h3", st).textContent, "Learn · step " + st.getAttribute("data-step"), st); });
+    $$("h3[id]", s).forEach(function(h){
+      var block = [h], n = h.nextElementSibling;
+      while(n && !/^H[23]$/.test(n.tagName)){ block.push(n); n = n.nextElementSibling; }
+      add(h.id, h.textContent, name, { textContent: block.map(function(b){ return b.textContent; }).join(" ") });
+    });
+    $$("details", s).forEach(function(d, i){ if(!d.id) d.id = s.id + "-q" + (i + 1); add(d.id, $("summary", d).textContent, "Troubleshooting", d); });
+  });
+  var pal = $("#palette"), input = $("#palInput"), list = $("#palList"), sel = 0, results = [];
+  function render(){
+    var q = input.value.trim().toLowerCase(), words = q.split(/\s+/).filter(Boolean);
+    results = !q ? index.filter(function(it){ return it.where === "Section"; }) : index.map(function(it){
+      var t = it.title.toLowerCase(), score = 0;
+      for(var i = 0; i < words.length; i++){
+        if(t.indexOf(words[i]) !== -1) score += 3; else if(it.text.indexOf(words[i]) !== -1) score += 1; else return null;
+      }
+      return { it: it, score: score + (it.where === "Section" ? 0.5 : 0) };
+    }).filter(Boolean).sort(function(a, b){ return b.score - a.score; }).map(function(r){ return r.it; });
+    results = results.slice(0, 40); sel = 0;
+    list.innerHTML = results.length ? results.map(function(it, i){
+      return '<li><a href="#'+it.id+'" class="'+(i === 0 ? "sel" : "")+'"><b>'+esc(it.title)+'</b><small>'+esc(it.where)+'</small></a></li>';
+    }).join("") : '<li class="empty">No results. Try another word, such as “slicer” or “export”.</li>';
+  }
+  function openPal(){ pal.classList.add("open"); input.value = ""; render(); input.focus(); }
+  function closePal(){ pal.classList.remove("open"); }
+  function go(i){ var it = results[i]; if(!it) return; closePal(); location.hash = it.id; var t = document.getElementById(it.id); if(t && t.tagName === "DETAILS") t.open = true; }
+  $("#searchBtn").addEventListener("click", openPal);
+  pal.addEventListener("click", function(e){ if(e.target === pal) closePal(); var a = e.target.closest("a"); if(a){ e.preventDefault(); go($$("a", list).indexOf(a)); } });
+  input.addEventListener("input", render);
+  input.addEventListener("keydown", function(e){
+    var links = $$("a", list);
+    if(e.key === "ArrowDown" || e.key === "ArrowUp"){
+      e.preventDefault(); sel = Math.max(0, Math.min(links.length - 1, sel + (e.key === "ArrowDown" ? 1 : -1)));
+      links.forEach(function(a, i){ a.classList.toggle("sel", i === sel); }); if(links[sel]) links[sel].scrollIntoView({ block: "nearest" });
+    } else if(e.key === "Enter"){ e.preventDefault(); go(sel); }
+  });
+  document.addEventListener("keydown", function(e){
+    var typing = /INPUT|TEXTAREA/.test((document.activeElement || {}).tagName || "");
+    if((e.key === "k" || e.key === "K") && (e.ctrlKey || e.metaKey)){ e.preventDefault(); pal.classList.contains("open") ? closePal() : openPal(); }
+    else if(e.key === "/" && !typing){ e.preventDefault(); openPal(); }
+    else if(e.key === "Escape"){ closePal(); drawer(false); }
+  });
+  if(navigator.platform && /Mac/.test(navigator.platform)){ var k = $("#searchBtn kbd"); if(k) k.textContent = "⌘ K"; }
 })();
+
 </script>
 </body>
 </html>
