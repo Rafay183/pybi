@@ -120,7 +120,7 @@ jobs:
           $u = Start-Process "$dir\unins000.exe" -Wait -PassThru -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'
           if ($u.ExitCode -ne 0) { throw "Uninstaller exit code $($u.ExitCode)" }
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: build-Windows-x64
           path: |
@@ -190,7 +190,7 @@ jobs:
           chmod +x dist/PyBI-*.AppImage
           APPIMAGE_EXTRACT_AND_RUN=1 ./dist/PyBI-*.AppImage --version
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: build-${{ matrix.name }}
           path: dist/*
