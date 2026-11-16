@@ -274,12 +274,12 @@ def test_install_kind_detection(monkeypatch):
 def test_pick_release_per_platform():
     assets = ("PyBI-Setup.exe", "PyBI-Setup.exe.sha256", "PyBI-macOS-arm64.dmg", "PyBI-macOS-arm64.dmg.sha256",
               "PyBI-Linux-x86_64.AppImage", "PyBI-Linux-x86_64.AppImage.sha256",
-              "pybi_1.2.0_amd64.deb", "pybi_1.2.0_amd64.deb.sha256")
+              "PyBI-Linux-amd64.deb", "PyBI-Linux-amd64.deb.sha256")
     payload = [_rel("v1.2.0", assets=assets)]
     for pattern, name in ((r"^PyBI-Setup.*\.exe$", "PyBI-Setup.exe"),
                           (r"^PyBI-macOS-arm64\.dmg$", "PyBI-macOS-arm64.dmg"),
                           (r"^PyBI-Linux-x86_64\.AppImage$", "PyBI-Linux-x86_64.AppImage"),
-                          (r"^pybi_.*_amd64\.deb$", "pybi_1.2.0_amd64.deb")):
+                          (r"^PyBI-Linux-amd64\.deb$", "PyBI-Linux-amd64.deb")):
         r = U.pick_release(payload, pattern, False)
         assert r.asset_name == name and r.sha256_url.endswith(name + ".sha256")
 
@@ -301,10 +301,10 @@ def test_appimage_self_replace(isolated, monkeypatch):
 def test_deb_update_goes_to_downloads(isolated, monkeypatch):
     monkeypatch.setenv("HOME", str(isolated / "home"))
     monkeypatch.setattr(Path, "home", classmethod(lambda cls: isolated / "home"))
-    f = isolated / "1.3.0-pybi_1.3.0_amd64.deb"
+    f = isolated / "1.3.0-PyBI-Linux-amd64.deb"
     f.write_bytes(b"deb")
     result, where = U.apply_update(f, C.Config(install_kind="deb"), isolated)
-    assert result == "manual" and where == isolated / "home" / "Downloads" / "pybi_1.3.0_amd64.deb"
+    assert result == "manual" and where == isolated / "home" / "Downloads" / "PyBI-Linux-amd64.deb"
     assert where.read_bytes() == b"deb"
 
 

@@ -4,6 +4,13 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-17
+
+### Added
+- Desktop apps for macOS (Apple Silicon and Intel `.dmg`), Linux (`.AppImage` for any distro, `.deb` for Debian/Ubuntu) and ChromeOS (`.deb` in the Linux environment), each with its own Python, the ر icon and automatic updates.
+- Documentation site with a 12-step business intelligence course, published on GitHub Pages at https://rafay183.github.io/pybi/.
+- The launcher runs without a window when no display is available and stops PyBI cleanly on logout or shutdown.
+
 ## [0.1.1] - 2026-11-14
 
 ### Added
@@ -27,6 +34,7 @@ First public release.
 - Live read-only network sharing (`/view`).
 - Exports: PNG, PowerPoint, PDF, interactive offline HTML, `.pybi` project files.
 
-[Unreleased]: https://github.com/rafay183/pybi/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/rafay183/pybi/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/rafay183/pybi/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/rafay183/pybi/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/rafay183/pybi/releases/tag/v0.1.0

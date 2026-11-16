@@ -1,11 +1,18 @@
-# PyBI Windows installer
+# PyBI desktop apps
 
-This folder builds **PyBI-Setup.exe**, a normal Windows setup wizard:
+This folder builds PyBI for every desktop platform. Every package includes its own Python and every library, shows the ر icon, opens PyBI in the browser, and updates itself from GitHub Releases.
 
-* **Next → Next → Install.** No admin rights, no UAC prompt. It installs per user into `%LOCALAPPDATA%\Programs\PyBI`.
-* **Nothing to install first.** The setup carries its own Python 3.11 plus `pybi-ray` and every dependency. It never touches a Python the user may already have.
-* **One icon, the Urdu letter ر.** It opens the PyBI window, starts PyBI on `http://127.0.0.1:8050` (or the next free port) and opens the browser.
-* **Updates itself.** Every release you publish on GitHub reaches users: the app shows *"PyBI x.y.z is available"*, downloads the installer, checks its SHA-256 and upgrades silently. Their dashboards and settings are kept.
+| Platform | File | How it installs | How it updates |
+|---|---|---|---|
+| Windows 10/11 x64 | `PyBI-Setup.exe` (+ `.zip`) | Wizard, per user, no admin | Silent in-place upgrade |
+| macOS 11+ Apple Silicon | `PyBI-macOS-arm64.dmg` | Drag `PyBI.app` to Applications | Replaces `PyBI.app` in place |
+| macOS 11+ Intel | `PyBI-macOS-x86_64.dmg` | Same | Same |
+| Linux x86_64 / ARM64 | `PyBI-Linux-<arch>.AppImage` | Nothing to install | Replaces the AppImage file |
+| Debian, Ubuntu, ChromeOS | `PyBI-Linux-<amd64\|arm64>.deb` | Double-click / `apt install` (`/opt/pybi`) | Downloads the new `.deb` to Downloads for one double-click |
+
+Every file has a `<name>.sha256`; the updater refuses a download whose checksum does not match.
+
+**ChromeOS** runs PyBI in its built-in Linux (Settings → Advanced → Developers → Linux development environment). Double-clicking the `.deb` in Files installs it, PyBI appears in the launcher, and Chrome opens the studio at `localhost`.
 
 ## Folder map
 
@@ -13,13 +20,14 @@ This folder builds **PyBI-Setup.exe**, a normal Windows setup wizard:
 .github/workflows/build-installer.yml   CI: test → build → smoke-test → publish to Releases
 installer/
   pybi.iss                 Inno Setup wizard script (AppId must never change)
-  scripts/build.ps1          builds runtime + PyBI.exe + setup (Windows, PowerShell 7)
+  scripts/build.ps1        Windows: runtime + PyBI.exe + setup (PowerShell 7)
+  scripts/build_unix.sh    macOS (.dmg) and Linux (.AppImage, .deb)
   launcher/                the PyBI.exe desktop app (Python + Tk)
     main.py                entry point
     launcher.json          start command, port, update settings
     pybi_launcher/         config, server, updater, versions, single-instance, UI
     tests/                 pytest suite (runs in CI before every build)
-  assets/                  ر icon (.ico/.png), wizard artwork, starter dashboard
+  assets/                  ر icon (.ico, .icns, .png), wizard artwork
   requirements-extra.txt   optional: extra packages to bundle (create it if needed)
 ```
 
@@ -31,7 +39,7 @@ installer/
    git tag v1.3.0
    git push origin v1.3.0
    ```
-3. GitHub Actions runs the launcher tests and builds the installer. It installs that build silently, checks that `pybi` imports, uninstalls it, then publishes `PyBI-Setup.exe` and `PyBI-Setup.exe.sha256` to the **v1.3.0** release. This takes about 6–10 minutes.
+3. GitHub Actions runs the launcher tests on Windows, macOS and Linux, then builds all six packages in parallel. Each one is installed and smoke-tested (PyBI must import, and the studio must answer on macOS and Linux) before everything is published together as release **v1.3.0**. This takes about 15–25 minutes.
 4. Installed copies see the update the next time they open PyBI (checks run at most every 6 hours, or immediately with **Check for updates**).
 
 Pre-releases: tag `v1.4.0rc1` or `v1.4.0-beta.1`. Those become GitHub pre-releases and reach only users with `include_prereleases=1` in `settings.ini`.

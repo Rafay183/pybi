@@ -6,7 +6,7 @@ Release contract (produced by .github/workflows/build-installer.yml):
       PyBI-Setup.exe                 Windows (Inno Setup)
       PyBI-macOS-arm64.dmg           macOS Apple Silicon      PyBI-macOS-x86_64.dmg   macOS Intel
       PyBI-Linux-x86_64.AppImage     Linux (any distro)       PyBI-Linux-aarch64.AppImage
-      pybi_X.Y.Z_amd64.deb           Debian/Ubuntu/ChromeOS   pybi_X.Y.Z_arm64.deb
+      PyBI-Linux-amd64.deb           Debian/Ubuntu/ChromeOS   PyBI-Linux-arm64.deb
   Each build's launcher.json carries the asset_pattern for its own platform.
 """
 from __future__ import annotations

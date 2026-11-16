@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyBI Documentation</title>
+<meta name="description" content="PyBI: open-source Power BI-style business intelligence studio. Download for Windows, Mac, Chromebook and Linux, and learn BI step by step.">
+<meta property="og:title" content="PyBI Documentation">
+<meta property="og:description" content="Open-source business intelligence studio: get data, model, DAX measures, interactive dashboards. Free for Windows, Mac, Chromebook and Linux.">
+<meta property="og:image" content="https://rafay183.github.io/pybi/images/dashboard.png">
+<link rel="icon" href="images/pybi-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky left nav + one reading column; Learn steps are numbered cards with a progress bar. */
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --ink:#13202a; --muted:#566573; --line:#dbe1e6;
+  --accent:#0a6c6c; --accent-soft:#e2f1f0; --amber:#d99a00; --amber-soft:#fbf1d6;
+  --code-bg:#0f1a21; --code-ink:#dfe8ee; --good:#1f8a4c; --warn:#b26a00;
+  --font-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body:"Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  --radius:10px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1418; --surface:#141d23; --ink:#e4ebef; --muted:#93a3b0; --line:#25323b;
+    --accent:#3fc2b6; --accent-soft:#16302f; --amber:#f0bb3a; --amber-soft:#33290f;
+    --code-bg:#091015; --code-ink:#dbe5ea; --good:#4cc781; --warn:#f0a940; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1418; --surface:#141d23; --ink:#e4ebef; --muted:#93a3b0; --line:#25323b;
+  --accent:#3fc2b6; --accent-soft:#16302f; --amber:#f0bb3a; --amber-soft:#33290f;
+  --code-bg:#091015; --code-ink:#dbe5ea; --good:#4cc781; --warn:#f0a940; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.65}
+a{color:var(--accent); text-underline-offset:3px}
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+h1,h2,h3,h4{font-family:var(--font-display); line-height:1.2; text-wrap:balance; margin:0}
+h1{font-size:clamp(2rem,4vw,2.7rem)}
+h2{font-size:1.75rem; margin-top:8px}
+h3{font-size:1.2rem; margin-top:28px; margin-bottom:8px}
+h4{font-size:1rem; margin-top:18px; margin-bottom:6px}
+p{margin:10px 0}
+code{font-family:var(--font-mono); font-size:.86em; background:var(--accent-soft); padding:.1em .35em; border-radius:4px}
+pre code{background:none; padding:0; font-size:inherit}
+
+/* Header */
+.topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:16px; padding:12px 20px; background:var(--surface); border-bottom:1px solid var(--line)}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:1.15rem; color:var(--ink); text-decoration:none}
+.brand svg{flex:none}
+.brand small{font-family:var(--font-mono); font-weight:400; font-size:.75rem; color:var(--muted); border:1px solid var(--line); padding:1px 6px; border-radius:20px}
+.topbar .spacer{flex:1}
+.topbar nav{display:flex; gap:16px; flex-wrap:wrap}
+.topbar nav a{color:var(--muted); text-decoration:none; font-weight:600; font-size:.92rem}
+.topbar nav a:hover{color:var(--ink)}
+.menu-btn{display:none; font:inherit; background:none; border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:4px 10px; cursor:pointer}
+
+/* Shell */
+.shell{display:grid; grid-template-columns:270px minmax(0,1fr); max-width:1240px; margin:0 auto}
+.side{position:sticky; top:57px; align-self:start; height:calc(100vh - 57px); overflow-y:auto; padding:20px 16px 40px; border-right:1px solid var(--line)}
+.side input{width:100%; font:inherit; font-size:.9rem; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink)}
+.side .group{margin-top:18px}
+.side .group-title{font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700; margin:0 0 6px 8px}
+.side a{display:block; padding:5px 8px; border-radius:6px; color:var(--ink); text-decoration:none; font-size:.92rem}
+.side a:hover{background:var(--accent-soft)}
+.side a.active{background:var(--accent-soft); color:var(--accent); font-weight:700}
+.side a .n{display:inline-block; width:22px; font-family:var(--font-mono); font-size:.78rem; color:var(--muted)}
+.side .empty{display:none; color:var(--muted); font-size:.85rem; margin:12px 8px}
+main{padding:32px clamp(16px,4vw,56px) 80px; min-width:0}
+.col{max-width:800px}
+section{padding-top:28px; margin-top:28px; border-top:1px solid var(--line)}
+section:first-of-type{border-top:none; margin-top:0; padding-top:0}
+.eyebrow{font-family:var(--font-mono); font-size:.78rem; color:var(--accent); font-weight:500; letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px}
+.lead{font-size:1.12rem; color:var(--muted); max-width:65ch}
+
+/* Hero */
+.hero{display:grid; gap:18px}
+.hero .actions{display:flex; flex-wrap:wrap; gap:10px}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:8px; font-weight:700; text-decoration:none; border:1px solid var(--line); color:var(--ink); background:var(--surface); font-size:.95rem}
+.btn.primary{background:var(--accent); color:var(--surface); border-color:var(--accent)}
+.feature-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:18px}
+.feature{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px}
+.feature b{display:block; font-family:var(--font-display); font-size:1.02rem; margin-bottom:2px}
+.feature span{color:var(--muted); font-size:.92rem}
+
+/* Downloads */
+.dl-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 0}
+.dl{display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:10px; text-decoration:none; background:var(--accent); color:var(--surface); border:1px solid var(--accent)}
+.dl b{font-family:var(--font-display); font-size:1.02rem}
+.dl span{font-size:.82rem; opacity:.85}
+.dl:hover{filter:brightness(1.08)}
+
+/* Code */
+.code{position:relative; margin:14px 0; border-radius:var(--radius); background:var(--code-bg); overflow:hidden; border:1px solid var(--line)}
+.code .bar{display:flex; justify-content:space-between; align-items:center; padding:6px 10px 6px 14px; font-family:var(--font-mono); font-size:.75rem; color:#8fa3b0; border-bottom:1px solid #1f2c35}
+.code button{font:inherit; font-size:.75rem; background:#1c2a33; color:#cfdbe2; border:1px solid #2c3d48; border-radius:6px; padding:3px 9px; cursor:pointer}
+.code button:hover{background:#26404a}
+.code pre{margin:0; padding:14px 16px; overflow-x:auto; color:var(--code-ink); font-family:var(--font-mono); font-size:.84rem; line-height:1.6}
+.tk-k{color:#ff9e7a}.tk-s{color:#a6e3a1}.tk-c{color:#7f939f; font-style:italic}.tk-n{color:#f5c26b}.tk-f{color:#7cc7ff}
+
+/* Callouts */
+.callout{display:grid; grid-template-columns:4px 1fr; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px 12px 0; margin:16px 0; overflow:hidden}
+.callout::before{content:""; background:var(--accent); border-radius:0 3px 3px 0}
+.callout.bi::before{background:var(--amber)}
+.callout.warn::before{background:var(--warn)}
+.callout .t{font-weight:800; font-size:.8rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.callout p{margin:4px 0}
+
+/* Tables */
+.tbl{overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:.9rem}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-size:.76rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); background:var(--bg)}
+tr:last-child td{border-bottom:none}
+td code{white-space:nowrap}
+.num{text-align:right; font-variant-numeric:tabular-nums}
+
+/* Learn */
+.progress{display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin:18px 0}
+.progress .track{flex:1; height:8px; background:var(--line); border-radius:8px; overflow:hidden}
+.progress .fill{height:100%; width:0; background:var(--accent); transition:width .3s}
+.progress .label{font-variant-numeric:tabular-nums; font-weight:700; font-size:.9rem; white-space:nowrap}
+.path{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin:14px 0; padding:0; list-style:none; counter-reset:p}
+.path li{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:.86rem}
+.path li a{color:var(--ink); text-decoration:none; font-weight:600}
+.path li .n{font-family:var(--font-mono); color:var(--accent); font-size:.75rem; display:block}
+.path li.done{border-color:var(--accent); background:var(--accent-soft)}
+.step{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:22px clamp(16px,3vw,28px); margin:22px 0}
+.step.done{border-color:var(--accent)}
+.step-head{display:flex; gap:14px; align-items:flex-start}
+.step-num{flex:none; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); font-family:var(--font-display); font-weight:700; font-size:1.1rem}
+.step.done .step-num{background:var(--accent); color:var(--surface)}
+.step-head h3{margin:2px 0 2px}
+.step-meta{color:var(--muted); font-size:.86rem}
+.goal{background:var(--bg); border-radius:8px; padding:10px 14px; margin:14px 0; font-size:.94rem}
+.goal b{color:var(--accent)}
+.check{background:var(--amber-soft); border-radius:8px; padding:10px 14px; margin:14px 0; font-size:.93rem}
+.check b{color:var(--warn)}
+.done-toggle{display:flex; align-items:center; gap:8px; margin-top:16px; font-weight:700; font-size:.92rem; cursor:pointer; width:max-content}
+.done-toggle input{width:18px; height:18px; accent-color:var(--accent)}
+ol.steps-list, ul.tight{padding-left:22px; margin:8px 0}
+ol.steps-list li, ul.tight li{margin:4px 0}
+
+/* Dashboard preview */
+.dash{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:14px; margin:18px 0}
+.dash-top{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px}
+.dash-top b{font-family:var(--font-display); font-size:1.05rem}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{font-size:.78rem; font-weight:600; border:1px solid var(--line); background:var(--surface); border-radius:20px; padding:3px 10px; color:var(--muted)}
+.chip.on{border-color:var(--accent); color:var(--accent)}
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px}
+.kpi{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px}
+.kpi .k{font-size:.78rem; color:var(--muted); font-weight:600}
+.kpi .v{font-family:var(--font-display); font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums}
+.kpi .d{font-size:.78rem; font-weight:700; font-variant-numeric:tabular-nums}
+.kpi .d.flat{color:var(--muted)} .kpi .d.up{color:var(--good)}
+.panels{display:grid; grid-template-columns:1.5fr 1fr; gap:10px; margin-top:10px}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px; min-width:0}
+.panel h5{margin:0 0 8px; font-size:.86rem; font-family:var(--font-body)}
+.panel svg{width:100%; height:auto; display:block}
+.hbar{display:grid; grid-template-columns:110px 1fr 52px; gap:8px; align-items:center; font-size:.8rem; margin:5px 0}
+.hbar .b{height:12px; background:var(--line); border-radius:4px; overflow:hidden}
+.hbar .b i{display:block; height:100%; background:var(--accent); border-radius:4px}
+.hbar .val{text-align:right; font-variant-numeric:tabular-nums; color:var(--muted)}
+.caption{font-size:.82rem; color:var(--muted); margin-top:8px}
+
+/* API */
+.sig{font-family:var(--font-mono); font-size:.88rem; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:6px; padding:8px 12px; margin:18px 0 6px; overflow-x:auto; white-space:nowrap}
+details{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:10px 16px; margin:10px 0}
+details summary{cursor:pointer; font-weight:700}
+details[open] summary{margin-bottom:6px}
+footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:.88rem}
+
+@media (max-width: 900px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static; height:auto; border-right:none; border-bottom:1px solid var(--line); display:none}
+  .side.open{display:block}
+  .menu-btn{display:inline-block}
+  .topbar nav{display:none}
+  .panels{grid-template-columns:1fr}
+}
+@media (max-width: 420px){ .hbar{grid-template-columns:90px 1fr 46px} }
+
+/* Screenshots and learn files */
+.shot{margin:16px 0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)}
+.shot img{display:block; width:100%; height:auto}
+.shot figcaption{font-size:.82rem; color:var(--muted); padding:8px 12px; border-top:1px solid var(--line)}
+.files{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px}
+.tk-d{color:#7cc7ff; font-weight:500}.tk-m{color:#f5c26b}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sidebar">Menu</button>
+  <a class="brand" href="#overview">
+    <img src="images/pybi-icon.png" width="28" height="28" alt="" style="border-radius:7px">
+    PyBI <small id="verTag">pybi-ray</small>
+  </a>
+  <span class="spacer"></span>
+  <nav aria-label="Top">
+    <a href="#download">Download</a>
+    <a href="#learn">Learn</a>
+    <a href="#guides">Guides</a>
+    <a href="#dax">DAX</a>
+    <a href="https://github.com/rafay183/pybi">GitHub</a>
+    <a class="btn primary" style="padding:5px 12px;font-size:.85rem" href="#download">Download</a>
+  </nav>
+</header>
+
+<div class="shell">
+<aside class="side" id="sidebar" aria-label="Documentation">
+  <label for="navSearch" class="group-title" style="display:block;margin-left:2px">Search the docs</label>
+  <input id="navSearch" type="search" placeholder="e.g. slicer, CALCULATE, export">
+  <p class="empty" id="navEmpty">No section matches that word.</p>
+
+  <div class="group"><p class="group-title">Getting started</p>
+    <a href="#overview">Overview</a>
+    <a href="#download">Download the app</a>
+    <a href="#pip">Install with pip</a>
+    <a href="#quickstart">Quickstart</a>
+    <a href="#tour">Tour of the studio</a>
+  </div>
+  <div class="group"><p class="group-title">Learn: BI step by step</p>
+    <a href="#learn">Course overview</a>
+    <a href="#step-1"><span class="n">01</span>Frame the questions</a>
+    <a href="#step-2"><span class="n">02</span>Open PyBI, get the data</a>
+    <a href="#step-3"><span class="n">03</span>Load data</a>
+    <a href="#step-4"><span class="n">04</span>Clean in the query editor</a>
+    <a href="#step-5"><span class="n">05</span>Build the model</a>
+    <a href="#step-6"><span class="n">06</span>Calculated columns</a>
+    <a href="#step-7"><span class="n">07</span>Measures (KPIs)</a>
+    <a href="#step-8"><span class="n">08</span>Visuals</a>
+    <a href="#step-9"><span class="n">09</span>Interactivity</a>
+    <a href="#step-10"><span class="n">10</span>Pages, design, smart tools</a>
+    <a href="#step-11"><span class="n">11</span>Share and export</a>
+    <a href="#step-12"><span class="n">12</span>Turn it into decisions</a>
+  </div>
+  <div class="group"><p class="group-title">Guides</p>
+    <a href="#guides">Get data &amp; connectors</a>
+    <a href="#query">Query editor steps</a>
+    <a href="#model">Model view</a>
+    <a href="#dax">DAX formulas</a>
+    <a href="#visuals">Visuals</a>
+    <a href="#filters">Filters &amp; interactivity</a>
+    <a href="#smart">Smart features</a>
+    <a href="#share">Share on your network</a>
+    <a href="#export">Export</a>
+  </div>
+  <div class="group"><p class="group-title">Reference</p>
+    <a href="#cli">Command line</a>
+    <a href="#python">Python &amp; Jupyter</a>
+    <a href="#how">How it works</a>
+    <a href="#security">Security</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+    <a href="#contributing">Contributing</a>
+  </div>
+</aside>
+
+<main>
+<div class="col">
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview">
+  <div class="hero">
+    <p class="eyebrow">Open-source business intelligence</p>
+    <h1>PyBI documentation</h1>
+    <p class="lead">PyBI is a Power BI–style business intelligence studio that runs on your own computer. Connect data, shape it in a visual query editor, build a model, write DAX-style measures, design interactive dashboards, share a live link on your network, and export to PNG, PowerPoint, PDF or an interactive HTML file.</p>
+    <div class="actions">
+      <a class="btn primary" href="#download">&#8681; Download the app</a>
+      <a class="btn" href="#learn">Start the BI course</a>
+      <a class="btn" href="https://github.com/rafay183/pybi">GitHub</a>
+      <a class="btn" href="https://pypi.org/project/pybi-ray/">PyPI: pybi-ray</a>
+    </div>
+  </div>
+  <figure class="shot"><img src="images/dashboard.png" alt="PyBI Studio showing the demo sales dashboard with KPI cards, a revenue trend and breakdown charts"><figcaption>PyBI Studio with the demo dashboard (<code>pybi demo</code>)</figcaption></figure>
+  <div class="feature-grid">
+    <div class="feature"><b>214 connectors</b><span>Excel, CSV, Parquet, 50 databases, cloud storage, 70+ SaaS apps, public data, REST, GraphQL and Python.</span></div>
+    <div class="feature"><b>Query editor</b><span>Power Query–style applied steps with live preview: types, filters, splits, merges, appends, group by, unpivot.</span></div>
+    <div class="feature"><b>Model and DAX</b><span>Star-schema relationships, a date table, and measures with CALCULATE, FILTER, time intelligence and iterators.</span></div>
+    <div class="feature"><b>25 visuals</b><span>Charts, cards, KPI, gauge, waterfall, treemap, tables, matrices and slicers, all cross-filtering each other.</span></div>
+    <div class="feature"><b>Smart tools</b><span>Ask your data in plain English, build a full insight page with Auto dashboard, add a smart narrative.</span></div>
+    <div class="feature"><b>Share and export</b><span>A live read-only link for your network; export to PNG, PowerPoint, PDF or one offline interactive HTML file.</span></div>
+  </div>
+  <p style="margin-top:14px">Created by <b>Muhammad Rafay Shaikh</b>, from Pakistan. MIT licensed.</p>
+</section>
+
+<!-- ============ DOWNLOAD ============ -->
+<section id="download">
+  <p class="eyebrow">Getting started</p>
+  <h2>Download the desktop app</h2>
+  <p>The easiest way to use PyBI. Each download includes its own Python and every library, so there is nothing else to install. Open PyBI from the ر icon: it starts on your computer and opens in your browser. It updates itself when a new version is released.</p>
+  <div class="dl-grid">
+    <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.exe"><b>Windows</b><span>10 / 11 · .exe installer</span></a>
+    <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-arm64.dmg"><b>Mac · Apple chip</b><span>M1–M4 · .dmg</span></a>
+    <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-macOS-x86_64.dmg"><b>Mac · Intel</b><span>.dmg</span></a>
+    <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb"><b>Chromebook</b><span>Intel / AMD · .deb</span></a>
+    <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-amd64.deb"><b>Ubuntu / Debian</b><span>.deb package</span></a>
+    <a class="dl" href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-x86_64.AppImage"><b>Any Linux</b><span>.AppImage</span></a>
+  </div>
+  <p style="font-size:.9rem;color:var(--muted)">ARM Chromebook or Linux: <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-arm64.deb">.deb (ARM64)</a> · <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Linux-aarch64.AppImage">.AppImage (ARM64)</a> · Windows <a href="https://github.com/rafay183/pybi/releases/latest/download/PyBI-Setup.zip">.zip with checksum</a> · <a href="https://github.com/rafay183/pybi/releases">all versions</a></p>
+  <div class="tbl"><table>
+    <thead><tr><th>Computer</th><th>How to install</th></tr></thead>
+    <tbody>
+      <tr><td><b>Windows</b></td><td>Open <code>PyBI-Setup.exe</code> and click <b>Next → Next → Install</b>. No admin rights needed. If Windows says "Windows protected your PC", click <b>More info → Run anyway</b>.</td></tr>
+      <tr><td><b>Mac</b></td><td>Open the <code>.dmg</code> and drag <b>PyBI</b> to <b>Applications</b>. The first time, if the Mac says PyBI "cannot be opened", go to <b>System Settings → Privacy &amp; Security → Open Anyway</b>. Apple menu → <b>About This Mac</b> shows whether you have an Apple chip or Intel.</td></tr>
+      <tr><td><b>Chromebook</b></td><td>Turn on Linux in <b>Settings → Advanced → Developers → Linux development environment</b>. Open the downloaded <code>.deb</code> in the Files app and choose <b>Install</b>. PyBI appears in your app launcher.</td></tr>
+      <tr><td><b>Ubuntu / Debian / Mint</b></td><td>Double-click the <code>.deb</code>, or run <code>sudo apt install ./PyBI-Linux-amd64.deb</code>. Start it from your app menu or with <code>pybi-desktop</code>.</td></tr>
+      <tr><td><b>Other Linux</b></td><td>Run <code>chmod +x PyBI-Linux-x86_64.AppImage</code>, then double-click it.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><div><p class="t">What the app does</p><p>A small PyBI window shows the status, with <b>Open PyBI</b>, <b>Restart</b> and <b>Stop</b>. Your projects live in <code>Documents/PyBI</code>. When a new version is out, the window offers <b>Update now</b>, verifies the download and keeps your projects and settings.</p></div></div>
+</section>
+
+<!-- ============ PIP ============ -->
+<section id="pip">
+  <p class="eyebrow">Getting started</p>
+  <h2>Install with pip</h2>
+  <p>For Python users, on any platform. Needs Python 3.10 or newer. The install name is <code>pybi-ray</code>, the command is <code>pybi</code>, and the import is <code>import pybi</code>.</p>
+  <div class="code" data-lang="bash"><pre><code>pip install pybi-ray
+pybi run          # opens PyBI Studio at http://127.0.0.1:8050
+pybi demo         # opens with a ready-made 3-page sales dashboard</code></pre></div>
+  <p>Some connectors need a database driver. Install drivers in groups with extras, or everything at once:</p>
+  <div class="code" data-lang="bash"><pre><code>pip install "pybi-ray[postgres,mysql,cloud]"
+pip install "pybi-ray[all]"</code></pre></div>
+  <div class="callout warn"><div><p class="t">Name check</p><p>Install <code>pybi-ray</code>. The plain name <code>pybi</code> on PyPI is an unrelated project.</p></div></div>
+</section>
+
+<!-- ============ QUICKSTART ============ -->
+<section id="quickstart">
+  <p class="eyebrow">Getting started</p>
+  <h2>Quickstart in 2 minutes</h2>
+  <ol class="steps-list">
+    <li>Open PyBI (the app, or <code>pybi run</code>). The studio opens in your browser.</li>
+    <li>In the ribbon, click <b>Data → Sample</b>. PyBI loads a demo dataset and a 3-page dashboard.</li>
+    <li>Click any bar or slice: every other visual filters to it. Ctrl+click to select several.</li>
+    <li>Type a question in the <b>Ask your data</b> box at the top, for example <code>top 5 products by profit as bar</code>, and press Enter.</li>
+    <li>Click <b>⇪ Share</b> for a link colleagues on your Wi-Fi can open, or <b>File → Export</b> for PNG, PowerPoint, PDF or interactive HTML.</li>
+  </ol>
+  <p>To learn every part properly, with your own data, follow the <a href="#learn">Learn course</a>.</p>
+</section>
+
+<!-- ============ TOUR ============ -->
+<section id="tour">
+  <p class="eyebrow">Getting started</p>
+  <h2>Tour of the studio</h2>
+  <p>If you know Power BI Desktop, you will recognise the layout.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Ribbon group</th><th>Buttons</th></tr></thead>
+    <tbody>
+      <tr><td><b>Data</b></td><td>Get data · Transform (query editor) · Refresh · Sample</td></tr>
+      <tr><td><b>Insert</b></td><td>New page · Text box · Visual · Slicer</td></tr>
+      <tr><td><b>Calculations</b></td><td>New measure · New column · Date table · Relationships</td></tr>
+      <tr><td><b>Smart</b></td><td>Auto dashboard · Ask data</td></tr>
+      <tr><td><b>View</b></td><td>Theme · Gridlines · Undo · Redo</td></tr>
+      <tr><td><b>File</b></td><td>New · Open · Save (.pybi) · Export</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="tight">
+    <li><b>Three views</b> on the left edge: <b>▦ Report</b> (design pages), <b>⊞ Table</b> (see the data) and <b>⛓ Model</b> (relationships).</li>
+    <li><b>Panes</b> on the right: <b>Visualizations</b> (visual type, field wells, formatting), <b>Fields</b> (your tables, columns and measures) and <b>Filters</b> (this visual, this page, all pages).</li>
+    <li><b>Ask your data</b> box at the top, the <b>⇪ Share</b> button top-right, and page tabs along the bottom.</li>
+  </ul>
+</section>
+
+<!-- ============ LEARN ============ -->
+<section id="learn">
+  <p class="eyebrow">Learn</p>
+  <h2>Business intelligence with PyBI, step by step</h2>
+  <p class="lead">You will build a complete sales dashboard for a bicycle company from four CSV files, the same way you would with your own company's data. Each step teaches one BI skill and exactly where to click in PyBI.</p>
+  <div class="callout bi"><div><p class="t">The scenario</p><p>You are the analyst at a bike retailer selling Bikes, Accessories, Clothing and Components in five regions. Management asks: How much did we sell in 2025? Are we growing? Which regions and products drive profit? Are we on target? You have three years of order lines (9,069 rows) plus product, customer and target lists.</p></div></div>
+
+  <div class="progress" aria-live="polite">
+    <span class="label" id="progLabel">0 of 12 steps done</span>
+    <div class="track"><div class="fill" id="progFill"></div></div>
+  </div>
+  <ul class="path" id="path">
+    <li data-step="1"><span class="n">01</span><a href="#step-1">Questions</a></li>
+    <li data-step="2"><span class="n">02</span><a href="#step-2">Open PyBI</a></li>
+    <li data-step="3"><span class="n">03</span><a href="#step-3">Load data</a></li>
+    <li data-step="4"><span class="n">04</span><a href="#step-4">Clean</a></li>
+    <li data-step="5"><span class="n">05</span><a href="#step-5">Model</a></li>
+    <li data-step="6"><span class="n">06</span><a href="#step-6">Columns</a></li>
+    <li data-step="7"><span class="n">07</span><a href="#step-7">Measures</a></li>
+    <li data-step="8"><span class="n">08</span><a href="#step-8">Visuals</a></li>
+    <li data-step="9"><span class="n">09</span><a href="#step-9">Interactivity</a></li>
+    <li data-step="10"><span class="n">10</span><a href="#step-10">Design</a></li>
+    <li data-step="11"><span class="n">11</span><a href="#step-11">Share</a></li>
+    <li data-step="12"><span class="n">12</span><a href="#step-12">Decisions</a></li>
+  </ul>
+  <p><b>You need:</b> PyBI (the app or <code>pip install pybi-ray</code>) and about 90 minutes. No coding and no BI experience required.</p>
+
+  <!-- STEP 1 -->
+  <article class="step" id="step-1" data-step="1">
+    <div class="step-head"><div class="step-num">1</div><div><h3>Frame the business questions</h3><div class="step-meta">BI skill: requirements · 10 min · no clicks yet</div></div></div>
+    <div class="goal"><b>Goal:</b> turn "make us a sales dashboard" into specific questions, each answered by one number.</div>
+    <p>Most failed dashboards fail before anyone opens a BI tool: lots of charts, no answers. Write down what management needs to decide and which number tells them.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Business question</th><th>KPI (measure)</th><th>Broken down by</th><th>Visual</th></tr></thead>
+      <tbody>
+        <tr><td>How much did we sell?</td><td>Total Revenue</td><td>Year</td><td>Card</td></tr>
+        <tr><td>Are we making money?</td><td>Profit, Profit Margin</td><td>Year, Category</td><td>Cards, matrix</td></tr>
+        <tr><td>Are we growing?</td><td>Revenue vs Revenue LY</td><td>Month</td><td>Line chart</td></tr>
+        <tr><td>Where do sales come from?</td><td>Total Revenue</td><td>Region, Category</td><td>Bar chart, donut</td></tr>
+        <tr><td>What sells best?</td><td>Total Revenue, Units Sold</td><td>Product</td><td>Bar chart, table</td></tr>
+        <tr><td>Are we on target?</td><td>Revenue vs Revenue Target</td><td>Year</td><td>KPI or gauge</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout bi"><div><p class="t">BI concept: KPI</p><p>A Key Performance Indicator is one number tied to a goal, with a definition, a time frame and a comparison. "Revenue" is a figure; "2025 revenue vs 2024" is a KPI.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> you can name the audience and the six questions above, each with its KPI.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="1"> Mark step 1 as done</label>
+  </article>
+
+  <!-- STEP 2 -->
+  <article class="step" id="step-2" data-step="2">
+    <div class="step-head"><div class="step-num">2</div><div><h3>Open PyBI and get the practice data</h3><div class="step-meta">5 min</div></div></div>
+    <div class="goal"><b>Goal:</b> PyBI running, and the four practice files on your computer.</div>
+    <ol class="steps-list">
+      <li>Open PyBI from its icon (or run <code>pybi run</code>). The studio opens in your browser with an empty report.</li>
+      <li>Download the four practice files into one folder:
+        <div class="files">
+          <a class="btn" href="learn-data/Sales.csv" download>Sales.csv</a>
+          <a class="btn" href="learn-data/Products.csv" download>Products.csv</a>
+          <a class="btn" href="learn-data/Customers.csv" download>Customers.csv</a>
+          <a class="btn" href="learn-data/Targets.csv" download>Targets.csv</a>
+        </div>
+      </li>
+    </ol>
+    <div class="tbl"><table>
+      <thead><tr><th>File</th><th>Rows</th><th>Columns</th><th>Kind</th></tr></thead>
+      <tbody>
+        <tr><td>Sales</td><td class="num">9,069</td><td>OrderID, OrderDate, CustomerID, ProductID, Quantity, UnitPrice, Discount</td><td>Fact table</td></tr>
+        <tr><td>Products</td><td class="num">16</td><td>ProductID, Product, Category, Subcategory, ListPrice, UnitCost</td><td>Dimension</td></tr>
+        <tr><td>Customers</td><td class="num">160</td><td>CustomerID, Customer, City, Region, Segment</td><td>Dimension</td></tr>
+        <tr><td>Targets</td><td class="num">5</td><td>Region, Annual Target</td><td>Plan data</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout bi"><div><p class="t">BI concept: fact and dimension tables</p><p>A <b>fact table</b> has one row per event (here, an order line) with numbers you add up. <b>Dimension tables</b> have one row per thing (a product, a customer) with descriptions you group and filter by. Spotting which is which makes the model in step 5 easy.</p></div></div>
+    <label class="done-toggle"><input type="checkbox" data-done="2"> Mark step 2 as done</label>
+  </article>
+
+  <!-- STEP 3 -->
+  <article class="step" id="step-3" data-step="3">
+    <div class="step-head"><div class="step-num">3</div><div><h3>Load the data</h3><div class="step-meta">BI skill: data ingestion · 10 min</div></div></div>
+    <div class="goal"><b>Goal:</b> four tables in the Fields pane.</div>
+    <figure class="shot"><img src="images/get-data.png" alt="The Get data window listing connector categories and a search box"><figcaption>Get data: search 214 connectors</figcaption></figure>
+    <ol class="steps-list">
+      <li>Click <b>Data → Get data</b> in the ribbon.</li>
+      <li>Search for <b>Text / CSV</b> and open it.</li>
+      <li>Choose <code>Sales.csv</code>. PyBI shows a preview of the first rows. Check the columns look right, then click <b>Load</b>.</li>
+      <li>Repeat for <code>Products.csv</code>, <code>Customers.csv</code> and <code>Targets.csv</code>.</li>
+      <li>Click <b>⊞ Table view</b> on the left to browse each table.</li>
+    </ol>
+    <div class="callout"><div><p class="t">With your own data</p><p>For an Excel workbook or a database, the connector opens a <b>Navigator</b> where you tick the sheets or tables to load. PyBI remembers how each source was connected, so <b>Data → Refresh</b> pulls fresh data later and replays your cleaning steps.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> the Fields pane lists Sales, Products, Customers and Targets. Table view shows Sales with 9,069 rows.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="3"> Mark step 3 as done</label>
+  </article>
+
+  <!-- STEP 4 -->
+  <article class="step" id="step-4" data-step="4">
+    <div class="step-head"><div class="step-num">4</div><div><h3>Clean the data in the query editor</h3><div class="step-meta">BI skill: data preparation (the Power Query stage) · 10 min</div></div></div>
+    <div class="goal"><b>Goal:</b> correct data types, and a cleaning recipe that reruns on every refresh.</div>
+    <figure class="shot"><img src="images/query-editor.png" alt="The query editor with a table preview, column quality bars and the list of applied steps"><figcaption>Query editor: applied steps on the right, column quality bars above each column</figcaption></figure>
+    <ol class="steps-list">
+      <li>Click <b>Data → Transform</b> and pick the <b>Sales</b> query.</li>
+      <li>Check each column's type in its header. <code>OrderDate</code> must be a <b>date</b> and <code>Discount</code> a <b>decimal number</b>. If one is wrong, use <b>Change type</b> on that column.</li>
+      <li>Look at the quality bar above each column: green is valid, red is errors, grey is empty. The practice data is clean, so every bar is green.</li>
+      <li>Each change appears in <b>Applied steps</b>. Click a step to see the data as it was at that point; remove a step to undo it.</li>
+      <li>Click <b>Close &amp; apply</b>.</li>
+    </ol>
+    <div class="callout warn"><div><p class="t">Trap: duplicate OrderIDs are real</p><p>OrderID repeats because one order can contain several products, one row per product. <b>Remove duplicates</b> on OrderID would delete real sales and understate revenue. Always ask "what does one row mean?" before removing duplicates.</p></div></div>
+    <div class="callout bi"><div><p class="t">BI concept: repeatable preparation</p><p>Cleaning in a query editor, rather than by hand in Excel, means next month's file gets exactly the same treatment when you click Refresh. The steps are saved inside your <code>.pybi</code> project.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> Sales still has 9,069 rows, and OrderDate shows as a date.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="4"> Mark step 4 as done</label>
+  </article>
+
+  <!-- STEP 5 -->
+  <article class="step" id="step-5" data-step="5">
+    <div class="step-head"><div class="step-num">5</div><div><h3>Build the data model</h3><div class="step-meta">BI skill: star schema · 10 min</div></div></div>
+    <div class="goal"><b>Goal:</b> filters on Region, Category or Year flow through to the sales numbers.</div>
+    <figure class="shot"><img src="images/model-view.png" alt="Model view showing tables as boxes connected by relationship lines"><figcaption>Model view: Sales in the middle, dimensions around it</figcaption></figure>
+    <ol class="steps-list">
+      <li>Click <b>Calculations → Date table</b>. Base it on <code>Sales[OrderDate]</code> and name it <b>Calendar</b>. PyBI creates one row per day with Year, Quarter, Month, Year-Month, Month Name and Weekday, and relates it to Sales.</li>
+      <li>Open <b>⛓ Model view</b>. Drag <code>Sales[ProductID]</code> onto <code>Products[ProductID]</code>, and <code>Sales[CustomerID]</code> onto <code>Customers[CustomerID]</code>. (Or use <b>Calculations → Relationships</b> and <b>Autodetect</b>.)</li>
+      <li>Check each line reads <b>many-to-one</b> (many sales, one product) with <b>single</b> cross-filter direction.</li>
+      <li>Leave <b>Targets</b> unrelated for now. It has one row per region, while Region lives on Customers; you will use it through a measure in step 7.</li>
+    </ol>
+    <div class="callout bi"><div><p class="t">BI concept: star schema</p><p>Put the fact table in the middle and dimensions around it, each joined by one key. This keeps measures correct and fast. Avoid joining dimensions to each other, and use <b>both</b>-direction cross-filtering only when you need it.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> Model view shows three lines into Sales: from Products, Customers and Calendar.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="5"> Mark step 5 as done</label>
+  </article>
+
+  <!-- STEP 6 -->
+  <article class="step" id="step-6" data-step="6">
+    <div class="step-head"><div class="step-num">6</div><div><h3>Add calculated columns</h3><div class="step-meta">BI skill: row-level calculations · 5 min</div></div></div>
+    <div class="goal"><b>Goal:</b> Revenue and Cost on every sales row.</div>
+    <p>The data has quantity, price and discount, but no revenue. Click <b>Calculations → New column</b>, choose table <b>Sales</b>, and add these two columns:</p>
+    <div class="code" data-lang="dax"><pre><code>Revenue = Sales[Quantity] * Sales[UnitPrice] * (1 - Sales[Discount])
+Cost    = Sales[Quantity] * RELATED(Products[UnitCost])</code></pre></div>
+    <p><code>RELATED</code> follows the relationship from step 5 to fetch each product's unit cost. Without that relationship this formula would fail.</p>
+    <div class="callout bi"><div><p class="t">BI concept: column or measure?</p><p>A <b>calculated column</b> is computed once per row and stored. Use it when you need the value on each row, for example to filter on it. A <b>measure</b> (next step) is computed for whatever is filtered right now. Totals, averages and percentages belong in measures.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> Table view shows Revenue and Cost on Sales.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="6"> Mark step 6 as done</label>
+  </article>
+
+  <!-- STEP 7 -->
+  <article class="step" id="step-7" data-step="7">
+    <div class="step-head"><div class="step-num">7</div><div><h3>Write measures: your KPIs</h3><div class="step-meta">BI skill: DAX · 15 min</div></div></div>
+    <div class="goal"><b>Goal:</b> every KPI from step 1, defined once, with a number format.</div>
+    <p>Click <b>Calculations → New measure</b> for each line. Build the simple ones first; the rest reuse them by name in square brackets.</p>
+    <div class="code" data-lang="dax"><pre><code>Total Revenue  = SUM(Sales[Revenue])
+Total Cost     = SUM(Sales[Cost])
+Profit         = [Total Revenue] - [Total Cost]
+Profit Margin  = DIVIDE([Profit], [Total Revenue])
+Orders         = DISTINCTCOUNT(Sales[OrderID])
+Units Sold     = SUM(Sales[Quantity])
+
+Revenue LY     = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR('Calendar'[Date]))
+YoY Growth     = DIVIDE([Total Revenue] - [Revenue LY], [Revenue LY])
+Revenue YTD    = TOTALYTD([Total Revenue], 'Calendar'[Date])
+% of Total     = DIVIDE([Total Revenue], CALCULATE([Total Revenue], ALLSELECTED(Sales)))
+
+Revenue Target =
+VAR yearly = SUM(Targets[Annual Target])
+VAR years  = DISTINCTCOUNT('Calendar'[Year])
+RETURN yearly * years</code></pre></div>
+    <p>Set the format in the measure editor: currency for money, percent for Profit Margin, YoY Growth and % of Total, whole number for Orders and Units Sold.</p>
+    <div class="callout bi"><div><p class="t">BI concept: always DIVIDE</p><p><code>DIVIDE(a, b)</code> returns blank instead of an error when <code>b</code> is zero, for example a month with no sales. It also computes margin from totals, so a $50 order cannot weigh as much as a $5,000 one.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> put Total Revenue on a card and filter Calendar Year to 2025: <b>$2,465,861</b>. Profit Margin for 2025 is <b>43.0%</b> and Orders is <b>1,684</b>.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="7"> Mark step 7 as done</label>
+  </article>
+
+  <!-- STEP 8 -->
+  <article class="step" id="step-8" data-step="8">
+    <div class="step-head"><div class="step-num">8</div><div><h3>Create visuals</h3><div class="step-meta">BI skill: choosing the right chart · 15 min</div></div></div>
+    <div class="goal"><b>Goal:</b> one visual per question, headline numbers at the top.</div>
+    <p>Click <b>Insert → Visual</b>, pick the type in the <b>Visualizations</b> pane, then drag fields from the <b>Fields</b> pane into its wells. Drag the corners to resize; guides help you align.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Visual</th><th>Type</th><th>Fields to drag in</th></tr></thead>
+      <tbody>
+        <tr><td>Four headline numbers</td><td>Card (×4)</td><td>Total Revenue · Profit · Profit Margin · Orders</td></tr>
+        <tr><td>Trend vs last year</td><td>Line chart</td><td>Category: Calendar[Year-Month] · Values: Total Revenue, Revenue LY</td></tr>
+        <tr><td>Revenue by region</td><td>Clustered bar</td><td>Category: Customers[Region] · Values: Total Revenue</td></tr>
+        <tr><td>Category share</td><td>Donut</td><td>Category: Products[Category] · Values: Total Revenue</td></tr>
+        <tr><td>Detail</td><td>Matrix</td><td>Rows: Products[Category], Products[Product] · Columns: Calendar[Year] · Values: Total Revenue</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout bi"><div><p class="t">BI concept: pick the chart from the question</p><p>Change over time → line. Comparing categories → bar, sorted by value. Share of a whole with few parts → donut. Exact values → table or matrix. Put the answer top-left, the explanation in the middle and the detail at the bottom.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> sort the region bar chart by value. With 2025 selected, Central leads with about <b>$744K</b> and West is last with about <b>$112K</b>.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="8"> Mark step 8 as done</label>
+  </article>
+
+  <!-- STEP 9 -->
+  <article class="step" id="step-9" data-step="9">
+    <div class="step-head"><div class="step-num">9</div><div><h3>Add interactivity</h3><div class="step-meta">BI skill: self-service exploration · 10 min</div></div></div>
+    <div class="goal"><b>Goal:</b> managers answer their own follow-up questions.</div>
+    <ol class="steps-list">
+      <li><b>Insert → Slicer</b> with <code>Calendar[Year]</code>, style <b>dropdown</b>. Add a second slicer with <code>Customers[Region]</code>, style <b>tiles</b>.</li>
+      <li>Click a bar in the region chart: every other visual filters to that region. <b>Ctrl+click</b> adds more; click again to clear.</li>
+      <li>Open the <b>Filters</b> pane. Add <code>Products[Category]</code> under <b>Filters on this page</b>. Filters can apply to one visual, this page, or all pages.</li>
+      <li>Hover a visual and use <b>focus mode</b> to open it full size.</li>
+    </ol>
+    <div class="callout bi"><div><p class="t">BI concept: filter context</p><p>The same measure gives different answers in different places because each place has its own filters: the slicers, the bar or cell it sits in, and any clicked selections. Total Revenue in the "North" bar means revenue where Region = North and Year = the slicer's year. Understanding this is the key to every BI tool.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> choose Region = North and Year = 2025: the cards show North's figures (about $618K revenue) and every chart follows.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="9"> Mark step 9 as done</label>
+  </article>
+
+  <!-- STEP 10 -->
+  <article class="step" id="step-10" data-step="10">
+    <div class="step-head"><div class="step-num">10</div><div><h3>Pages, design and smart tools</h3><div class="step-meta">BI skill: report design · 10 min</div></div></div>
+    <div class="goal"><b>Goal:</b> a polished multi-page report where each page has one job.</div>
+    <ol class="steps-list">
+      <li><b>Insert → New page</b>, and name it <b>Products</b> from its page tab.</li>
+      <li>Add a title with <b>Insert → Text box</b>, and a short description of what the page answers.</li>
+      <li><b>View → Theme</b>: pick one of six themes, including dark.</li>
+      <li>Type <code>top 5 products by profit as bar</code> in <b>Ask your data</b>. PyBI builds the visual; refine it in the Visualizations pane.</li>
+      <li>On a new page, try <b>Smart → Auto dashboard</b>: PyBI builds a full insight page from your model. Keep what helps.</li>
+      <li>Add a <b>Smart narrative</b> visual for an automatically written summary of the numbers on the page.</li>
+    </ol>
+    <ul class="tight">
+      <li>One page, one question: Overview (how are we doing), Products (what sells), Regions (where).</li>
+      <li>One accent colour for what matters; everything else neutral.</li>
+      <li>Every title says what it shows and in which units.</li>
+    </ul>
+    <div class="check"><b>Checkpoint:</b> the report has at least two pages with titles, and an Ask-your-data visual.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="10"> Mark step 10 as done</label>
+  </article>
+
+  <!-- STEP 11 -->
+  <article class="step" id="step-11" data-step="11">
+    <div class="step-head"><div class="step-num">11</div><div><h3>Save, share and export</h3><div class="step-meta">BI skill: distribution · 10 min</div></div></div>
+    <div class="goal"><b>Goal:</b> the dashboard in front of the people who need it.</div>
+    <ol class="steps-list">
+      <li><b>File → Save</b> to keep a <code>.pybi</code> project: data, steps, model and report in one file.</li>
+      <li>Click <b>⇪ Share</b> and copy the link. Anyone on the same Wi-Fi or office network can open the live, read-only dashboard; it updates as you edit. Viewers can use slicers and cross-filtering but cannot edit.</li>
+      <li><b>File → Export</b> for meetings and email:</li>
+    </ol>
+    <div class="tbl"><table>
+      <thead><tr><th>Export</th><th>Best for</th><th>Interactive?</th></tr></thead>
+      <tbody>
+        <tr><td>PNG (this page or all pages)</td><td>WhatsApp, email, quick screenshots</td><td>No</td></tr>
+        <tr><td>PowerPoint (.pptx)</td><td>Monthly review meetings</td><td>No</td></tr>
+        <tr><td>PDF document</td><td>Printing, archives</td><td>No</td></tr>
+        <tr><td>Interactive HTML</td><td>Sending the whole dashboard to anyone; opens offline in any browser</td><td>Yes: slicers and cross-filtering work</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout warn"><div><p class="t">Before you share</p><p>The share link reaches everyone on that network, and an exported HTML file contains the data. Share only what the recipients may see. Use <code>pybi run --private</code> to turn the network link off.</p></div></div>
+    <div class="check"><b>Checkpoint:</b> a colleague opens your Share link on their phone, and you have a .pptx and an .html export.</div>
+    <label class="done-toggle"><input type="checkbox" data-done="11"> Mark step 11 as done</label>
+  </article>
+
+  <!-- STEP 12 -->
+  <article class="step" id="step-12" data-step="12">
+    <div class="step-head"><div class="step-num">12</div><div><h3>Turn visuals into decisions</h3><div class="step-meta">BI skill: analysis and storytelling · 15 min</div></div></div>
+    <div class="goal"><b>Goal:</b> read the dashboard like an analyst and write the summary management actually reads.</div>
+    <div class="tbl"><table>
+      <thead><tr><th>Question</th><th>What the practice data shows (2025)</th><th>So what?</th></tr></thead>
+      <tbody>
+        <tr><td>How much did we sell?</td><td>$2.47M revenue, $1.06M profit</td><td>Baseline for 2026</td></tr>
+        <tr><td>Are we growing?</td><td>+5.1% vs 2024 (2024 grew +25%)</td><td>Growth is slowing sharply</td></tr>
+        <tr><td>On target?</td><td>$2.47M vs $2.44M target: 101%</td><td>Just made it overall</td></tr>
+        <tr><td>Where?</td><td>Central $744K leads; West $112K</td><td>Compare each region with its target in the Targets table: South ($410K vs $820K) reached only half</td></tr>
+        <tr><td>What sells?</td><td>Bikes are 72% of revenue; E-Bike Volt alone $555K</td><td>Revenue depends on one category</td></tr>
+        <tr><td>Making money?</td><td>Margin steady at 43%; Bikes 38.7% vs Accessories 59.6%, Clothing 56.8%</td><td>The biggest category has the lowest margin</td></tr>
+      </tbody>
+    </table></div>
+    <h4>The three-line executive summary</h4>
+    <ol class="steps-list">
+      <li><b>Headline:</b> "2025 revenue reached $2.47M, 101% of target, but growth slowed to 5% from 25%."</li>
+      <li><b>Driver:</b> "Bikes bring 72% of revenue at the lowest margin, and the South region delivered only half its target."</li>
+      <li><b>Action:</b> "Grow high-margin accessories and clothing alongside bike sales, and review the South plan."</li>
+    </ol>
+    <div class="callout bi"><div><p class="t">BI concept: descriptive → diagnostic → prescriptive</p><p>Descriptive says <i>what</i> happened (growth slowed). Diagnostic says <i>why</i> (one category, one weak region). Prescriptive says <i>what to do</i>. Your dashboard does the first, slicers and drill-downs support the second, and your summary delivers the third.</p></div></div>
+    <h4>Practice exercises</h4>
+    <ol class="steps-list">
+      <li>Add a measure <code>Profit per Unit = DIVIDE([Profit], [Units Sold])</code> and show it by product. Which product earns most per bike sold?</li>
+      <li>Build a KPI visual of Total Revenue against Revenue Target, by year.</li>
+      <li>Add a Customers[Segment] slicer. Which segment has the highest margin?</li>
+      <li>Rank products with <code>Product Rank = RANKX(ALL(Products), [Total Revenue])</code> and show the top 5 in a table.</li>
+      <li>Replace the CSVs with real data from your work, click Refresh, and see which visuals still answer the questions.</li>
+    </ol>
+    <label class="done-toggle"><input type="checkbox" data-done="12"> Mark step 12 as done</label>
+  </article>
+</section>
+
+<!-- ============ GUIDES ============ -->
+<section id="guides">
+  <p class="eyebrow">Guides</p>
+  <h2>Get data and connectors</h2>
+  <p>Open <b>Data → Get data</b> to search the catalog. Each connector shows a form and a live preview; databases, workbooks, folders and buckets add a <b>Navigator</b> to pick tables. Sources remember how they were connected, so <b>Refresh</b> re-pulls fresh data while keeping your query steps.</p>
+  <figure class="shot"><img src="images/navigator.png" alt="The Navigator listing tables in a source with a preview of the selected table"><figcaption>Navigator: tick the tables to load</figcaption></figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Category</th><th class="num">Count</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>File</td><td class="num">23</td><td>CSV, Excel, JSON, XML, Parquet, PDF tables, SAS, SPSS, Stata, folder (combine files)</td></tr>
+      <tr><td>Database</td><td class="num">50</td><td>SQL Server, PostgreSQL, MySQL, Oracle, Snowflake, BigQuery, Databricks, DuckDB, ODBC</td></tr>
+      <tr><td>Web &amp; online files</td><td class="num">10</td><td>Web page tables, Google Sheets link, OneDrive/SharePoint link, GitHub file</td></tr>
+      <tr><td>Public data</td><td class="num">20</td><td>World Bank, FRED, Eurostat, OECD, IMF, Our World in Data, exchange rates</td></tr>
+      <tr><td>NoSQL &amp; search</td><td class="num">16</td><td>MongoDB, Elasticsearch, Redis, DynamoDB, Firestore, Neo4j</td></tr>
+      <tr><td>Cloud storage</td><td class="num">13</td><td>Amazon S3, Azure Blob, Google Cloud Storage, SFTP, FTP</td></tr>
+      <tr><td>SaaS apps</td><td class="num">78</td><td>Salesforce, HubSpot, Stripe, Shopify, Jira, Notion, Google Analytics 4, Xero, QuickBooks</td></tr>
+      <tr><td>Generic</td><td class="num">4</td><td>REST API (auth, 6 pagination styles, JSON flattening), GraphQL, OData, Python script</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="tight">
+    <li>Connectors marked with a driver note tell you the exact <code>pip install</code> command to run.</li>
+    <li>Passwords and tokens are stored only on your computer in <code>~/.pybi/credentials.json</code>, never inside <code>.pybi</code> files.</li>
+    <li>SaaS connectors use the vendor's REST API with a token you provide. If an endpoint changes, override it under <b>Advanced options</b>.</li>
+  </ul>
+
+  <h3 id="query">Query editor steps</h3>
+  <p>Open with <b>Data → Transform</b>. Every action becomes an <b>applied step</b> with a live preview; steps replay on refresh and are saved in the project. A JSON advanced editor shows the full recipe.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Group</th><th>Steps</th></tr></thead>
+    <tbody>
+      <tr><td>Columns</td><td>Choose / remove columns, promote headers, change type, rename, custom column, conditional column, split column</td></tr>
+      <tr><td>Rows</td><td>Filter rows, keep top rows, remove duplicates, remove blanks, fill up / down, replace values</td></tr>
+      <tr><td>Text &amp; numbers</td><td>Text formatting (trim, upper, lower…), date parts, round</td></tr>
+      <tr><td>Reshape</td><td>Group by, unpivot</td></tr>
+      <tr><td>Combine</td><td>Merge queries (joins), append queries (stack rows)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="model">Model view</h3>
+  <ul class="tight">
+    <li>Drag a column onto another to create a relationship; <b>Autodetect</b> finds matching keys.</li>
+    <li>Relationships are many-to-one with <b>single</b> or <b>both</b> cross-filter direction, and can be active or inactive.</li>
+    <li><b>Calculations → Date table</b> creates and relates a calendar in one click. Column options include <b>Sort by column</b> (for example Month Name by Month Number) and <b>Hide in report view</b>.</li>
+  </ul>
+
+  <h3 id="dax">DAX formulas</h3>
+  <p>Measures and calculated columns use a DAX-style language. Columns are written <code>Table[Column]</code>, measures <code>[Measure]</code>, and tables with spaces or reserved names in quotes, like <code>'Calendar'[Date]</code>. Use <code>VAR … RETURN</code> to name steps.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Family</th><th>Functions</th></tr></thead>
+    <tbody>
+      <tr><td>Aggregation</td><td><code>SUM</code> <code>AVERAGE</code> <code>MIN</code> <code>MAX</code> <code>COUNT</code> <code>COUNTROWS</code> <code>DISTINCTCOUNT</code></td></tr>
+      <tr><td>Filter context</td><td><code>CALCULATE</code> <code>FILTER</code> <code>ALL</code> <code>ALLEXCEPT</code> <code>ALLSELECTED</code> <code>REMOVEFILTERS</code> <code>KEEPFILTERS</code> <code>VALUES</code> <code>SELECTEDVALUE</code></td></tr>
+      <tr><td>Relationships</td><td><code>RELATED</code> <code>RELATEDTABLE</code> <code>LOOKUPVALUE</code></td></tr>
+      <tr><td>Iterators</td><td><code>SUMX</code> <code>AVERAGEX</code> <code>RANKX</code> <code>TOPN</code> <code>CONCATENATEX</code></td></tr>
+      <tr><td>Time intelligence</td><td><code>TOTALYTD</code> <code>DATESYTD</code> <code>SAMEPERIODLASTYEAR</code> <code>DATEADD</code> <code>PARALLELPERIOD</code> <code>PREVIOUSMONTH</code> <code>DATESBETWEEN</code></td></tr>
+      <tr><td>Logic, math, text, dates</td><td><code>DIVIDE</code> <code>IF</code> <code>SWITCH</code> and the common math, text and date functions</td></tr>
+    </tbody>
+  </table></div>
+  <div class="code" data-lang="dax"><pre><code>% of Total   = DIVIDE([Total Revenue], CALCULATE([Total Revenue], ALLSELECTED(Sales)))
+Product Rank = RANKX(ALL(Products), [Total Revenue])
+Big Orders   = CALCULATE([Orders], Sales[Quantity] >= 3)
+Revenue YTD  = TOTALYTD([Total Revenue], 'Calendar'[Date])</code></pre></div>
+  <p>Not every DAX function exists yet. An unsupported function shows a clear error in the formula editor.</p>
+
+  <h3 id="visuals">Visuals</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Group</th><th>Visuals</th></tr></thead>
+    <tbody>
+      <tr><td>Column &amp; bar</td><td>Clustered, stacked and 100% column and bar</td></tr>
+      <tr><td>Line &amp; area</td><td>Line, area, stacked area, line &amp; column combo, ribbon, waterfall</td></tr>
+      <tr><td>Part of whole</td><td>Pie, donut, treemap, funnel</td></tr>
+      <tr><td>Relationships</td><td>Scatter / bubble</td></tr>
+      <tr><td>Numbers</td><td>Card, multi-row card, KPI, gauge</td></tr>
+      <tr><td>Tables</td><td>Table (with data bars), matrix (expand/collapse, subtotals)</td></tr>
+      <tr><td>Controls &amp; text</td><td>Slicers (list, dropdown, tiles, range), text box, smart narrative</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="filters">Filters and interactivity</h3>
+  <ul class="tight">
+    <li><b>Cross-filtering:</b> click any data point to filter the page; Ctrl+click for several.</li>
+    <li><b>Slicers</b> can be synced across pages.</li>
+    <li><b>Filters pane:</b> visual, page and report level, each basic, advanced or range.</li>
+    <li>Tooltips, focus mode, and <b>export data</b> behind any visual to CSV or Excel.</li>
+    <li>Design: drag, resize, snap guides, keyboard nudging, copy/paste, undo/redo, page sizes, 6 themes, per-visual formatting.</li>
+  </ul>
+
+  <h3 id="smart">Smart features</h3>
+  <ul class="tight">
+    <li><b>Ask your data:</b> type a question such as <code>revenue by region as pie</code> or <code>top 5 products by profit</code>.</li>
+    <li><b>Auto dashboard:</b> builds a full insight page from your model.</li>
+    <li><b>Smart narrative:</b> a text visual that writes a summary of the numbers in view.</li>
+  </ul>
+
+  <h3 id="share">Share on your network</h3>
+  <p>Click <b>⇪ Share</b> for a live, read-only link (<code>/view</code>) that anyone on the same Wi-Fi or office network can open. It refreshes as you edit. Viewers can use slicers, cross-filtering and focus mode, and download images, but cannot edit: all editing stays on your computer. The first time, your firewall may ask to allow PyBI on the network. Start with <code>--private</code> to turn sharing off.</p>
+
+  <h3 id="export">Export</h3>
+  <p><b>File → Export</b> offers: this page or all pages as PNG, PowerPoint (.pptx), PDF, interactive HTML (one offline file with data, slicers and cross-filtering), the project as <code>.pybi</code>, and Print. From the command line: <code>pybi export report.pybi -o dashboard.html</code>.</p>
+</section>
+
+<!-- ============ CLI ============ -->
+<section id="cli">
+  <p class="eyebrow">Reference</p>
+  <h2>Command line</h2>
+  <div class="code" data-lang="bash"><pre><code>pybi run                      # start the studio (network view link enabled)
+pybi run sales.xlsx           # start with a data file loaded (csv, xlsx, json, parquet)
+pybi run my_report.pybi       # open a saved project
+pybi run --private            # only this computer can connect
+pybi run --port 9000 --no-browser
+pybi run --demo               # start with the demo data and dashboard
+pybi demo                     # same as run --demo
+pybi export my_report.pybi -o dashboard.html   # headless export to interactive HTML
+pybi version
+python -m pybi run            # same as pybi run</code></pre></div>
+  <p>The desktop app runs <code>pybi run --no-browser</code> on a free port (8050 or the next free one) and opens the browser itself. Its own options: <code>PyBI --no-browser</code>, <code>--check-updates</code>, <code>--version</code> (Linux: <code>pybi-desktop</code>).</p>
+</section>
+
+<!-- ============ PYTHON ============ -->
+<section id="python">
+  <p class="eyebrow">Reference</p>
+  <h2>Python and Jupyter</h2>
+  <p>Open the studio with pandas DataFrames already loaded; each keyword becomes a table:</p>
+  <div class="code" data-lang="python"><pre><code>import pandas as pd
+import pybi
+
+sales = pd.read_csv("sales.csv")
+products = pd.read_excel("products.xlsx")
+pybi.run(Sales=sales, Products=products)   # opens the studio with these tables</code></pre></div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section id="how">
+  <p class="eyebrow">Reference</p>
+  <h2>How it works</h2>
+  <ul class="tight">
+    <li><b>Python</b> (Flask and pandas) serves the studio, loads and transforms data, saves <code>.pybi</code> projects (a zip of raw data, query steps and the report) and builds PPTX, PDF and HTML exports.</li>
+    <li>The <b>analytics engine</b> (filter context, relationships, the DAX language) and the <b>d3 visuals</b> run in the browser, so the studio, the network view and exported HTML behave the same.</li>
+    <li>Autosave keeps the current project in <code>~/.pybi/autosave.pybi</code>.</li>
+    <li>Data is held in memory: comfortable up to a few million rows, depending on your computer.</li>
+  </ul>
+</section>
+
+<!-- ============ SECURITY ============ -->
+<section id="security">
+  <p class="eyebrow">Reference</p>
+  <h2>Security</h2>
+  <ul class="tight">
+    <li>The studio listens on your network so the share link works. Other computers can only <b>view</b>; every editing API is limited to your own computer. <code>--private</code> turns network access off.</li>
+    <li>The custom-column step evaluates pandas expressions. Only open <code>.pybi</code> files from people you trust.</li>
+    <li>Desktop updates are downloaded from this project's GitHub Releases and checked against a SHA-256 checksum before installing.</li>
+    <li>Report vulnerabilities privately as described in <a href="https://github.com/rafay183/pybi/blob/main/SECURITY.md">SECURITY.md</a>.</li>
+  </ul>
+</section>
+
+<!-- ============ TROUBLESHOOTING ============ -->
+<section id="troubleshooting">
+  <p class="eyebrow">Reference</p>
+  <h2>Troubleshooting</h2>
+  <details><summary>Windows: "Windows protected your PC"</summary><p>The installer is not code-signed yet. Click <b>More info → Run anyway</b>.</p></details>
+  <details><summary>Mac: "PyBI cannot be opened" or "Apple could not verify"</summary><p>Open <b>System Settings → Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>. You only need to do this once.</p></details>
+  <details><summary>Chromebook: the .deb does not install</summary><p>Turn on Linux first (Settings → Advanced → Developers → Linux development environment), then open the file from the Files app. ARM Chromebooks need the ARM64 file.</p></details>
+  <details><summary>Linux: the AppImage does not start</summary><p>Make it executable with <code>chmod +x</code>. On very old systems, use the .deb instead.</p></details>
+  <details><summary>Colleagues cannot open the Share link</summary><p>They must be on the same network, and your firewall must allow PyBI. Guest Wi-Fi often blocks device-to-device traffic. If you started with <code>--private</code>, sharing is off.</p></details>
+  <details><summary>A chart shows the same number on every bar</summary><p>The table you group by is not related to the fact table. Check Model view and add the relationship; both key columns need the same type.</p></details>
+  <details><summary>Time-intelligence measures are blank</summary><p><code>TOTALYTD</code> and <code>SAMEPERIODLASTYEAR</code> need a date table related to your facts, and the visual's axis must use the date table's columns.</p></details>
+  <details><summary>"Port 8050 is already in use"</summary><p>Another program uses the port. Run <code>pybi run --port 9000</code>. The desktop app picks the next free port automatically.</p></details>
+  <details><summary>Where are my logs?</summary><p>Desktop app logs: Windows <code>%LOCALAPPDATA%\PyBI\logs</code>, Mac <code>~/Library/Application Support/PyBI/logs</code>, Linux <code>~/.local/share/pybi/logs</code>. The PyBI window has a <b>Logs</b> link.</p></details>
+</section>
+
+<!-- ============ CONTRIBUTING ============ -->
+<section id="contributing">
+  <p class="eyebrow">Community</p>
+  <h2>Contributing</h2>
+  <p>PyBI is built in the open. Connectors tested against real accounts, visuals, DAX functions, docs and translations are all welcome.</p>
+  <div class="code" data-lang="bash"><pre><code>git clone https://github.com/rafay183/pybi
+cd pybi
+pip install -e ".[dev]"
+pytest -q
+pybi demo</code></pre></div>
+  <p>Read <a href="https://github.com/rafay183/pybi/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>, look for issues labelled <b>good first issue</b>, and bring questions to <a href="https://github.com/rafay183/pybi/discussions">Discussions</a>. Release history is in the <a href="https://github.com/rafay183/pybi/blob/main/CHANGELOG.md">changelog</a>.</p>
+</section>
+
+<footer>
+  PyBI · MIT © Muhammad Rafay Shaikh · <a href="https://github.com/rafay183/pybi">GitHub</a> · <a href="https://pypi.org/project/pybi-ray/">PyPI</a> · Not a Microsoft product; does not open .pbix files.
+</footer>
+
+</div>
+</main>
+</div>
+
+<script>
+(function(){
+  /* ---------- Syntax highlighting + copy buttons ---------- */
+  var KW = /^(import|from|as|def|return|for|in|if|else|elif|True|False|None|with|and|or|not|lambda|class|print)$/;
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function highlightPy(src){
+    var re = /(#[^\n]*)|("""[\s\S]*?"""|f?"[^"\n]*"|f?'[^'\n]*')|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_][A-Za-z0-9_]*)\b(\s*\()?/g;
+    var out = "", last = 0, m;
+    while((m = re.exec(src))){
+      out += esc(src.slice(last, m.index));
+      if(m[1]) out += '<span class="tk-c">'+esc(m[1])+'</span>';
+      else if(m[2]) out += '<span class="tk-s">'+esc(m[2])+'</span>';
+      else if(m[3]) out += '<span class="tk-n">'+m[3]+'</span>';
+      else if(m[4]){
+        if(KW.test(m[4])) out += '<span class="tk-k">'+m[4]+'</span>'+(m[5]?esc(m[5]):"");
+        else if(m[5]) out += '<span class="tk-f">'+m[4]+'</span>'+esc(m[5]);
+        else out += m[4];
+      }
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function highlightDax(src){
+    var re = /(\/\/[^\n]*)|("[^"\n]*")|(\[[^\]\n]+\])|\b([A-Z][A-Z0-9.]*)(?=\s*\()|\b(VAR|RETURN)\b|\b(\d+(?:\.\d+)?)\b/g;
+    var out = "", last = 0, m;
+    while((m = re.exec(src))){
+      out += esc(src.slice(last, m.index));
+      if(m[1]) out += '<span class="tk-c">'+esc(m[1])+'</span>';
+      else if(m[2]) out += '<span class="tk-s">'+esc(m[2])+'</span>';
+      else if(m[3]) out += '<span class="tk-m">'+esc(m[3])+'</span>';
+      else if(m[4]) out += '<span class="tk-d">'+m[4]+'</span>';
+      else if(m[5]) out += '<span class="tk-k">'+m[5]+'</span>';
+      else if(m[6]) out += '<span class="tk-n">'+m[6]+'</span>';
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function highlightComments(src){
+    return src.split("\n").map(function(line){
+      var i = line.indexOf("#");
+      if(i === -1) return esc(line);
+      return esc(line.slice(0,i)) + '<span class="tk-c">'+esc(line.slice(i))+'</span>';
+    }).join("\n");
+  }
+  document.querySelectorAll(".code").forEach(function(block){
+    var lang = block.getAttribute("data-lang") || "text";
+    var codeEl = block.querySelector("code");
+    var raw = codeEl.textContent;
+    if(lang === "python") codeEl.innerHTML = highlightPy(raw);
+    else if(lang === "dax") codeEl.innerHTML = highlightDax(raw);
+    else if(lang === "bash") codeEl.innerHTML = highlightComments(raw);
+    var bar = document.createElement("div"); bar.className = "bar";
+    var label = document.createElement("span"); label.textContent = lang;
+    var btn = document.createElement("button"); btn.type = "button"; btn.textContent = "Copy";
+    btn.addEventListener("click", function(){
+      function ok(){ btn.textContent = "Copied"; setTimeout(function(){btn.textContent="Copy";},1500); }
+      function fallback(){
+        var r = document.createRange(); r.selectNodeContents(codeEl);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = "Selected: press Ctrl+C"; setTimeout(function(){btn.textContent="Copy";},2500);
+      }
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(raw).then(ok, fallback);
+        } else fallback();
+      }catch(e){ fallback(); }
+    });
+    bar.appendChild(label); bar.appendChild(btn);
+    block.insertBefore(bar, block.firstChild);
+  });
+
+  /* ---------- Learn progress ---------- */
+  var KEY = "pybi-docs-progress-v2";
+  var done = {};
+  try{ done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }catch(e){ done = {}; }
+  var total = 12;
+  function render(){
+    var count = 0;
+    for(var i=1;i<=total;i++){
+      var on = !!done[i]; if(on) count++;
+      var step = document.querySelector('.step[data-step="'+i+'"]');
+      var li = document.querySelector('#path li[data-step="'+i+'"]');
+      var cb = document.querySelector('input[data-done="'+i+'"]');
+      if(step) step.classList.toggle("done", on);
+      if(li) li.classList.toggle("done", on);
+      if(cb) cb.checked = on;
+    }
+    document.getElementById("progLabel").textContent = count + " of " + total + " steps done";
+    document.getElementById("progFill").style.width = (count/total*100) + "%";
+  }
+  document.querySelectorAll("input[data-done]").forEach(function(cb){
+    cb.addEventListener("change", function(){
+      done[cb.getAttribute("data-done")] = cb.checked;
+      try{ localStorage.setItem(KEY, JSON.stringify(done)); }catch(e){}
+      render();
+    });
+  });
+  render();
+
+  /* ---------- Sidebar: search, active link, mobile menu ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll(".side a"));
+  var search = document.getElementById("navSearch");
+  var index = links.map(function(a){
+    var el = document.querySelector(a.getAttribute("href"));
+    var text = a.textContent + " " + (el ? (el.closest("section, article") || el).textContent : "");
+    return text.toLowerCase();
+  });
+  search.addEventListener("input", function(){
+    var q = search.value.trim().toLowerCase(), shown = 0;
+    links.forEach(function(a,i){
+      var hit = !q || index[i].indexOf(q) !== -1;
+      a.style.display = hit ? "" : "none"; if(hit) shown++;
+    });
+    document.querySelectorAll(".side .group").forEach(function(gr){
+      var any = Array.prototype.some.call(gr.querySelectorAll("a"), function(a){return a.style.display !== "none";});
+      gr.style.display = any ? "" : "none";
+    });
+    document.getElementById("navEmpty").style.display = shown ? "none" : "block";
+  });
+
+  var targets = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
+  function setActive(){
+    var y = window.scrollY + 120, cur = 0;
+    targets.forEach(function(t,i){ if(t && t.getBoundingClientRect().top + window.scrollY <= y) cur = i; });
+    links.forEach(function(a,i){ a.classList.toggle("active", i === cur); });
+  }
+  window.addEventListener("scroll", setActive, {passive:true}); setActive();
+
+  var menuBtn = document.getElementById("menuBtn"), side = document.getElementById("sidebar");
+  menuBtn.addEventListener("click", function(){
+    var open = side.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  links.forEach(function(a){ a.addEventListener("click", function(){
+    if(window.innerWidth <= 900){ side.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); }
+  });});
+})();
+</script>
+</body>
+</html>
