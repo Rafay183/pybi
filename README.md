@@ -1,8 +1,10 @@
 # PyBI — Business Intelligence in Python
 
-[![PyPI](https://img.shields.io/pypi/v/pybi-ray.svg)](https://pypi.org/project/pybi-ray/) [![CI](https://github.com/rafay183/pybi/actions/workflows/ci.yml/badge.svg)](https://github.com/rafay183/pybi/actions/workflows/ci.yml) [![Python](https://img.shields.io/pypi/pyversions/pybi-ray.svg)](https://pypi.org/project/pybi-ray/) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![PyPI](https://img.shields.io/pypi/v/pybi-ray.svg)](https://pypi.org/project/pybi-ray/) [![CI](https://github.com/rafay183/pybi/actions/workflows/ci.yml/badge.svg)](https://github.com/rafay183/pybi/actions/workflows/ci.yml) [![Python](https://img.shields.io/pypi/pyversions/pybi-ray.svg)](https://pypi.org/project/pybi-ray/) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md) [![Docs](https://img.shields.io/badge/docs-rafay183.github.io%2Fpybi-0a6c6c.svg)](https://rafay183.github.io/pybi/)
 
 > Install name: **`pybi-ray`** · command: **`pybi`** · import: **`import pybi`**
+>
+> 📖 **[Documentation and step-by-step BI course](https://rafay183.github.io/pybi/)** · ⬇ **[Download the desktop app](https://rafay183.github.io/pybi/#download)**
 
 **PyBI** is an open-source, Power BI–style business intelligence studio that you install with `pip` and run on your own computer. Connect data, shape it with a visual query editor, build a star-schema model, write DAX-style measures, design interactive dashboards, share a live link on your network, and export to PNG, PowerPoint, PDF or a self-contained interactive HTML file.
 
@@ -188,7 +190,7 @@ pytest -q
 pybi demo
 ```
 
-Maintainers: release steps are in [docs/PUBLISHING.md](docs/PUBLISHING.md). See also [CHANGELOG.md](CHANGELOG.md) and [SECURITY.md](SECURITY.md).
+Full documentation: **[rafay183.github.io/pybi](https://rafay183.github.io/pybi/)**. Maintainers: release steps are in [docs/PUBLISHING.md](docs/PUBLISHING.md). See also [CHANGELOG.md](CHANGELOG.md) and [SECURITY.md](SECURITY.md).
 
 ## License
 
