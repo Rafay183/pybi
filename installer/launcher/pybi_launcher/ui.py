@@ -45,7 +45,7 @@ class LauncherApp:
         self.release: updater.Release | None = None
         self.update_checked = False
 
-        self.root = tk.Tk()
+        self.root = tk.Tk(className="PyBI")  # WM_CLASS matches StartupWMClass in pybi.desktop
         self.root.title(cfg.app_name)
         self.root.configure(bg=BG)
         self.root.resizable(False, False)
@@ -73,7 +73,8 @@ class LauncherApp:
             log.exception("Icon load failed")
 
     def _fonts(self):
-        family = "Segoe UI" if C.IS_WINDOWS else tkfont.nametofont("TkDefaultFont").actual("family")
+        family = ("Segoe UI" if C.IS_WINDOWS else ".AppleSystemUIFont" if C.IS_MAC
+                  else tkfont.nametofont("TkDefaultFont").actual("family"))
         tkfont.nametofont("TkDefaultFont").configure(family=family, size=10)
         self.f_title = tkfont.Font(family=family, size=17, weight="bold")
         self.f_sub = tkfont.Font(family=family, size=9)
@@ -358,12 +359,27 @@ class LauncherApp:
             def go():
                 self.server.stop()
                 try:
-                    updater.launch_installer(path, C.logs_dir())
-                except OSError as e:
-                    self.q.put(("update_error", f"Could not start the installer: {e}"))
+                    result, where = updater.apply_update(path, self.cfg, C.logs_dir())
+                except Exception as e:  # noqa: BLE001
+                    log.exception("Applying update failed")
+                    self.q.put(("update_error", f"Could not install the update: {e}"))
                     return
-                self.q.put(("quit",))
+                self.q.put(("quit",) if result == "restart" else ("manual_update", where))
             threading.Thread(target=go, daemon=True).start()
+        elif kind == "manual_update":
+            where = a[0]
+            self.progress.stop()
+            self.progress.pack_forget()
+            hint = ("Double-click it to install (on a Chromebook: right-click → Install with Linux)."
+                    if str(where).endswith(".deb") else "Open it to finish the update.")
+            self.banner_text.config(text=f"PyBI {self.release.version} is downloaded to\n{where}\n{hint}")
+            for w in self.banner_btns.winfo_children():
+                w.pack_forget()
+            ttk.Button(self.banner_btns, text="Show file", style="Primary.TButton",
+                       command=lambda: _open_path(where.parent)).pack(side="left")
+            self.banner_btns.pack(anchor="w", pady=(8, 0))
+            if not self.server.running:
+                self.start_server()
         elif kind == "update_error":
             self.progress.stop()
             self.progress.pack_forget()
@@ -398,5 +414,7 @@ class LauncherApp:
         y = (self.root.winfo_screenheight() - h) // 3
         self.root.geometry(f"{w}x{h}+{x}+{y}")
         self.start_server()
-        self.root.mainloop()
-        self.server.stop()
+        try:
+            self.root.mainloop()
+        finally:
+            self.server.stop()

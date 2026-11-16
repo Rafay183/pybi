@@ -2,8 +2,12 @@
 
 Release contract (produced by .github/workflows/build-installer.yml):
   * tag ``vX.Y.Z`` (pre-releases marked as such on GitHub)
-  * asset ``PyBI-Setup.exe``            the Inno Setup installer
-  * asset ``PyBI-Setup.exe.sha256``     its SHA-256, "<hex>  PyBI-Setup.exe"
+  * one asset per platform, each with ``<name>.sha256`` ("<hex>  <name>"):
+      PyBI-Setup.exe                 Windows (Inno Setup)
+      PyBI-macOS-arm64.dmg           macOS Apple Silicon      PyBI-macOS-x86_64.dmg   macOS Intel
+      PyBI-Linux-x86_64.AppImage     Linux (any distro)       PyBI-Linux-aarch64.AppImage
+      pybi_X.Y.Z_amd64.deb           Debian/Ubuntu/ChromeOS   pybi_X.Y.Z_arm64.deb
+  Each build's launcher.json carries the asset_pattern for its own platform.
 """
 from __future__ import annotations
 
@@ -12,7 +16,10 @@ import json
 import logging
 import os
 import re
+import shutil
 import subprocess
+import sys
+import tempfile
 import threading
 import time
 import urllib.error
@@ -22,6 +29,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import versions
+from . import config as C
 from .config import IS_WINDOWS, Config, State
 
 log = logging.getLogger("pybi.updater")
@@ -144,7 +152,7 @@ def download(rel: Release, dest: Path, progress: Callable[[int, int], None] | No
              cancel: threading.Event | None = None, timeout: float = 30.0) -> Path:
     """Download the installer, verify its SHA-256, return its path."""
     dest.mkdir(parents=True, exist_ok=True)
-    target = dest / f"PyBI-Setup-{rel.version}.exe"
+    target = dest / f"{rel.version}-{rel.asset_name}"
     part = target.with_suffix(".part")
     expected = _expected_sha(rel, timeout)
     req = urllib.request.Request(rel.asset_url, headers={"User-Agent": UA, "Accept": "application/octet-stream"})
@@ -193,8 +201,85 @@ def launch_installer(installer: Path, log_dir: Path) -> None:
 
 def cleanup_downloads(dest: Path, keep: int = 1) -> None:
     try:
-        files = sorted(dest.glob("PyBI-Setup-*.exe"), key=lambda p: p.stat().st_mtime, reverse=True)
+        files = sorted((p for p in dest.iterdir() if p.is_file()), key=lambda p: p.stat().st_mtime, reverse=True)
         for p in files[keep:]:
             p.unlink(missing_ok=True)
     except OSError:
         pass
+
+
+def _relaunch_later(argv: list[str]) -> None:
+    """Start the new version two seconds after this process exits (frees the single-instance port)."""
+    script = 'sleep 2; exec "$@"'
+    subprocess.Popen(["/bin/sh", "-c", script, "pybi-relaunch", *argv],
+                     start_new_session=True, close_fds=True,
+                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def replace_appimage(new_file: Path, target: Path) -> None:
+    tmp = target.with_name(target.name + ".new")
+    shutil.copyfile(new_file, tmp)
+    os.chmod(tmp, 0o755)
+    os.replace(tmp, target)  # the running AppImage keeps its old inode until it exits
+
+
+def install_mac_app(dmg: Path, bundle: Path) -> None:
+    mnt = tempfile.mkdtemp(prefix="pybi-dmg-")
+    subprocess.run(["hdiutil", "attach", "-nobrowse", "-readonly", "-noautoopen", "-mountpoint", mnt, str(dmg)],
+                   check=True, capture_output=True)
+    try:
+        src = Path(mnt) / "PyBI.app"
+        if not src.exists():
+            raise UpdateError("The downloaded disk image does not contain PyBI.app.")
+        staging = bundle.with_name(".PyBI-update.app")
+        old = bundle.with_name(".PyBI-old.app")
+        for d in (staging, old):
+            shutil.rmtree(d, ignore_errors=True)
+        subprocess.run(["ditto", str(src), str(staging)], check=True, capture_output=True)
+        os.rename(bundle, old)
+        os.rename(staging, bundle)
+        shutil.rmtree(old, ignore_errors=True)
+    finally:
+        subprocess.run(["hdiutil", "detach", mnt, "-quiet", "-force"], capture_output=True)
+
+
+def _manual(downloaded: Path) -> tuple[str, Path]:
+    """Put the file where people look (Downloads) for them to open."""
+    downloads = Path.home() / "Downloads"
+    try:
+        downloads.mkdir(parents=True, exist_ok=True)
+        final = downloads / downloaded.name.split("-", 1)[-1]
+        shutil.copyfile(downloaded, final)
+        return "manual", final
+    except OSError:
+        return "manual", downloaded
+
+
+def apply_update(downloaded: Path, cfg: Config, log_dir: Path) -> tuple[str, Path]:
+    """Install a downloaded update. Returns ("restart", path) when this launcher must now exit,
+    or ("manual", path) when the user has to open the file (deb packages, read-only installs)."""
+    kind = cfg.install_kind
+    log.info("Applying update %s as %s", downloaded, kind)
+    if kind == "inno":
+        launch_installer(downloaded, log_dir)
+        return "restart", downloaded
+    if kind == "appimage" and os.environ.get("APPIMAGE"):
+        target = Path(os.environ["APPIMAGE"])
+        try:
+            replace_appimage(downloaded, target)
+        except OSError:
+            log.exception("Cannot replace %s", target)
+            return _manual(downloaded)
+        _relaunch_later([str(target)])
+        return "restart", target
+    if kind == "macapp" and C.mac_bundle() is not None:
+        bundle = C.mac_bundle()
+        try:
+            install_mac_app(downloaded, bundle)
+        except (OSError, subprocess.CalledProcessError, UpdateError):
+            log.exception("In-place macOS update failed; opening the disk image instead")
+            subprocess.Popen(["open", str(downloaded)])
+            return "manual", downloaded
+        _relaunch_later(["/usr/bin/open", "-n", str(bundle)])
+        return "restart", bundle
+    return _manual(downloaded)

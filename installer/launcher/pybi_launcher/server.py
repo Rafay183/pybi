@@ -5,6 +5,7 @@ import collections
 import logging
 import os
 import re
+import signal
 import socket
 import subprocess
 import threading
@@ -180,6 +181,7 @@ class Server:
             cmd, cwd=str(C.workspace_dir()), env=env, stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8", errors="replace",
             bufsize=1, creationflags=CREATE_NO_WINDOW if C.IS_WINDOWS else 0,
+            start_new_session=not C.IS_WINDOWS,  # own process group, so stop() reaches its children
         )
         self._job.assign(self.proc)
         threading.Thread(target=self._pump, args=(self.proc, logf), name="server-output", daemon=True).start()
@@ -219,15 +221,23 @@ class Server:
             return
         if proc.poll() is None:
             log.info("Stopping server pid %s", proc.pid)
-            try:
-                proc.terminate()
-                proc.wait(timeout=timeout)
-            except (OSError, subprocess.TimeoutExpired):
-                if C.IS_WINDOWS:
+            if C.IS_WINDOWS:
+                try:
+                    proc.terminate()
+                    proc.wait(timeout=timeout)
+                except (OSError, subprocess.TimeoutExpired):
                     subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"],
                                    capture_output=True, creationflags=CREATE_NO_WINDOW)
-                else:
-                    proc.kill()
+            else:
+                for sig, wait in ((signal.SIGTERM, timeout), (signal.SIGKILL, 3)):
+                    try:
+                        os.killpg(proc.pid, sig)
+                        proc.wait(timeout=wait)
+                        break
+                    except ProcessLookupError:
+                        break
+                    except (OSError, subprocess.TimeoutExpired):
+                        continue
         if self._job:
             self._job.close()  # kills any leftover child processes
             self._job = None
