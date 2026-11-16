@@ -162,10 +162,19 @@ def test_disabled_without_repo():
 
 # ---------------- server ----------------
 FAKE_PYBI = textwrap.dedent('''
-    import http.server, os, sys
+    # minimal HTTP server; http.server is avoided because its getfqdn() call can stall on macOS CI
+    import os, socket
     host, port = os.environ["PYBI_HOST"], int(os.environ["PYBI_PORT"])
+    s = socket.socket()
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((host, port))
+    s.listen(8)
     print(f"PyBI running at http://{host}:{port}", flush=True)
-    http.server.ThreadingHTTPServer((host, port), http.server.SimpleHTTPRequestHandler).serve_forever()
+    while True:
+        c, _ = s.accept()
+        c.recv(1024)
+        c.sendall(b"HTTP/1.0 200 OK\\r\\nContent-Length: 2\\r\\n\\r\\nok")
+        c.close()
 ''')
 
 
