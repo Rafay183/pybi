@@ -7,7 +7,7 @@ Author: Muhammad Rafay Shaikh, from Pakistan.
 """
 from __future__ import annotations
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __author__ = "Muhammad Rafay Shaikh"
 
 from typing import Any

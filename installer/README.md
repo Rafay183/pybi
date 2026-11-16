@@ -8,11 +8,11 @@ This folder builds PyBI for every desktop platform. Every package includes its o
 | macOS 11+ Apple Silicon | `PyBI-macOS-arm64.dmg` | Drag `PyBI.app` to Applications | Replaces `PyBI.app` in place |
 | macOS 11+ Intel | `PyBI-macOS-x86_64.dmg` | Same | Same |
 | Linux x86_64 / ARM64 | `PyBI-Linux-<arch>.AppImage` | Nothing to install | Replaces the AppImage file |
-| Debian, Ubuntu, ChromeOS | `PyBI-Linux-<amd64\|arm64>.deb` | Double-click / `apt install` (`/opt/pybi`) | Downloads the new `.deb` to Downloads for one double-click |
+| Debian, Ubuntu, ChromeOS | `PyBI-Linux-<amd64\|arm64>.deb` | `install.sh` one-liner, double-click or `apt install` (`/opt/pybi`) | Installs itself when `sudo` needs no password (ChromeOS); otherwise saves it to Downloads with the install command |
 
 Every file has a `<name>.sha256`; the updater refuses a download whose checksum does not match.
 
-**ChromeOS** runs PyBI in its built-in Linux (Settings → Advanced → Developers → Linux development environment). Double-clicking the `.deb` in Files installs it, PyBI appears in the launcher, and Chrome opens the studio at `localhost`.
+**ChromeOS** runs PyBI in its built-in Linux. ChromeOS 145 stopped installing `.deb` files from the Files app, so Chromebook users run `curl -fsSL https://rafay183.github.io/pybi/install.sh | bash` in the Terminal ([docs/install.sh](../docs/install.sh): picks amd64/arm64, verifies the SHA-256, installs with apt). PyBI appears in the launcher and opens in Chrome. Because Linux on a Chromebook has passwordless `sudo`, the `.deb` build also installs its own updates.
 
 ## Folder map
 
