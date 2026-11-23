@@ -28,7 +28,7 @@ import requests
 
 # Public identifier of the "PyBI" OAuth app (not a secret - device flow apps have no client secret).
 # Override with the PYBI_GITHUB_CLIENT_ID environment variable to use your own OAuth app.
-DEFAULT_CLIENT_ID = "PYBI_CLIENT_ID_NOT_SET"
+DEFAULT_CLIENT_ID = "Ov23lik95RvkgxvdgGYS"
 GITHUB = "https://github.com"
 API = "https://api.github.com"
 DEVICE_URL = f"{GITHUB}/login/device"
