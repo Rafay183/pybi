@@ -642,8 +642,19 @@ BANNER = r"""
 """
 
 
+def use_system_certificates() -> None:
+    """HTTPS checks (GitHub sign-in, web connectors) use the operating system's certificate store, like the browser,
+    so they also work behind antivirus web protection and company proxies."""
+    try:
+        import truststore
+        truststore.inject_into_ssl()
+    except Exception:  # noqa: BLE001 - optional; fall back to Python's own checks
+        pass
+
+
 def serve(project: str | None = None, host: str = "0.0.0.0", port: int = 8050, open_browser: bool = True,
           dataframes: dict | None = None, sample: bool = False) -> None:
+    use_system_certificates()
     if project and is_power_bi_file(project) and Path(project).exists():
         proj, imp = project_from_pbix(project)
         proj.path = Path(project).with_suffix(".pybi")

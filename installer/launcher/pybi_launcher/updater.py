@@ -17,6 +17,7 @@ import logging
 import os
 import re
 import shutil
+import ssl
 import subprocess
 import sys
 import tempfile
@@ -63,12 +64,52 @@ class CheckResult:
     error: str = ""
 
 
+_SYSTEM_CTX: ssl.SSLContext | None = None
+
+
+def _system_context() -> ssl.SSLContext:
+    """Verify HTTPS with the operating system (like the web browser does).
+
+    Python's own check only sees certificates already present in the Windows store; Windows adds many root
+    certificates on demand, and antivirus / company networks add their own. truststore asks Windows / macOS
+    to verify, so update checks work wherever the browser works.
+    """
+    global _SYSTEM_CTX
+    if _SYSTEM_CTX is None:
+        try:
+            import truststore
+            _SYSTEM_CTX = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        except Exception:  # noqa: BLE001 - optional dependency
+            _SYSTEM_CTX = ssl.create_default_context()
+    return _SYSTEM_CTX
+
+
+def _bundled_context() -> ssl.SSLContext | None:
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:  # noqa: BLE001 - optional dependency
+        return None
+
+
+def _urlopen(req: urllib.request.Request, timeout: float):
+    try:
+        return urllib.request.urlopen(req, timeout=timeout, context=_system_context())
+    except urllib.error.URLError as exc:
+        if isinstance(exc.reason, ssl.SSLCertVerificationError):
+            ctx = _bundled_context()
+            if ctx is not None:
+                log.info("System certificate check failed (%s); retrying with the bundled certificates", exc.reason)
+                return urllib.request.urlopen(req, timeout=timeout, context=ctx)
+        raise
+
+
 def _get(url: str, timeout: float, accept: str = "application/vnd.github+json") -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
     token = os.environ.get("PYBI_GITHUB_TOKEN")  # optional, raises the API rate limit
     if token and "api.github.com" in url:
         req.add_header("Authorization", f"Bearer {token}")
-    with urllib.request.urlopen(req, timeout=timeout) as r:
+    with _urlopen(req, timeout) as r:
         return r.read()
 
 
@@ -124,6 +165,10 @@ def check(cfg: Config, state: State, force: bool = False, timeout: float = 10.0)
             msg = f"GitHub refused the update check (HTTP {e.code})."
         return CheckResult("error", error=msg)
     except (urllib.error.URLError, OSError, ValueError) as e:
+        if isinstance(getattr(e, "reason", None), ssl.SSLCertVerificationError):
+            return CheckResult("error", error="Could not check for updates: this computer could not verify GitHub's security "
+                                              "certificate. If you use antivirus web protection or a company network, allow "
+                                              "github.com, or download the newest PyBI from https://rafay183.github.io/pybi/")
         return CheckResult("error", error=f"Could not reach GitHub ({e}).")
     state.last_check = time.time()
     try:
@@ -158,7 +203,7 @@ def download(rel: Release, dest: Path, progress: Callable[[int, int], None] | No
     req = urllib.request.Request(rel.asset_url, headers={"User-Agent": UA, "Accept": "application/octet-stream"})
     h = hashlib.sha256()
     done = 0
-    with urllib.request.urlopen(req, timeout=timeout) as r, open(part, "wb") as f:
+    with _urlopen(req, timeout) as r, open(part, "wb") as f:
         total = int(r.headers.get("Content-Length") or rel.asset_size or 0)
         while True:
             if cancel is not None and cancel.is_set():

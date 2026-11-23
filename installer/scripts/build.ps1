@@ -93,7 +93,7 @@ Remove-Item -Force (Join-Path $Stage "runtime\Scripts\*.exe") -ErrorAction Silen
 
 # ------------------------------------------------------------------ 2. launcher
 Step "Freeze the launcher into PyBI.exe"
-Run "python" @("-m", "pip", "install", "--disable-pip-version-check", "pyinstaller==6.11.1")
+Run "python" @("-m", "pip", "install", "--disable-pip-version-check", "pyinstaller==6.11.1", "truststore>=0.9", "certifi")
 $vfile = Join-Path $Build "version_info.txt"
 $tuple = ($parts[0..3] -join ', ')
 Write-Utf8NoBom $vfile @"
@@ -119,6 +119,7 @@ Run "python" @("-m", "PyInstaller", "--noconfirm", "--clean", "--windowed", "--o
   "--icon", (Join-Path $Assets "pybi.ico"),
   "--version-file", $vfile,
   "--paths", $launcher,
+  "--hidden-import", "truststore", "--hidden-import", "certifi", "--collect-data", "certifi",
   "--add-data", "$(Join-Path $Assets 'pybi.png');assets",
   "--add-data", "$(Join-Path $Assets 'pybi.ico');assets",
   "--distpath", (Join-Path $Build "dist"),

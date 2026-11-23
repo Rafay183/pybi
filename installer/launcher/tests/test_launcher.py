@@ -355,3 +355,51 @@ def test_deb_update_installs_itself_with_passwordless_sudo(isolated, monkeypatch
     monkeypatch.setattr(U, "install_deb", lambda deb, log_dir: False)
     monkeypatch.setattr(Path, "home", classmethod(lambda cls: isolated / "home"))
     assert U.apply_update(f, C.Config(install_kind="deb"), isolated)[0] == "manual"
+
+
+def test_update_check_retries_with_bundled_certificates(monkeypatch):
+    """A certificate failure with the system check (antivirus, lazily-filled Windows store) retries with certifi."""
+    import ssl
+    import urllib.error
+
+    from pybi_launcher import updater
+
+    calls = []
+
+    class Resp:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b"[]"
+
+    def fake_urlopen(req, timeout=None, context=None):
+        calls.append(context)
+        if len(calls) == 1:
+            raise urllib.error.URLError(ssl.SSLCertVerificationError(1, "unable to get issuer certificate"))
+        return Resp()
+
+    sentinel = ssl.create_default_context()
+    monkeypatch.setattr(updater.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(updater, "_bundled_context", lambda: sentinel)
+    assert updater._get("https://api.github.com/repos/x/y/releases", 5) == b"[]"
+    assert calls[1] is sentinel and len(calls) == 2
+
+
+def test_certificate_failure_gives_a_clear_message(monkeypatch, tmp_path):
+    import ssl
+    import urllib.error
+
+    from pybi_launcher import updater
+
+    def fail(*a, **k):
+        raise urllib.error.URLError(ssl.SSLCertVerificationError(1, "unable to get issuer certificate"))
+
+    monkeypatch.setattr(updater, "_urlopen", fail)
+    cfg = type("Cfg", (), {"github_repo": "rafay183/pybi", "auto_check": True, "check_interval_hours": 6})()
+    state = type("St", (), {"auto_check": None, "last_check": 0, "save": lambda self: None})()
+    res = updater.check(cfg, state, force=True)
+    assert res.status == "error" and "security certificate" in res.error

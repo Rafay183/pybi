@@ -97,8 +97,9 @@ DEBVER="$(printf '%s' "$VERSION" | sed -E 's/^v//; s/-?(a|b|rc|alpha|beta|dev|pr
 # ================================================================== macOS
 if [ "$OS" = Darwin ]; then
   step "Freeze the launcher into PyBI.app"
-  python3 -m pip install --disable-pip-version-check pyinstaller==6.11.1
+  python3 -m pip install --disable-pip-version-check pyinstaller==6.11.1 "truststore>=0.9" certifi
   python3 -m PyInstaller --noconfirm --clean --windowed --onedir --name PyBI \
+    --hidden-import truststore --hidden-import certifi --collect-data certifi \
     --icon "$INST/assets/pybi.icns" --osx-bundle-identifier io.github.rafay183.pybi \
     --paths "$INST/launcher" --add-data "$INST/assets/pybi.png:assets" \
     --distpath "$BUILD/dist" --workpath "$BUILD/work" --specpath "$BUILD" \
