@@ -30,8 +30,9 @@ permissions:
   contents: write
 
 concurrency:
-  # "v2": runs of the previous pipeline that are stuck waiting for a Mac machine do not block new releases
-  group: desktop-apps-v2-${{ github.ref }}
+  # One queue per commit: a release whose Mac builds are still waiting for a GitHub Mac machine
+  # never holds up the next release (each run publishes its own version).
+  group: desktop-apps-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
