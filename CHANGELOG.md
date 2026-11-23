@@ -4,6 +4,11 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-11-24
+
+### Fixed
+- "Check for updates" failed on some Windows PCs with `CERTIFICATE_VERIFY_FAILED ... unable to get issuer certificate`. PyBI now checks HTTPS certificates with the operating system (like the web browser), so updates, GitHub sign-in and web connectors also work when Windows hasn't downloaded a root certificate yet or antivirus / company networks inspect secure connections. If that is not possible, it falls back to a built-in certificate list.
+
 ## [0.1.6] - 2026-11-24
 
 ### Added
