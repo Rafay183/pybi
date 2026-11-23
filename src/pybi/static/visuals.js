@@ -42,6 +42,7 @@
     matrix: { label: "Matrix", roles: [["rows", "Rows", 2, "dim"], ["columns", "Columns", 1, "dim"], ["values", "Values", 8, "value"]], group: "Tables" },
     slicer: { label: "Slicer", roles: [["category", "Field", 1, "dim"]], group: "Filters" },
     textbox: { label: "Text box", roles: [], group: "Other" },
+    image: { label: "Image", roles: [], group: "Other" },
     narrative: { label: "Smart narrative", roles: [["category", "Explain by", 1, "dim"], ["values", "Measure", 1, "value"]], group: "Other" },
   };
 
@@ -636,8 +637,17 @@
     const f = v.format || {};
     const d = document.createElement("div"); d.className = "textbox";
     d.style.cssText = "font-size:" + (f.fontSize || 16) + "px;font-weight:" + (f.bold ? 700 : 400) + ";font-style:" + (f.italic ? "italic" : "normal") + ";color:" + (f.color || o.theme.text) + ";text-align:" + (f.align || "left") + ";";
-    d.innerHTML = esc(f.text || "Double-click to add text").replace(/\n/g, "<br>").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    d.innerHTML = esc(f.text ?? "Double-click to add text").replace(/\n/g, "<br>").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
     el.appendChild(d);
+  }
+
+  function renderImage(el, v) {
+    const f = v.format || {};
+    if (!f.src) { el.innerHTML = '<div class="empty">Add an image URL in Format</div>'; return; }
+    const img = document.createElement("img");
+    img.src = f.src; img.alt = v.title || "";
+    img.style.cssText = "width:100%;height:100%;display:block;object-fit:" + (f.fit || "contain") + ";object-position:center";
+    el.appendChild(img);
   }
 
   function renderNarrative(el, v, r, o) {
@@ -668,6 +678,7 @@
   function render(el, v, r, o) {
     el.innerHTML = "";
     if (v.type === "textbox") return renderText(el, v, o);
+    if (v.type === "image") return renderImage(el, v);
     if (!r || r.empty) {
       const meta = TYPES[v.type];
       el.innerHTML = '<div class="empty">' + icon(v.type) + "<div>" + (meta ? "Add fields: " + meta.roles.map((x) => x[1]).join(", ") : "Unknown visual") + "</div></div>";
@@ -713,6 +724,11 @@
       lines.forEach((ln, i) => (s += t(x, 6 + size * (i + 1), ln.replace(/\*\*/g, ""), { size, color: f.color || theme.text, bold: f.bold, anchor })));
       return s;
     }
+    if (v.type === "image") {
+      if (!f.src) return s;
+      const par = f.fit === "cover" ? "xMidYMid slice" : f.fit === "none" ? "xMidYMid" : "xMidYMid meet";
+      return '<image href="' + esc(f.src) + '" x="0" y="0" width="' + w + '" height="' + h + '" preserveAspectRatio="' + par + '"/>';
+    }
     if (!r || r.empty) return s;
     if (v.type === "slicer") {
       const sel = (v.state && v.state.values) || [];
@@ -755,6 +771,7 @@
   function pageSVG(page, items, theme, W, H) {
     let s = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" font-family="' + FONT + '">';
     s += '<rect width="' + W + '" height="' + H + '" fill="' + ((page.background) || theme.page) + '"/>';
+    if (page.wallpaper) s += '<image href="' + esc(page.wallpaper) + '" width="' + W + '" height="' + H + '" preserveAspectRatio="xMidYMid slice"/>';
     for (const it of items) {
       const v = it.visual, f = v.format || {};
       const bg = f.background === "transparent" ? null : f.background || theme.card;

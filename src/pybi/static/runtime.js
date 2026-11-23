@@ -27,7 +27,7 @@
     }
 
     get page() { return this.report.pages[this.pageIndex] || this.report.pages[0]; }
-    get theme() { return V.THEMES[this.report.theme] || V.THEMES.pybi; }
+    get theme() { const base = V.THEMES[this.report.theme] || V.THEMES.pybi; const c = this.report.customTheme; return c ? Object.assign({}, base, c) : base; }
     pageSize() { const p = this.page; return { w: p.width || 1280, h: p.height || 720 }; }
 
     // ------------------------------------------------------------ filter context
@@ -58,9 +58,12 @@
     }
 
     queryVisual(v, page) {
-      if (v.type === "textbox") return null;
+      if (v.type === "textbox" || v.type === "image") return null;
       const filters = this.filtersFor(v, page);
       if (v.type === "slicer") v._slicerFilters = this.specFilters(this.report.reportFilters).concat(this.specFilters((page || this.page).filters)).concat(this.slicerFilters(page || this.page, v.id));
+      const missing = [];
+      for (const list of Object.values(v.fields || {})) for (const f of list || []) if (f && f.table && !this.model.tables[f.table] && !missing.includes(f.table)) missing.push(f.table);
+      if (missing.length) return { empty: false, errors: ["No data loaded for table " + missing.map((t) => "'" + t + "'").join(", ")] };
       try { return E.query(this.model, v, filters, this.report); }
       catch (e) { console.error(e); return { empty: false, errors: [e.message] }; }
     }
@@ -115,7 +118,7 @@
         tools.addEventListener("click", (ev) => { const a = ev.target.dataset.act; if (a === "focus") this.focus(v); if (a === "csv") this.exportData(v); });
       }
       const headH = v.type === "slicer" ? 24 : 34;
-      const bw = v.w - (v.type === "textbox" ? 8 : 16), bh = v.h - (showTitle ? headH : 8) - 8;
+      const bw = v.w - (v.type === "textbox" || v.type === "image" ? 8 : 16), bh = v.h - (showTitle ? headH : 8) - 8;
       body.style.height = bh + "px";
       const result = this.queryVisual(v);
       this.results[v.id] = result;

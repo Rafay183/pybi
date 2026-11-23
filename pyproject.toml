@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Muhammad Rafay Shaikh" }]
 maintainers = [{ name = "Muhammad Rafay Shaikh" }]
-keywords = ["business intelligence", "bi", "dashboard", "power bi", "dax", "analytics", "data visualization", "reporting", "pandas"]
+keywords = ["business intelligence", "bi", "dashboard", "power bi", "pbix", "dax", "analytics", "data visualization", "reporting", "pandas"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Web Environment",
@@ -53,8 +53,9 @@ odbc = ["pyodbc"]
 nosql = ["pymongo", "redis", "boto3"]
 cloud = ["fsspec", "s3fs", "gcsfs", "adlfs", "paramiko"]
 finance = ["yfinance"]
+pbix = ["pbixray>=0.15"]
 all = ["pyarrow>=10", "xlrd", "pyxlsb", "odfpy", "fastavro", "pyreadstat", "pyyaml", "pdfplumber", "sqlalchemy>=2.0", "psycopg2-binary",
-       "pymysql", "pymssql", "oracledb", "duckdb", "pymongo", "redis", "boto3", "fsspec", "s3fs", "gcsfs", "adlfs", "paramiko", "yfinance"]
+       "pymysql", "pymssql", "oracledb", "duckdb", "pymongo", "redis", "boto3", "fsspec", "s3fs", "gcsfs", "adlfs", "paramiko", "yfinance", "pbixray>=0.15"]
 dev = ["pytest>=7", "ruff>=0.6", "build", "twine", "reportlab", "pdfplumber", "odfpy"]
 
 [project.urls]

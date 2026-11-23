@@ -312,7 +312,7 @@ footer.site p{color:var(--muted); margin:6px 0}
     <a href="#guides">Get data &amp; connectors</a><a href="#query">Query editor</a><a href="#model">Model view</a><a href="#dax">DAX formulas</a><a href="#visuals">Visuals</a><a href="#filters">Filters &amp; interactivity</a><a href="#smart">Smart features</a><a href="#share">Share on your network</a><a href="#export">Export</a>
   </div>
   <div class="group"><p class="gtitle"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6l6 6-6 6M12 19h8"/></svg>Reference</p>
-    <a href="#cli">Command line</a><a href="#python">Python &amp; Jupyter</a><a href="#how">How it works</a><a href="#security">Security</a><a href="#troubleshooting">Troubleshooting</a><a href="#contributing">Contributing</a>
+    <a href="#powerbi">Power BI files</a><a href="#cli">Command line</a><a href="#python">Python &amp; Jupyter</a><a href="#how">How it works</a><a href="#security">Security</a><a href="#troubleshooting">Troubleshooting</a><a href="#contributing">Contributing</a>
   </div>
 </aside>
 <main id="content"><div class="col">
@@ -811,6 +811,25 @@ Revenue YTD  = TOTALYTD([Total Revenue], 'Calendar'[Date])</code></pre></div>
   <p><b>File → Export</b> offers: this page or all pages as PNG, PowerPoint (.pptx), PDF, interactive HTML (one offline file with data, slicers and cross-filtering), the project as <code>.pybi</code>, and Print. From the command line: <code>pybi export report.pybi -o dashboard.html</code>.</p>
 </section>
 
+<!-- ============ POWER BI ============ -->
+<section id="powerbi">
+  <p class="eyebrow">Guide</p>
+  <h2><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V12M10 20V8M15 20V4M20 20v-6"/></svg></span>Open Power BI files (.pbix)</h2>
+  <p>PyBI opens Power BI Desktop reports directly. Click <b>Open</b> (or <b>Get data → Power BI file</b>, or drop the file on the Get data window) and pick a <code>.pbix</code> or <code>.pbit</code> file. PyBI brings over:</p>
+  <ul>
+    <li><b>Pages</b> with their size, background colour or image, and hidden/tooltip pages (hidden in the viewer).</li>
+    <li><b>Visuals</b> at the same position and size: column, bar, line, area, combo, waterfall, ribbon, scatter, pie, donut, treemap, funnel, gauge, card, multi-row card, KPI, table, matrix, slicers, text boxes, shapes and images, with their fields, titles, data labels, legends and colours.</li>
+    <li><b>Filters</b> on the report, pages and visuals, and the values selected in slicers.</li>
+    <li><b>The data model</b>: every table with its data, relationships (direction and active/inactive), DAX measures with their number formats, calculated columns, hidden fields and sort-by columns.</li>
+    <li><b>The theme</b> colours of the report.</li>
+  </ul>
+  <p>Reading the data inside a <code>.pbix</code> needs the <code>pbixray</code> package. The desktop app includes it; with pip, install it with the <code>pbix</code> extra:</p>
+  <div class="code" data-lang="bash"><pre><code>pip install "pybi-ray[pbix]"
+pybi run "Sales Report.pbix"          # open it in the studio
+pybi convert "Sales Report.pbix"      # or save it as Sales Report.pybi</code></pre></div>
+  <p>After the import PyBI lists anything it could not carry over exactly, so you know what to check. Not supported yet: maps, custom visuals from AppSource, Q&amp;A, decomposition tree and key influencers (shown as grey placeholders in the same spot), buttons and bookmarks, Top N and relative-date filters, row-level security, and DAX functions the PyBI engine does not have yet. Reports with a <i>live connection</i> to a Power BI dataset or Analysis Services keep their data on the server, so only the layout is imported.</p>
+</section>
+
 <!-- ============ CLI ============ -->
 <section id="cli">
   <p class="eyebrow">Reference</p>
@@ -818,6 +837,8 @@ Revenue YTD  = TOTALYTD([Total Revenue], 'Calendar'[Date])</code></pre></div>
   <div class="code" data-lang="bash"><pre><code>pybi run                      # start the studio (network view link enabled)
 pybi run sales.xlsx           # start with a data file loaded (csv, xlsx, json, parquet)
 pybi run my_report.pybi       # open a saved project
+pybi run report.pbix          # open a Power BI report (pip install "pybi-ray[pbix]" for its data)
+pybi convert report.pbix      # convert a Power BI report to report.pybi
 pybi run --private            # only this computer can connect
 pybi run --port 9000 --no-browser
 pybi run --demo               # start with the demo data and dashboard
