@@ -35,6 +35,7 @@
     rt.pageIndex = Math.min(page, rt.report.pages.length - 1);
     document.title = data.report.title || "PyBI report";
     $("vtitle").textContent = data.report.title || "PyBI report";
+    const ver = data.app && data.app.version; if (ver && $("vver")) $("vver").textContent = "v" + ver;
     if (data.exportedAt) $("vstamp").textContent = "· exported " + data.exportedAt.replace("T", " ");
     rt.render(); tabs(); fit();
   }

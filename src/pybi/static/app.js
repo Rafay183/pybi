@@ -37,6 +37,7 @@
   // ================================================================ state & history
   function applyState(st) {
     S.report = st.report; S.tables = st.tables; S.sources = st.sources;
+    if (st.app && st.app.version) { const ver = document.getElementById("appver"); if (ver) ver.textContent = "v" + st.app.version; S.version = st.app.version; }
     S.report.pages = S.report.pages && S.report.pages.length ? S.report.pages : [{ id: "p1", name: "Page 1", visuals: [], filters: [] }];
     for (const k of ["measures", "calcColumns", "relationships", "reportFilters"]) S.report[k] = S.report[k] || [];
     S.report.columnProps = S.report.columnProps || {};
@@ -141,7 +142,7 @@
     let w = $("#welcome");
     if (empty && !Object.keys(S.tables).length) {
       if (!w) {
-        w = h("div", { id: "welcome", class: "welcome" }, '<div class="card"><h1>Welcome to PyBI</h1><p>Open-source business intelligence that runs on your own computer. Connect data, model it, write DAX-style measures and design interactive dashboards.</p><div class="acts"><button class="btn primary" data-a="get">⊕ Get data</button><button class="btn" data-a="sample">☷ Try the demo dashboard</button><button class="btn" data-a="open">📂 Open .pybi file</button><button class="btn" data-a="pbix">📊 Open Power BI file (.pbix)</button></div><div class="credit">PyBI · created by Muhammad Rafay Shaikh, from Pakistan</div></div>');
+        w = h("div", { id: "welcome", class: "welcome" }, '<div class="card"><h1>Welcome to PyBI</h1><p>Open-source business intelligence that runs on your own computer. Connect data, model it, write DAX-style measures and design interactive dashboards.</p><div class="acts"><button class="btn primary" data-a="get">⊕ Get data</button><button class="btn" data-a="sample">☷ Try the demo dashboard</button><button class="btn" data-a="open">📂 Open .pybi file</button><button class="btn" data-a="pbix">📊 Open Power BI file (.pbix)</button></div><div class="credit">PyBI ' + (S.version ? "v" + esc(S.version) + " " : "") + '· created by Muhammad Rafay Shaikh, from Pakistan</div></div>');
         $("#reportView").appendChild(w);
         w.addEventListener("click", (e) => { const a = e.target.dataset.a; if (a === "get") openGetData(); if (a === "sample") loadSample(); if (a === "open") openProject(); if (a === "pbix") openProject(".pbix,.pbit"); });
       }
@@ -974,7 +975,7 @@
   const CAT_COLORS = { File: "#118DFF", Database: "#12239E", "NoSQL & search": "#197278", "Cloud storage": "#E66C37", "Web & online files": "#6B007B", "Generic & developer": "#252423",
     "Developer tools": "#744EC2", "Project & productivity": "#D9B300", "CRM & sales": "#E044A7", "Finance & payments": "#1AAB40", "Marketing & analytics": "#D64550",
     "Support & ITSM": "#0E7C86", "HR & time tracking": "#8A6D00", "E-commerce & CMS": "#B83280", "Microsoft & Google": "#0078D4", "Public data": "#2F855A", Popular: "#F2C811" };
-  const POPULAR = ["excel", "csv", "json", "folder", "web", "gsheets_public", "sqlite", "postgresql", "mysql", "sqlserver", "rest_api", "python", "sharepoint_list", "salesforce", "worldbank", "pdf"];
+  const POPULAR = ["pbix", "excel", "csv", "json", "folder", "web", "gsheets_public", "sqlite", "postgresql", "mysql", "sqlserver", "rest_api", "python", "sharepoint_list", "salesforce", "worldbank", "pdf"];
   let CATALOG = null;
   async function loadCatalog() { if (!CATALOG) CATALOG = await api("/api/connectors"); return CATALOG; }
   const initials = (n) => n.replace(/\(.*?\)/g, "").split(/[\s/&.-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
@@ -1001,10 +1002,10 @@
       let list = q ? cat.connectors.filter((c) => (c.name + " " + c.category + " " + c.description + " " + c.id).toLowerCase().includes(q))
         : current === "All" ? cat.connectors : current === "Popular" ? POPULAR.map((id) => byId[id]).filter(Boolean) : cat.connectors.filter((c) => c.category === current);
       let html = "";
-      if (!q && current === "Popular") html += '<button class="gd-tile" data-special="sample"><span class="gd-badge" style="background:#F2C811;color:#111">☷</span><span class="gd-txt"><b>Demo sales dataset</b><small>A ready-made 3-page dashboard to explore</small></span></button><button class="gd-tile" data-special="pbix"><span class="gd-badge" style="background:#F2C811;color:#111">P</span><span class="gd-txt"><b>Power BI file (.pbix)</b><small>Open a Power BI report with its pages, visuals, model and data</small></span></button><button class="gd-tile" data-special="paste"><span class="gd-badge" style="background:#605e5c">✎</span><span class="gd-txt"><b>Enter / paste data</b><small>Type a small table or paste from Excel</small></span></button><button class="gd-tile" data-special="pybi"><span class="gd-badge" style="background:#111827">.pb</span><span class="gd-txt"><b>Open .pybi project</b><small>A saved PyBI report</small></span></button>';
+      if (!q && current === "Popular") html += '<button class="gd-tile" data-special="sample"><span class="gd-badge" style="background:#F2C811;color:#111">☷</span><span class="gd-txt"><b>Demo sales dataset</b><small>A ready-made 3-page dashboard to explore</small></span></button><button class="gd-tile" data-special="paste"><span class="gd-badge" style="background:#605e5c">✎</span><span class="gd-txt"><b>Enter / paste data</b><small>Type a small table or paste from Excel</small></span></button><button class="gd-tile" data-special="pybi"><span class="gd-badge" style="background:#111827">.pb</span><span class="gd-txt"><b>Open .pybi project</b><small>A saved PyBI report</small></span></button>';
       html += list.map(tile).join("");
       main.innerHTML = '<div class="gd-head"><h3>' + esc(q ? list.length + " result(s) for “" + q + "”" : current) + '</h3><span>' + cat.count + ' connectors · drop a file anywhere here to load it</span></div><div class="gd-grid">' + (html || '<div class="empty">No connector matches. Try “REST API”, “ODBC” or “Python script”.</div>') + "</div>";
-      $$(".gd-tile[data-id]", main).forEach((b) => (b.onclick = () => openConnector(byId[b.dataset.id])));
+      $$(".gd-tile[data-id]", main).forEach((b) => (b.onclick = () => { if (b.dataset.id === "pbix") { m.close(); return openProject(".pbix,.pbit"); } openConnector(byId[b.dataset.id]); }));
       $$(".gd-tile[data-special]", main).forEach((b) => (b.onclick = async () => {
         const k = b.dataset.special;
         if (k === "sample") { m.close(); loadSample(); }
@@ -1042,6 +1043,13 @@
         (c.params.some((p) => p.secret) ? '<label class="f" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="cp__remember" checked> Remember credentials on this computer (stored in ~/.pybi, never in the report file)</label>' : "") +
         '<div class="gd-err"></div><div class="gd-actions"><button class="btn" data-a="preview">👁 Preview</button><button class="btn primary" data-a="load">⤓ Load</button></div></div><div class="gd-nav"><div class="gd-navlist"></div><div class="gd-prev"><div class="empty">Click <b>Preview</b> to see the data before loading.' + (c.multi ? "<br>For sources with several tables you'll pick which ones to load." : "") + "</div></div></div></div></div>";
       $(".gd-back", main).onclick = drawGrid;
+      if (c.id === "github" || c.id === "github_file") {
+        const g = S.gh || {};
+        const note = h("div", { class: "gh-note" }, g.signedIn ? GH_ICON + " Using your GitHub sign-in (<b>" + esc(g.user.login) + "</b>), so no token is needed." + (g.user.private ? " Private repositories work too." : "")
+          : GH_ICON + ' <span><b>Sign in with GitHub</b> to load private repositories without a personal access token.</span> <button class="btn">Sign in</button>');
+        $(".gd-err", main).before(note);
+        const b = $("button", note); if (b) b.onclick = () => ghSignIn(() => openConnector(c));
+      }
       const errBox = $(".gd-err", main), nav = $(".gd-navlist", main), prev = $(".gd-prev", main);
       let tables = null, chosen = new Set();
       const body = () => {
@@ -1340,7 +1348,7 @@
       ["🖼  This page as PNG image", () => exportPNG(false)], ["🖼  All pages as PNG images", () => exportPNG(true)],
       ["📊  PowerPoint (.pptx)", exportPPTX], ["📄  PDF document", exportPDF],
       ["🌐  Interactive HTML (works offline)", exportHTML], null,
-      ["💾  Download project (.pybi)", () => download("/api/download-project", null, "report.pybi")], ["🖨  Print", () => window.print()],
+      ["💾  Download project (.pybi)", () => download("/api/download-project", null, "report.pybi")], ["☁  Save to GitHub", ghSave], ["🖨  Print", () => window.print()],
     ]);
   }
   async function exportPNG(all) {
@@ -1361,6 +1369,10 @@
       : '<p>Network sharing is off because PyBI was started with <code>--private</code>.</p><p>Restart with <code>pybi run</code> (without --private) to get a link for your network.</p>';
     const m = modal("Share report", body + '<hr style="border:0;border-top:1px solid #e1dfdd"><p><b>Share outside your network</b></p><p style="font-size:12.5px">Export an <b>interactive HTML</b> file — one file with data and charts that opens in any browser, even offline. Email it, put it on a shared drive, or host it on GitHub Pages / Netlify.</p>', [["Open viewer", () => window.open("/view", "_blank")], ["Export HTML", exportHTML], ["Close"]]);
     const cp = $("#cp", m); if (cp) cp.onclick = () => { navigator.clipboard.writeText(info.shareUrl).then(() => toast("Link copied")); };
+    const extra = h("div", {}, '<hr style="border:0;border-top:1px solid #e1dfdd"><p><b>Share on the web with GitHub</b></p><p style="font-size:12.5px">Publish this dashboard as a public web page with GitHub Pages, or keep the report in your own GitHub repository.</p><div style="display:flex;gap:8px"><button class="btn" data-g="pub">🌐 Publish as web page</button><button class="btn" data-g="save">☁ Save to GitHub</button></div>');
+    $(".mbd", m).appendChild(extra);
+    $("[data-g=pub]", extra).onclick = () => { m.close(); ghPublish(); };
+    $("[data-g=save]", extra).onclick = () => { m.close(); ghSave(); };
   }
   $("#shareBtn").onclick = share;
   $("#docTitle").addEventListener("change", (e) => { S.report.title = e.target.value.trim() || "Untitled report"; document.title = S.report.title + " · PyBI Studio"; commit({ render: false }); });
@@ -1384,11 +1396,155 @@
     }
   });
 
+  // ================================================================ GitHub sign-in (device flow) and reports on GitHub
+  const GH_ICON = '<svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
+  async function ghLoad(refresh) {
+    try { S.gh = await api("/api/github/status" + (refresh ? "?refresh=1" : "")); } catch (e) { S.gh = S.gh || { signedIn: false, configured: true }; }
+    renderGh();
+  }
+  function renderGh() {
+    const el = $("#ghAccount"); if (!el) return; const g = S.gh || {};
+    if (g.signedIn && g.user) {
+      el.innerHTML = '<button class="gh-btn gh-user" title="Signed in to GitHub as ' + esc(g.user.login) + '">' + (g.user.avatar_url ? '<img src="' + esc(g.user.avatar_url + (g.user.avatar_url.includes("?") ? "&" : "?") + "s=48") + '" alt="">' : GH_ICON) + "<span>" + esc(g.user.login) + "</span> ▾</button>";
+      $("button", el).onclick = ghMenu;
+    } else {
+      el.innerHTML = '<button class="gh-btn" title="Sign in with your GitHub account">' + GH_ICON + "<span>Sign in with GitHub</span></button>";
+      $("button", el).onclick = () => ghSignIn();
+    }
+  }
+  function ghMenu(e) {
+    const g = S.gh; const rect = e.currentTarget.getBoundingClientRect();
+    showMenu({ clientX: rect.left - 120, clientY: rect.bottom + 2, stopPropagation: () => e.stopPropagation() }, [
+      ["☁  Save report to GitHub", ghSave], ["📂  Open report from GitHub", ghOpen], ["🌐  Publish dashboard as a web page", ghPublish], null,
+      ["↗  My reports on GitHub", () => window.open(g.user.html_url + "/" + (g.reportsRepo || "pybi-reports"), "_blank", "noopener")],
+      ["👤  " + (g.user.name || g.user.login) + " on GitHub", () => window.open(g.user.html_url, "_blank", "noopener")], null,
+      ["⎋  Sign out", ghSignOut],
+    ]);
+  }
+  function ghNeed(next) { if (S.gh && S.gh.signedIn) return true; ghSignIn(next); return false; }
+
+  function ghSignIn(next) {
+    const g = S.gh || {};
+    if (g.configured === false) {
+      modal("Sign in with GitHub", "<p>GitHub sign-in is not set up in this copy of PyBI. Update PyBI (<code>pip install --upgrade pybi-ray</code>) or set the <code>PYBI_GITHUB_CLIENT_ID</code> environment variable to your own GitHub OAuth app.</p>", [["OK", null, "primary"]]);
+      return;
+    }
+    const html = '<div class="gh-intro">' + GH_ICON.replace('width="15" height="15"', 'width="34" height="34"') +
+      "<div><b>Connect PyBI to your GitHub account</b><br><span>Load GitHub data without a token, save and open your reports on GitHub, and publish dashboards as web pages.</span></div></div>" +
+      '<ul class="gh-safe"><li>🔒 You approve PyBI on <b>github.com</b>. PyBI never sees your GitHub password.</li><li>🔑 The access key stays on this computer only (your system keychain or <code>~/.pybi</code>). It is never put in report files, exports or the network view.</li><li>↩ Sign out here at any time, or remove access in your GitHub settings.</li></ul>' +
+      '<label class="f" style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="ghPrivate" checked style="margin-top:3px"><span><b>Include my private repositories</b><br><small style="color:#605e5c">Needed to load data from private repos and to keep your saved reports private. Untick to allow public repositories only.</small></span></label>' +
+      '<p style="margin:14px 0 0;font-weight:600">Do you have a GitHub account?</p>';
+    modal("Sign in with GitHub", html, [
+      ["No, help me create one", (m) => { const priv = $("#ghPrivate", m).checked; setTimeout(() => ghGuide(priv, next), 0); }],
+      ["Yes, sign in", (m) => { const priv = $("#ghPrivate", m).checked; setTimeout(() => ghStart(priv, next), 0); }, "primary"],
+    ]);
+  }
+
+  function ghGuide(priv, next) {
+    const url = (S.gh && S.gh.signupUrl) || "https://github.com/signup";
+    const html = "<p>A GitHub account is free and takes about 3 minutes:</p><ol class=\"gh-steps\">" +
+      "<li>Click <b>Open GitHub sign-up</b>. GitHub opens in a new tab.</li>" +
+      "<li>Enter your <b>email</b>, create a <b>password</b> (at least 15 characters, or 8 with a number and a lowercase letter) and choose a <b>username</b>.</li>" +
+      "<li>Solve the short puzzle, then type the <b>launch code</b> GitHub emails you.</li>" +
+      "<li>If GitHub asks about plans, the <b>Free</b> plan is all you need. You can skip the personalisation questions.</li>" +
+      "<li>Stay signed in on github.com, come back to this window and click <b>I've created my account</b>.</li></ol>" +
+      '<p style="font-size:12px;color:#605e5c">Tip: turn on two-factor authentication in GitHub settings later. It keeps your reports safe.</p>';
+    modal("Create a free GitHub account", html, [
+      ["Cancel"],
+      ["Open GitHub sign-up", () => { window.open(url, "_blank", "noopener"); return false; }],
+      ["I've created my account", () => { setTimeout(() => ghStart(priv, next), 0); }, "primary"],
+    ]);
+  }
+
+  async function ghStart(priv, next) {
+    let flow;
+    try { flow = await busy("Contacting GitHub…", () => api("/api/github/start", { private: priv })); } catch (e) { return; }
+    if (!flow) return;
+    const html = '<p style="margin-top:0">Approve PyBI on GitHub with this one-time code:</p>' +
+      '<div class="gh-code"><span id="ghCode">' + esc(flow.user_code) + '</span><button class="btn" id="ghCopy">Copy</button></div>' +
+      '<ol class="gh-steps"><li>Click <b>Open GitHub</b> (the code is copied for you).</li><li>Sign in to GitHub if asked, paste the code and click <b>Continue</b>.</li><li>Check that it says <b>PyBI</b>, then click <b>Authorize</b>.</li></ol>' +
+      '<div class="gh-wait"><span class="gh-spin"></span><span id="ghStatus">Waiting for you to approve on GitHub…</span></div>' +
+      '<p style="font-size:12px;color:#605e5c">The code works for ' + Math.round((flow.expires_in || 900) / 60) + " minutes. Only approve it if you started this sign-in yourself.</p>";
+    let done = false;
+    const m = modal("Sign in with GitHub", html, [
+      ["Cancel", () => { done = true; api("/api/github/cancel", { flow: flow.flow }).catch(() => {}); }],
+      ["Open GitHub", () => { navigator.clipboard && navigator.clipboard.writeText(flow.user_code).catch(() => {}); window.open(flow.verification_uri, "_blank", "noopener"); return false; }, "primary"],
+    ]);
+    $("#ghCopy", m).onclick = () => navigator.clipboard.writeText(flow.user_code).then(() => toast("Code copied"));
+    const status = (t, cls) => { const s = $("#ghStatus", m); if (s) { s.textContent = t; s.className = cls || ""; } };
+    let wait = (flow.interval || 5) * 1000;
+    const tick = async () => {
+      if (done || !document.body.contains(m)) { if (!done) api("/api/github/cancel", { flow: flow.flow }).catch(() => {}); return; }
+      let r;
+      try { r = await api("/api/github/poll", { flow: flow.flow }); } catch (e) { status("Network problem, retrying… (" + e.message + ")", "err"); setTimeout(tick, wait); return; }
+      if (r.status === "pending") { if (r.interval) wait = r.interval * 1000; setTimeout(tick, wait); return; }
+      done = true;
+      if (r.status === "ok") {
+        m.close(); await ghLoad(); toast("Signed in to GitHub as " + ((r.user && r.user.login) || ""));
+        if (typeof next === "function") next();
+      } else if (r.status === "denied") status("You declined on GitHub, so PyBI is not connected. Close this and try again any time.", "err");
+      else if (r.status === "expired") status("The code expired. Close this and click Sign in with GitHub again.", "err");
+      else status(r.error || "Sign-in failed.", "err");
+    };
+    setTimeout(tick, wait);
+  }
+
+  async function ghSignOut() {
+    if (!confirm("Sign out of GitHub in PyBI? The access key is deleted from this computer.")) return;
+    S.gh = await api("/api/github/signout", {}); renderGh();
+    modal("Signed out", '<p>PyBI no longer has access to your GitHub account on this computer.</p><p style="font-size:12.5px">To remove PyBI from your GitHub account completely, open <a href="' + esc(S.gh.revokeUrl || "https://github.com/settings/applications") + '" target="_blank" rel="noopener">GitHub → Settings → Applications</a> and click <b>Revoke</b> next to PyBI.</p>', [["OK", null, "primary"]]);
+  }
+
+  async function ghSave() {
+    if (!ghNeed(ghSave)) return;
+    const r = await form("Save report to GitHub", [
+      { key: "name", label: "Report name", value: S.report.title || "report" },
+      { key: "html", label: "Also save an interactive HTML dashboard next to it", type: "checkbox", value: true },
+    ], "Save");
+    if (!r) return;
+    const res = await busy("Saving to GitHub…", () => api("/api/github/save", { report: S.report, name: r.name, html: !!r.html }));
+    if (!res) return;
+    modal("Saved to GitHub", "<p>Your report is saved in your <b>" + esc(res.repo) + "</b> repository (" + (res.private ? "🔒 private, only you can see it" : "🌐 public") + ").</p>" +
+      '<p><a href="' + esc(res.url) + '" target="_blank" rel="noopener">Open the .pybi file on GitHub ↗</a>' + (res.htmlUrl ? '<br><a href="' + esc(res.htmlUrl) + '" target="_blank" rel="noopener">Open the HTML dashboard on GitHub ↗</a>' : "") + "</p>" +
+      '<p style="font-size:12px;color:#605e5c">Saving again with the same name updates it, and GitHub keeps every earlier version in the history.</p>', [["OK", null, "primary"]]);
+  }
+
+  async function ghOpen() {
+    if (!ghNeed(ghOpen)) return;
+    const res = await busy("Loading your reports from GitHub…", () => api("/api/github/reports"));
+    if (!res) return;
+    const list = res.reports || [];
+    const html = list.length ? '<div class="gh-list">' + list.map((x, i) => '<button class="btn" data-i="' + i + '">📊 ' + esc(x.name) + ' <small>' + Math.max(1, Math.round((x.size || 0) / 1024)) + " KB</small></button>").join("") + "</div>"
+      : "<p>No reports saved on GitHub yet. Use <b>Save report to GitHub</b> first.</p>";
+    const m = modal("Open report from GitHub", html, [["Close"]]);
+    $$("button[data-i]", m).forEach((b) => (b.onclick = async () => {
+      const x = list[+b.dataset.i];
+      if (Object.keys(S.tables).length && !confirm("Open “" + x.name + "”? It replaces the current report (an autosave is kept in ~/.pybi).")) return;
+      m.close();
+      await busy("Opening " + x.name + "…", async () => { applyState(await api("/api/github/open", { path: x.path })); S.history = []; toast("Opened " + x.name + " from GitHub"); });
+    }));
+  }
+
+  async function ghPublish() {
+    if (!ghNeed(ghPublish)) return;
+    const r = await form("Publish dashboard as a web page", [
+      { key: "name", label: "Page name", value: S.report.title || "dashboard" },
+      { key: "ok", label: "I understand the page and the data in it will be public: anyone with the link can see them", type: "checkbox", value: false },
+    ], "Publish");
+    if (!r) return;
+    if (!r.ok) { toast("Tick the box to confirm the dashboard can be public", true); return; }
+    const res = await busy("Publishing with GitHub Pages…", () => api("/api/github/publish", { report: S.report, name: r.name }));
+    if (!res) return;
+    const m = modal("Dashboard published", '<p>Your interactive dashboard is live at:</p><div class="share-url"><input type="text" readonly value="' + esc(res.url) + '"><button class="btn primary" id="cp">Copy</button></div><p style="font-size:12px;color:#605e5c">' + esc(res.note || "") + ' Publish again with the same name to update it.</p>', [["Open", () => { window.open(res.url, "_blank", "noopener"); }], ["Close", null, "primary"]]);
+    $("#cp", m).onclick = () => navigator.clipboard.writeText(res.url).then(() => toast("Link copied"));
+  }
+
   // ================================================================ boot
   (async function boot() {
     try {
       S.info = await api("/api/info");
       applyState(await api("/api/state"));
+      ghLoad(true);
     } catch (e) { document.body.innerHTML = '<div class="empty" style="height:100vh">Could not reach the PyBI server: ' + esc(e.message) + "</div>"; }
   })();
 })();

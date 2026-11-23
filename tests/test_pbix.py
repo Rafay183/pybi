@@ -383,3 +383,14 @@ def test_real_power_bi_files():
         for p in imp.report["pages"]:
             for v in p["visuals"]:
                 assert v["w"] > 0 and v["h"] > 0
+
+
+def test_pbix_connector_in_get_data():
+    from pybi.connectors import BY_ID
+
+    c = BY_ID["pbix"]
+    assert c.category == "File" and "power bi" in c.tags
+    app = create_app()
+    r = app.test_client().post("/api/connectors/pbix/load", data={"file": (io.BytesIO(build_pbix()), "Sales.pbit"), "params": "{}"},
+                               content_type="multipart/form-data")
+    assert r.status_code == 200 and set(r.get_json()["tables"]) == {"Sales", "Products"}

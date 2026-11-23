@@ -678,7 +678,10 @@ def file_engine(c: Connector, params: dict, file: FileArg = None, preview=False,
         link = c.config.get("link")
         if link:
             url = SHARE_LINKS[link](url)
-        r = http("GET", url, headers={"Accept": "*/*"})
+        headers = {"Accept": "*/*"}
+        if link == "github" and params.get("token") and url.startswith("https://raw.githubusercontent.com/"):
+            headers["Authorization"] = f"token {params['token']}"  # private repositories, via GitHub sign-in
+        r = http("GET", url, headers=headers)
         fname = _filename_from(url, c.config.get("ext", ".csv"), r.headers.get("content-type", ""))
         if c.config.get("ext") and Path(fname).suffix.lower() not in SUPPORTED:
             fname = Path(fname).stem + c.config["ext"]
@@ -686,6 +689,35 @@ def file_engine(c: Connector, params: dict, file: FileArg = None, preview=False,
     else:
         raise ConnectorError("Choose a file, enter a path on this computer, or a URL")
     dfs = read_bytes(fname, data, opts)
+    if discover:
+        return list(dfs)
+    if tables:
+        dfs = {k: v for k, v in dfs.items() if k in tables}
+    return {k: (v.head(PREVIEW_ROWS) if preview else v) for k, v in dfs.items()}
+
+
+def pbix_engine(c: Connector, params: dict, file: FileArg = None, preview=False, tables=None, discover=False, **_):
+    """Tables of a Power BI file. The studio opens the full report (pages, visuals, model) through /api/open."""
+    from ..pbix import PbixError, read_pbix
+
+    if file:
+        fname, data = file
+    elif params.get("path"):
+        p = Path(os.path.expanduser(params["path"]))
+        if not p.exists():
+            raise ConnectorError(f"File not found: {p}")
+        fname, data = p.name, p.read_bytes()
+    elif params.get("url"):
+        url = params["url"].strip()
+        data, fname = http("GET", url, headers={"Accept": "*/*"}).content, _filename_from(url, ".pbix")
+    else:
+        raise ConnectorError("Choose a .pbix file, enter a path on this computer, or a URL")
+    try:
+        dfs = read_pbix(data, fname).tables
+    except PbixError as exc:
+        raise ConnectorError(str(exc)) from exc
+    if not dfs:
+        raise ConnectorError("No data could be read from this file. Install it with: pip install \"pybi-ray[pbix]\"", install="pbixray")
     if discover:
         return list(dfs)
     if tables:
@@ -980,10 +1012,10 @@ ENGINES = {
     "folder": folder_engine, "storage": storage_engine, "mongo": mongo_engine, "elastic": elastic_engine,
     "influx": influx_engine, "redis": redis_engine, "cassandra": cassandra_engine, "dynamodb": dynamodb_engine,
     "firestore": firestore_engine, "cosmos": cosmos_engine, "python": python_engine, "yfinance": yfinance_engine,
-    "kaggle": kaggle_engine,
+    "kaggle": kaggle_engine, "pbix": pbix_engine,
 }
 
-DISCOVERABLE = {"sql", "file", "web", "storage", "mongo", "elastic", "dynamodb"}
+DISCOVERABLE = {"sql", "file", "pbix", "web", "storage", "mongo", "elastic", "dynamodb"}
 
 
 def run(c: Connector, params: dict, file: FileArg = None, preview: bool = False, tables: Optional[List[str]] = None) -> Dict[str, pd.DataFrame]:

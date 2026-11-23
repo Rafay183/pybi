@@ -43,6 +43,9 @@ FILE_SRC = [P("file", "Upload a file", "file"), P("path", "…or a path on this 
 
 # ================================================================== FILES
 FILES = "File"
+add(Connector("pbix", "Power BI file (.pbix / .pbit)", FILES, "pbix", FILE_SRC, {},
+              "Open a Power BI Desktop report: pages, visuals, filters, theme, tables, relationships and DAX measures.",
+              "pbixray", multi=True, tags="power bi pbix pbit powerbi desktop report template microsoft"))
 for cid, name, fmt, extra, install, desc in [
     ("csv", "Text / CSV", ".csv", [P("delimiter", "Delimiter (blank = auto)", advanced=True), P("skiprows", "Skip first rows", "number", advanced=True)], None, "Comma, semicolon, tab or pipe separated text files."),
     ("tsv", "Tab-separated (TSV)", ".tsv", [], None, "Tab-delimited text."),
@@ -90,7 +93,7 @@ add(Connector("onedrive", "OneDrive / SharePoint file link", WEB, "file", [P("ur
               {"link": "onedrive"}, "Excel or CSV shared from OneDrive or SharePoint.", multi=True))
 add(Connector("dropbox", "Dropbox file", WEB, "file", [P("url", "Dropbox share link", required=True)], {"link": "dropbox"}, "Shared Dropbox files.", multi=True))
 add(Connector("github_file", "GitHub file", WEB, "file", [P("url", "GitHub file URL", required=True, placeholder="https://github.com/owner/repo/blob/main/data.csv")],
-              {"link": "github"}, "Data files committed to a GitHub repository.", multi=True))
+              {"link": "github"}, "Data files committed to a GitHub repository (private ones too when you sign in with GitHub).", multi=True))
 add(Connector("huggingface", "Hugging Face dataset file", WEB, "file", [P("repo", "Dataset repo", required=True, placeholder="owner/dataset"), P("filepath", "File path in the repo", "text", True, placeholder="data/train.csv")],
               {"url_template": "https://huggingface.co/datasets/{repo}/resolve/main/{filepath}"}, "CSV / Parquet / JSON files from Hugging Face datasets."))
 add(Connector("owid", "Our World in Data", "Public data", "file", [P("slug", "Chart slug", required=True, default="life-expectancy", help="The last part of an ourworldindata.org/grapher/… URL"),
@@ -299,7 +302,7 @@ GH_RES = {"Issues": {"endpoint": "/repos/{owner}/{repo}/issues", "query": {"stat
           "Commits": {"endpoint": "/repos/{owner}/{repo}/commits"}, "Releases": {"endpoint": "/repos/{owner}/{repo}/releases"},
           "Contributors": {"endpoint": "/repos/{owner}/{repo}/contributors"}, "Workflow runs": {"endpoint": "/repos/{owner}/{repo}/actions/runs", "records": "workflow_runs"},
           "Organization repos": {"endpoint": "/orgs/{owner}/repos"}, "User repos": {"endpoint": "/users/{owner}/repos"}}
-saas("github", "GitHub", DEV, [res(GH_RES), P("owner", "Owner / org", required=True), P("repo", "Repository"), P("token", "Personal access token (optional, raises limits)", "password", secret=True)],
+saas("github", "GitHub", DEV, [res(GH_RES), P("owner", "Owner / org", required=True), P("repo", "Repository"), P("token", "Personal access token (optional: not needed when you sign in with GitHub)", "password", secret=True)],
      {"base": "https://api.github.com", "resources": GH_RES, "query": {"per_page": "100"}, "headers": {"X-GitHub-Api-Version": "2022-11-28"},
       "auth": {"type": "bearer", "token": "{token}"}, "paginate": {"type": "link"}}, "Issues, PRs, commits, releases, Actions runs.")
 GL_RES = {"Issues": {"endpoint": "/projects/{project}/issues"}, "Merge requests": {"endpoint": "/projects/{project}/merge_requests"},

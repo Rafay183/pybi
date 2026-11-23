@@ -355,3 +355,23 @@ body.viewer-mode { background: #e9e8e6; }
 .gd-prev { flex: 1; min-width: 0; overflow: auto; } .gd-ptitle { font-size: 12px; color: var(--sub); margin-bottom: 6px; }
 .gd-prev table { border-collapse: collapse; font-size: 12px; } .gd-prev th { position: sticky; top: 0; background: #f3f2f1; border: 1px solid var(--line); padding: 4px 8px; text-align: left; white-space: nowrap; }
 .gd-prev td { border: 1px solid #f0efee; padding: 3px 8px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; } .gd-prev td.null { color: var(--muted); font-style: italic; }
+
+/* GitHub sign-in */
+.gh-btn { display: inline-flex; align-items: center; gap: 6px; background: #24292f; color: #fff; border: 1px solid #57606a; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.gh-btn:hover { background: #32383f; }
+.gh-btn img { width: 18px; height: 18px; border-radius: 50%; }
+.gh-intro { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.gh-intro span { color: #605e5c; font-size: 12.5px; }
+.gh-safe { margin: 0 0 12px; padding-left: 0; list-style: none; font-size: 12.5px; line-height: 1.6; background: #f3f9f4; border: 1px solid #cde6d2; border-radius: 6px; padding: 8px 10px; }
+.gh-steps { padding-left: 20px; line-height: 1.65; font-size: 13px; }
+.gh-code { display: flex; align-items: center; gap: 10px; margin: 6px 0 10px; }
+.gh-code span { font: 700 26px/1.2 ui-monospace, Consolas, monospace; letter-spacing: 4px; background: #f6f8fa; border: 1px dashed #8c959f; border-radius: 6px; padding: 6px 14px; user-select: all; }
+.gh-wait { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 6px 0; }
+.gh-wait .err { color: #a4262c; }
+.gh-spin { width: 14px; height: 14px; border: 2px solid #c8c6c4; border-top-color: #118dff; border-radius: 50%; animation: ghspin .8s linear infinite; }
+@keyframes ghspin { to { transform: rotate(360deg); } }
+.gh-list { display: flex; flex-direction: column; gap: 6px; }
+.gh-list .btn { text-align: left; justify-content: flex-start; }
+.gh-list small { color: #8a8886; margin-left: 6px; }
+.gh-note { display: flex; align-items: center; gap: 8px; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 8px 10px; font-size: 12.5px; margin: 8px 0; }
+.gh-note .btn { margin-left: auto; }

@@ -49,7 +49,7 @@ Created by **Muhammad Rafay Shaikh, from Pakistan**.
 
 <details><summary><b>More screenshots</b></summary>
 
-| Get data (214 connectors) | Navigator & preview |
+| Get data (215 connectors) | Navigator & preview |
 |---|---|
 | ![Get data](https://raw.githubusercontent.com/rafay183/pybi/main/docs/images/get-data.png) | ![Navigator](https://raw.githubusercontent.com/rafay183/pybi/main/docs/images/navigator.png) |
 | **Query editor** | **Model view** |
@@ -63,7 +63,7 @@ Created by **Muhammad Rafay Shaikh, from Pakistan**.
 
 | Area | What you get |
 |---|---|
-| **Get data** | **214 connectors**: files (Excel, CSV, JSON, XML, Parquet, PDF tables, SAS/SPSS/Stata…), 50 databases (SQL Server, PostgreSQL, MySQL, Oracle, Snowflake, BigQuery, Databricks…), NoSQL, cloud storage (S3, Azure, GCS, SFTP), 70+ SaaS apps (Salesforce, HubSpot, Stripe, Shopify, Jira, Notion…), public data (World Bank, FRED, Eurostat…), REST/GraphQL/OData/Python — with preview, navigator and refresh |
+| **Get data** | **215 connectors**: files (Excel, CSV, JSON, XML, Parquet, PDF tables, SAS/SPSS/Stata…), 50 databases (SQL Server, PostgreSQL, MySQL, Oracle, Snowflake, BigQuery, Databricks…), NoSQL, cloud storage (S3, Azure, GCS, SFTP), 70+ SaaS apps (Salesforce, HubSpot, Stripe, Shopify, Jira, Notion…), public data (World Bank, FRED, Eurostat…), REST/GraphQL/OData/Python — with preview, navigator and refresh |
 | **Query editor** (Power Query style) | Applied steps with live preview and column quality bars: choose/remove columns, promote headers, change type, filter rows, replace values, fill up/down, remove duplicates/blanks, keep top rows, custom column, conditional column, split column, text formatting, date parts, round, group by, unpivot, merge queries, append queries, plus a JSON advanced editor |
 | **Model view** | Drag-and-drop relationships, many-to-one with single or **both** cross-filter direction, active/inactive, autodetect, one-click date table |
 | **DAX-style formulas** | Measures and calculated columns with `VAR … RETURN`, `CALCULATE`, `FILTER`, `ALL`, `ALLEXCEPT`, `ALLSELECTED`, `REMOVEFILTERS`, `KEEPFILTERS`, `VALUES`, `SELECTEDVALUE`, `RELATED`, `RELATEDTABLE`, `LOOKUPVALUE`, iterators (`SUMX`, `AVERAGEX`, `RANKX`, `TOPN`, `CONCATENATEX`), time intelligence (`TOTALYTD`, `DATESYTD`, `SAMEPERIODLASTYEAR`, `DATEADD`, `PARALLELPERIOD`, `PREVIOUSMONTH`, `DATESBETWEEN`, …), logic, math, text and date functions |
@@ -73,15 +73,16 @@ Created by **Muhammad Rafay Shaikh, from Pakistan**.
 | **Smart features** | **Ask your data** (type "top 5 products by profit as bar"), **Auto dashboard** (builds a full insight page from your model), **Smart narrative** (auto-written summary) |
 | **Share** | Live, read-only network link (`/view`) for anyone on your Wi-Fi/LAN that refreshes as you edit; editing stays on your machine |
 | **Open Power BI files** | Open `.pbix` / `.pbit` reports: pages, visuals (positions, fields, formatting), filters, slicer selections, theme, images, tables with data, relationships and DAX measures. Anything that can't be carried over is listed after the import |
+| **GitHub** | Sign in with GitHub (secure device sign-in), GitHub data without tokens, save/open reports in your own repo, publish dashboards with GitHub Pages |
 | **Export** | PNG (page or all pages), PowerPoint `.pptx`, PDF, **interactive HTML** (one offline file with data, slicers and cross-filtering), `.pybi` project file, CSV/Excel of any table |
 
-## Connectors (214)
+## Connectors (215)
 
 Open **Get data** to search the catalog. Each connector shows a form, a live preview, and (for databases, workbooks, folders, buckets) a **Navigator** to pick tables. Loaded sources remember how they were connected, so **Refresh** re-pulls fresh data while keeping your query steps. Passwords and tokens are stored only on your computer in `~/.pybi/credentials.json` — never inside `.pybi` files.
 
 Connectors marked † need an extra driver (`pip install …` — PyBI tells you the exact command).
 
-**File (23)** — Text / CSV, Tab-separated (TSV), Fixed-width text, Excel workbook, Excel 97-2003 (.xls) †, Excel binary (.xlsb) †, OpenDocument spreadsheet †, JSON, JSON Lines / NDJSON, XML, HTML file, Parquet †, Feather / Arrow IPC †, ORC †, Avro †, SAS (.sas7bdat / .xpt), SPSS (.sav) †, Stata (.dta), HDF5 †, YAML, PDF tables, ZIP archive, Folder (combine files)
+**File (24)** — Power BI file (.pbix / .pbit) †, Text / CSV, Tab-separated (TSV), Fixed-width text, Excel workbook, Excel 97-2003 (.xls) †, Excel binary (.xlsb) †, OpenDocument spreadsheet †, JSON, JSON Lines / NDJSON, XML, HTML file, Parquet †, Feather / Arrow IPC †, ORC †, Avro †, SAS (.sas7bdat / .xpt), SPSS (.sav) †, Stata (.dta), HDF5 †, YAML, PDF tables, ZIP archive, Folder (combine files)
 
 **Database (50)** — SQLite database, PostgreSQL †, TimescaleDB †, Greenplum †, YugabyteDB †, Supabase (Postgres) †, Neon (serverless Postgres) †, Google Cloud SQL for PostgreSQL †, Amazon Aurora / RDS PostgreSQL †, Azure Database for PostgreSQL †, Google AlloyDB †, MySQL †, MariaDB †, PlanetScale †, TiDB †, Google Cloud SQL for MySQL †, Amazon Aurora / RDS MySQL †, Azure Database for MySQL †, Microsoft SQL Server †, Azure SQL Database †, Azure Synapse Analytics (SQL) †, Microsoft Fabric Warehouse (SQL endpoint) †, Oracle Database †, IBM Db2 †, SAP HANA †, Teradata †, Vertica †, CockroachDB †, SingleStore †, Exasol †, Firebird †, ClickHouse †, Trino †, Presto †, Apache Hive †, Spark SQL (Thrift server) †, Apache Impala †, Apache Druid †, Apache Pinot †, Dremio †, Snowflake †, Amazon Redshift †, Google BigQuery †, Amazon Athena †, Databricks SQL †, DuckDB †, MotherDuck †, Microsoft Access †, ODBC (any driver) †, Other SQL database (SQLAlchemy URL) †
 
@@ -180,6 +181,18 @@ imp.tables          # {"Sales": DataFrame, ...}
 imp.report          # the PyBI report definition
 imp.warnings        # what to check
 ```
+
+## Sign in with GitHub
+
+Click **Sign in with GitHub** in the title bar. PyBI shows a one-time code; open github.com/login/device, enter it and approve **PyBI**. No account yet? PyBI walks you through creating a free one first.
+
+* **Secure by design:** GitHub's device sign-in (OAuth 2.0 device flow). Your password is only typed on github.com, PyBI ships no client secret, and the access key is stored only on your computer (system keychain with `pip install keyring`, otherwise `~/.pybi/credentials.json`, readable only by you). It is never written into `.pybi` files, exports or the network view, and write requests from other websites are blocked.
+* **GitHub data without a token:** the GitHub connectors (issues, PRs, commits, releases, Actions, files) use your sign-in, private repositories included if you allow them.
+* **Save / open reports on GitHub:** reports go to your own `pybi-reports` repository (private when allowed) with full version history.
+* **Publish a dashboard as a web page:** one click puts the interactive HTML on GitHub Pages (`https://<you>.github.io/pybi-dashboards/...`). PyBI asks you to confirm first, because the page and its data are public.
+* **Sign out** from the account menu. To remove access completely: GitHub → Settings → Applications → PyBI → Revoke.
+
+Using your own OAuth app (for forks): create one at GitHub → Settings → Developer settings → OAuth Apps, tick **Enable Device Flow**, and start PyBI with `PYBI_GITHUB_CLIENT_ID=<client id>`.
 
 ## How it works
 
