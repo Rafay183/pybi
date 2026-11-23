@@ -1043,7 +1043,7 @@
         (c.params.some((p) => p.secret) ? '<label class="f" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="cp__remember" checked> Remember credentials on this computer (stored in ~/.pybi, never in the report file)</label>' : "") +
         '<div class="gd-err"></div><div class="gd-actions"><button class="btn" data-a="preview">👁 Preview</button><button class="btn primary" data-a="load">⤓ Load</button></div></div><div class="gd-nav"><div class="gd-navlist"></div><div class="gd-prev"><div class="empty">Click <b>Preview</b> to see the data before loading.' + (c.multi ? "<br>For sources with several tables you'll pick which ones to load." : "") + "</div></div></div></div></div>";
       $(".gd-back", main).onclick = drawGrid;
-      if (c.id === "github" || c.id === "github_file") {
+      if ((c.id === "github" || c.id === "github_file") && (S.gh || {}).configured !== false) {
         const g = S.gh || {};
         const note = h("div", { class: "gh-note" }, g.signedIn ? GH_ICON + " Using your GitHub sign-in (<b>" + esc(g.user.login) + "</b>), so no token is needed." + (g.user.private ? " Private repositories work too." : "")
           : GH_ICON + ' <span><b>Sign in with GitHub</b> to load private repositories without a personal access token.</span> <button class="btn">Sign in</button>');
@@ -1344,12 +1344,15 @@
   }
   function exportMenu(e) {
     const rect = e.currentTarget.getBoundingClientRect();
-    showMenu({ clientX: rect.left, clientY: rect.bottom + 2, stopPropagation: () => e.stopPropagation() }, [
+    const items = [
       ["🖼  This page as PNG image", () => exportPNG(false)], ["🖼  All pages as PNG images", () => exportPNG(true)],
       ["📊  PowerPoint (.pptx)", exportPPTX], ["📄  PDF document", exportPDF],
       ["🌐  Interactive HTML (works offline)", exportHTML], null,
-      ["💾  Download project (.pybi)", () => download("/api/download-project", null, "report.pybi")], ["☁  Save to GitHub", ghSave], ["🖨  Print", () => window.print()],
-    ]);
+      ["💾  Download project (.pybi)", () => download("/api/download-project", null, "report.pybi")],
+    ];
+    if ((S.gh || {}).configured !== false) items.push(["☁  Save to GitHub", ghSave]);
+    items.push(["🖨  Print", () => window.print()]);
+    showMenu({ clientX: rect.left, clientY: rect.bottom + 2, stopPropagation: () => e.stopPropagation() }, items);
   }
   async function exportPNG(all) {
     await busy("Rendering image…", async () => {
@@ -1369,6 +1372,7 @@
       : '<p>Network sharing is off because PyBI was started with <code>--private</code>.</p><p>Restart with <code>pybi run</code> (without --private) to get a link for your network.</p>';
     const m = modal("Share report", body + '<hr style="border:0;border-top:1px solid #e1dfdd"><p><b>Share outside your network</b></p><p style="font-size:12.5px">Export an <b>interactive HTML</b> file — one file with data and charts that opens in any browser, even offline. Email it, put it on a shared drive, or host it on GitHub Pages / Netlify.</p>', [["Open viewer", () => window.open("/view", "_blank")], ["Export HTML", exportHTML], ["Close"]]);
     const cp = $("#cp", m); if (cp) cp.onclick = () => { navigator.clipboard.writeText(info.shareUrl).then(() => toast("Link copied")); };
+    if ((S.gh || {}).configured === false) return;
     const extra = h("div", {}, '<hr style="border:0;border-top:1px solid #e1dfdd"><p><b>Share on the web with GitHub</b></p><p style="font-size:12.5px">Publish this dashboard as a public web page with GitHub Pages, or keep the report in your own GitHub repository.</p><div style="display:flex;gap:8px"><button class="btn" data-g="pub">🌐 Publish as web page</button><button class="btn" data-g="save">☁ Save to GitHub</button></div>');
     $(".mbd", m).appendChild(extra);
     $("[data-g=pub]", extra).onclick = () => { m.close(); ghPublish(); };
@@ -1404,6 +1408,7 @@
   }
   function renderGh() {
     const el = $("#ghAccount"); if (!el) return; const g = S.gh || {};
+    if (g.configured === false) { el.innerHTML = ""; return; }  // this build has no GitHub OAuth app yet
     if (g.signedIn && g.user) {
       el.innerHTML = '<button class="gh-btn gh-user" title="Signed in to GitHub as ' + esc(g.user.login) + '">' + (g.user.avatar_url ? '<img src="' + esc(g.user.avatar_url + (g.user.avatar_url.includes("?") ? "&" : "?") + "s=48") + '" alt="">' : GH_ICON) + "<span>" + esc(g.user.login) + "</span> ▾</button>";
       $("button", el).onclick = ghMenu;
