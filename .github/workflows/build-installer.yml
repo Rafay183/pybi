@@ -30,7 +30,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: desktop-apps-${{ github.ref }}
+  # "v2": runs of the previous pipeline that are stuck waiting for a Mac machine do not block new releases
+  group: desktop-apps-v2-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -68,11 +69,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-15, ubuntu-22.04]
+        os: [windows-latest, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
-    # GitHub's Mac runners are sometimes unavailable for a while; the macOS build job
-    # below still smoke-tests the real app, so a missing Mac test runner must not block a release.
-    continue-on-error: ${{ startsWith(matrix.os, 'macos') }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -138,8 +136,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: macOS-arm64,   os: macos-15,         optional: false }
-          - { name: macOS-x86_64,  os: macos-15-intel,   optional: true }
           - { name: Linux-x86_64,  os: ubuntu-22.04,     optional: false }
           - { name: Linux-aarch64, os: ubuntu-22.04-arm, optional: true }
     runs-on: ${{ matrix.os }}
@@ -199,8 +195,77 @@ jobs:
           name: build-${{ matrix.name }}
           path: dist/*
 
+  mac:
+    needs: [meta, launcher-tests]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: macOS-arm64,   os: macos-15,         optional: false }
+          - { name: macOS-x86_64,  os: macos-15-intel,   optional: true }
+    runs-on: ${{ matrix.os }}
+    # GitHub's Mac machines are sometimes busy for hours: Mac builds never hold up the Windows/Linux release.
+    continue-on-error: true
+    timeout-minutes: 45
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Launcher tests
+        run: python -m pip install --disable-pip-version-check pytest && python -m pytest -q installer/launcher/tests
+
+      - name: Build
+        run: bash installer/scripts/build_unix.sh --version "$VERSION" --repo "$GITHUB_REPOSITORY"
+
+      - name: Smoke test (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          set -e
+          mnt=$(mktemp -d)
+          hdiutil attach -nobrowse -readonly -mountpoint "$mnt" dist/PyBI-*.dmg
+          cp -R "$mnt/PyBI.app" /tmp/PyBI.app
+          hdiutil detach "$mnt"
+          codesign --verify --deep --strict /tmp/PyBI.app
+          /tmp/PyBI.app/Contents/MacOS/PyBI --version
+          cat /tmp/PyBI.app/Contents/Resources/launcher.json
+          RT=/tmp/PyBI.app/Contents/Resources/runtime/bin/python3
+          "$RT" -c "import pybi, sys; print('pybi OK on', sys.version)"
+          "$RT" -m pybi run --port 8765 --no-browser --private > /tmp/srv.log 2>&1 &
+          for i in $(seq 1 150); do curl -fsS -o /dev/null http://127.0.0.1:8765/ && break; sleep 1; done
+          curl -fsS -o /dev/null -w "studio HTTP %{http_code}\n" http://127.0.0.1:8765/ || { cat /tmp/srv.log; exit 1; }
+          kill %1 || true
+
+      - name: Smoke test (Linux .deb + AppImage)
+        if: runner.os == 'Linux'
+        run: |
+          set -e
+          sudo apt-get install -y ./dist/PyBI-Linux-*.deb
+          /opt/pybi/runtime/bin/python3 -c "import pybi, sys; print('pybi OK on', sys.version)"
+          desktop-file-validate /usr/share/applications/pybi.desktop || true
+          # headless launcher: no DISPLAY, so it runs PyBI and prints the address
+          env -u DISPLAY timeout 90 pybi-desktop --no-browser > /tmp/launch.log 2>&1 &
+          for i in $(seq 1 60); do grep -q "running at" /tmp/launch.log && break; sleep 1; done
+          cat /tmp/launch.log
+          url=$(grep -oE 'http://[0-9.:]+/' /tmp/launch.log | head -1)
+          curl -fsS -o /dev/null -w "studio HTTP %{http_code}\n" "$url"
+          pkill -TERM -f /opt/pybi/launcher/main.py; sleep 3
+          ! pgrep -f "pybi run" || { echo "server left running"; exit 1; }
+          sudo apt-get remove -y pybi
+          chmod +x dist/PyBI-*.AppImage
+          APPIMAGE_EXTRACT_AND_RUN=1 ./dist/PyBI-*.AppImage --version
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.name }}
+          path: dist/*
+
   publish:
-    needs: [meta, windows, unix]
+    needs: [meta, windows, unix]  # Mac files are added by publish-mac when they are ready
     if: always() && needs.meta.outputs.mode == 'release' && needs.windows.result == 'success' && needs.unix.result == 'success'
     runs-on: ubuntu-latest
     env:
@@ -240,3 +305,25 @@ jobs:
             **First launch:** Windows may say "Windows protected your PC": click **More info → Run anyway**. On a Mac, if it says PyBI "cannot be opened", go to **System Settings → Privacy & Security → Open Anyway**.
 
             Python users: `pip install --upgrade pybi-ray`
+
+  publish-mac:
+    needs: [meta, publish, mac]
+    if: always() && needs.meta.outputs.mode == 'release' && needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: build-macOS-*
+          path: dist
+          merge-multiple: true
+      - name: Add the Mac apps to the release
+        run: |
+          shopt -s nullglob
+          files=(dist/*)
+          if [ ${#files[@]} -eq 0 ]; then echo "::warning::No Mac build finished; the release has Windows and Linux only."; exit 0; fi
+          ls -lh dist
+          gh release upload "v$VERSION" "${files[@]}" --clobber -R "$GITHUB_REPOSITORY"
