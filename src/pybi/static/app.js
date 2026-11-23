@@ -37,6 +37,7 @@
   // ================================================================ state & history
   function applyState(st) {
     S.report = st.report; S.tables = st.tables; S.sources = st.sources;
+    if (st.app && st.app.version) { const ver = document.getElementById("appver"); if (ver) ver.textContent = "v" + st.app.version; S.version = st.app.version; }
     S.report.pages = S.report.pages && S.report.pages.length ? S.report.pages : [{ id: "p1", name: "Page 1", visuals: [], filters: [] }];
     for (const k of ["measures", "calcColumns", "relationships", "reportFilters"]) S.report[k] = S.report[k] || [];
     S.report.columnProps = S.report.columnProps || {};
@@ -141,7 +142,7 @@
     let w = $("#welcome");
     if (empty && !Object.keys(S.tables).length) {
       if (!w) {
-        w = h("div", { id: "welcome", class: "welcome" }, '<div class="card"><h1>Welcome to PyBI</h1><p>Open-source business intelligence that runs on your own computer. Connect data, model it, write DAX-style measures and design interactive dashboards.</p><div class="acts"><button class="btn primary" data-a="get">⊕ Get data</button><button class="btn" data-a="sample">☷ Try the demo dashboard</button><button class="btn" data-a="open">📂 Open .pybi file</button><button class="btn" data-a="pbix">📊 Open Power BI file (.pbix)</button></div><div class="credit">PyBI · created by Muhammad Rafay Shaikh, from Pakistan</div></div>');
+        w = h("div", { id: "welcome", class: "welcome" }, '<div class="card"><h1>Welcome to PyBI</h1><p>Open-source business intelligence that runs on your own computer. Connect data, model it, write DAX-style measures and design interactive dashboards.</p><div class="acts"><button class="btn primary" data-a="get">⊕ Get data</button><button class="btn" data-a="sample">☷ Try the demo dashboard</button><button class="btn" data-a="open">📂 Open .pybi file</button><button class="btn" data-a="pbix">📊 Open Power BI file (.pbix)</button></div><div class="credit">PyBI ' + (S.version ? "v" + esc(S.version) + " " : "") + '· created by Muhammad Rafay Shaikh, from Pakistan</div></div>');
         $("#reportView").appendChild(w);
         w.addEventListener("click", (e) => { const a = e.target.dataset.a; if (a === "get") openGetData(); if (a === "sample") loadSample(); if (a === "open") openProject(); if (a === "pbix") openProject(".pbix,.pbit"); });
       }
@@ -974,7 +975,7 @@
   const CAT_COLORS = { File: "#118DFF", Database: "#12239E", "NoSQL & search": "#197278", "Cloud storage": "#E66C37", "Web & online files": "#6B007B", "Generic & developer": "#252423",
     "Developer tools": "#744EC2", "Project & productivity": "#D9B300", "CRM & sales": "#E044A7", "Finance & payments": "#1AAB40", "Marketing & analytics": "#D64550",
     "Support & ITSM": "#0E7C86", "HR & time tracking": "#8A6D00", "E-commerce & CMS": "#B83280", "Microsoft & Google": "#0078D4", "Public data": "#2F855A", Popular: "#F2C811" };
-  const POPULAR = ["excel", "csv", "json", "folder", "web", "gsheets_public", "sqlite", "postgresql", "mysql", "sqlserver", "rest_api", "python", "sharepoint_list", "salesforce", "worldbank", "pdf"];
+  const POPULAR = ["pbix", "excel", "csv", "json", "folder", "web", "gsheets_public", "sqlite", "postgresql", "mysql", "sqlserver", "rest_api", "python", "sharepoint_list", "salesforce", "worldbank", "pdf"];
   let CATALOG = null;
   async function loadCatalog() { if (!CATALOG) CATALOG = await api("/api/connectors"); return CATALOG; }
   const initials = (n) => n.replace(/\(.*?\)/g, "").split(/[\s/&.-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
@@ -1001,10 +1002,10 @@
       let list = q ? cat.connectors.filter((c) => (c.name + " " + c.category + " " + c.description + " " + c.id).toLowerCase().includes(q))
         : current === "All" ? cat.connectors : current === "Popular" ? POPULAR.map((id) => byId[id]).filter(Boolean) : cat.connectors.filter((c) => c.category === current);
       let html = "";
-      if (!q && current === "Popular") html += '<button class="gd-tile" data-special="sample"><span class="gd-badge" style="background:#F2C811;color:#111">☷</span><span class="gd-txt"><b>Demo sales dataset</b><small>A ready-made 3-page dashboard to explore</small></span></button><button class="gd-tile" data-special="pbix"><span class="gd-badge" style="background:#F2C811;color:#111">P</span><span class="gd-txt"><b>Power BI file (.pbix)</b><small>Open a Power BI report with its pages, visuals, model and data</small></span></button><button class="gd-tile" data-special="paste"><span class="gd-badge" style="background:#605e5c">✎</span><span class="gd-txt"><b>Enter / paste data</b><small>Type a small table or paste from Excel</small></span></button><button class="gd-tile" data-special="pybi"><span class="gd-badge" style="background:#111827">.pb</span><span class="gd-txt"><b>Open .pybi project</b><small>A saved PyBI report</small></span></button>';
+      if (!q && current === "Popular") html += '<button class="gd-tile" data-special="sample"><span class="gd-badge" style="background:#F2C811;color:#111">☷</span><span class="gd-txt"><b>Demo sales dataset</b><small>A ready-made 3-page dashboard to explore</small></span></button><button class="gd-tile" data-special="paste"><span class="gd-badge" style="background:#605e5c">✎</span><span class="gd-txt"><b>Enter / paste data</b><small>Type a small table or paste from Excel</small></span></button><button class="gd-tile" data-special="pybi"><span class="gd-badge" style="background:#111827">.pb</span><span class="gd-txt"><b>Open .pybi project</b><small>A saved PyBI report</small></span></button>';
       html += list.map(tile).join("");
       main.innerHTML = '<div class="gd-head"><h3>' + esc(q ? list.length + " result(s) for “" + q + "”" : current) + '</h3><span>' + cat.count + ' connectors · drop a file anywhere here to load it</span></div><div class="gd-grid">' + (html || '<div class="empty">No connector matches. Try “REST API”, “ODBC” or “Python script”.</div>') + "</div>";
-      $$(".gd-tile[data-id]", main).forEach((b) => (b.onclick = () => openConnector(byId[b.dataset.id])));
+      $$(".gd-tile[data-id]", main).forEach((b) => (b.onclick = () => { if (b.dataset.id === "pbix") { m.close(); return openProject(".pbix,.pbit"); } openConnector(byId[b.dataset.id]); }));
       $$(".gd-tile[data-special]", main).forEach((b) => (b.onclick = async () => {
         const k = b.dataset.special;
         if (k === "sample") { m.close(); loadSample(); }

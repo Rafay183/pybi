@@ -118,7 +118,7 @@ def test_catalog_size_and_shape():
     assert len(CATEGORIES) >= 10
     for c in CATALOG:
         assert c.engine in {"rest", "graphql", "sql", "file", "web", "folder", "storage", "mongo", "elastic", "influx", "redis",
-                            "cassandra", "dynamodb", "firestore", "cosmos", "python", "yfinance", "kaggle"}, c.id
+                            "cassandra", "dynamodb", "firestore", "cosmos", "python", "yfinance", "kaggle", "pbix"}, c.id
         json.dumps(c.to_dict())
         keys = [p.key for p in c.params]
         assert len(keys) == len(set(keys)), f"duplicate params in {c.id}"
