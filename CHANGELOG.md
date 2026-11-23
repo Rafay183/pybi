@@ -4,6 +4,8 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-11-24
+
 ### Added
 - **Sign in with GitHub** (title bar). Uses GitHub's device sign-in: PyBI shows a one-time code, you approve it on github.com, and PyBI never sees your password. People without a GitHub account get a step-by-step guide to create one. The access key stays on this computer (system keychain when `keyring` is installed, otherwise `~/.pybi`) and never goes into report files, exports or the network view. Sign out at any time.
 - The GitHub connectors use your sign-in, so no personal access token is needed, private repositories included.
