@@ -81,6 +81,9 @@ $extra = Join-Path $Installer "requirements-extra.txt"
 if (Test-Path $extra) {
   Run $Py @("-m", "pip", "install", "--no-warn-script-location", "--disable-pip-version-check", "-r", $extra)
 }
+# Power BI (.pbix) data support. Optional: a missing wheel must never break the installer build.
+& $Py -m pip install --no-warn-script-location --disable-pip-version-check --only-binary=:all: "pbixray>=0.15"
+if ($LASTEXITCODE -ne 0) { Write-Warning "pbixray could not be installed - .pbix files will open without their data." }
 Run $Py @("-c", "import pybi; print('pybi', getattr(pybi, '__version__', '(no __version__)'), 'from', pybi.__file__)")
 
 Step "Precompile bytecode (faster first start)"

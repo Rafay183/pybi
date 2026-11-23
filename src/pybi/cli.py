@@ -1,4 +1,4 @@
-"""Command line interface:  pybi run | pybi demo | pybi export | pybi version"""
+"""Command line interface:  pybi run | pybi demo | pybi export | pybi convert | pybi version"""
 from __future__ import annotations
 
 import argparse
@@ -13,7 +13,7 @@ def main(argv=None) -> int:
     sub = parser.add_subparsers(dest="cmd")
 
     run = sub.add_parser("run", help="start the PyBI studio in your browser")
-    run.add_argument("project", nargs="?", help="a .pybi project file (or data file: csv/xlsx/json/parquet) to open")
+    run.add_argument("project", nargs="?", help="a .pybi project, a Power BI file (.pbix/.pbit) or a data file (csv/xlsx/json/parquet) to open")
     run.add_argument("--port", "-p", type=int, default=8050)
     run.add_argument("--private", action="store_true", help="only this computer can connect (no network view link)")
     run.add_argument("--no-browser", action="store_true", help="do not open a browser window")
@@ -28,6 +28,10 @@ def main(argv=None) -> int:
     exp.add_argument("project")
     exp.add_argument("--out", "-o", help="output .html path")
 
+    conv = sub.add_parser("convert", help="convert a Power BI file (.pbix/.pbit) to a .pybi project")
+    conv.add_argument("file")
+    conv.add_argument("--out", "-o", help="output .pybi path")
+
     sub.add_parser("version", help="print the version")
 
     args = parser.parse_args(argv)
@@ -36,7 +40,7 @@ def main(argv=None) -> int:
 
         project = getattr(args, "project", None)
         dataframes = None
-        if project and Path(project).suffix.lower() not in (".pybi", ""):
+        if project and Path(project).suffix.lower() not in (".pybi", ".pbix", ".pbit", ""):
             from .project import read_upload
 
             p = Path(project)
@@ -54,6 +58,18 @@ def main(argv=None) -> int:
         out = Path(args.out or Path(args.project).with_suffix(".html"))
         out.write_text(export_html(proj.state()), encoding="utf-8")
         print(f"Exported {out}")
+        return 0
+    if args.cmd == "convert":
+        from .pbix import project_from_pbix
+
+        proj, imp = project_from_pbix(args.file)
+        out = proj.save(args.out or str(Path(args.file).with_suffix(".pybi")))
+        i = imp.info
+        print(f"Converted {Path(args.file).name} -> {out}")
+        print(f"  {i['pages']} pages, {i['visuals']} visuals, {i['tables']} tables ({i['rows']:,} rows), "
+              f"{i['measures']} measures, {i['relationships']} relationships")
+        for w in imp.warnings:
+            print(f"  ! {w}")
         return 0
     if args.cmd == "version":
         print(f"PyBI {__version__}")

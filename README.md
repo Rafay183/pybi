@@ -72,6 +72,7 @@ Created by **Muhammad Rafay Shaikh, from Pakistan**.
 | **Report design** | Drag, resize, snap & alignment guides, pages, page sizes, 6 themes (including dark), per-visual formatting, undo/redo, copy/paste, keyboard nudging |
 | **Smart features** | **Ask your data** (type "top 5 products by profit as bar"), **Auto dashboard** (builds a full insight page from your model), **Smart narrative** (auto-written summary) |
 | **Share** | Live, read-only network link (`/view`) for anyone on your Wi-Fi/LAN that refreshes as you edit; editing stays on your machine |
+| **Open Power BI files** | Open `.pbix` / `.pbit` reports: pages, visuals (positions, fields, formatting), filters, slicer selections, theme, images, tables with data, relationships and DAX measures. Anything that can't be carried over is listed after the import |
 | **Export** | PNG (page or all pages), PowerPoint `.pptx`, PDF, **interactive HTML** (one offline file with data, slicers and cross-filtering), `.pybi` project file, CSV/Excel of any table |
 
 ## Connectors (214)
@@ -125,6 +126,8 @@ Install drivers in bulk with extras, e.g. `pip install "pybi-ray[postgres,mysql,
 pybi run                      # start the studio (network view link enabled)
 pybi run sales.xlsx           # start with a data file loaded
 pybi run my_report.pybi       # open a saved project
+pybi run report.pbix          # open a Power BI report
+pybi convert report.pbix      # convert it to report.pybi
 pybi run --private            # only this computer can connect
 pybi run --port 9000 --no-browser
 pybi demo                     # demo dataset + dashboard
@@ -161,6 +164,23 @@ Calculated column:
 Sales[Cost] = Sales[Quantity] * RELATED(Products[UnitCost])
 ```
 
+## Opening Power BI files
+
+```bash
+pip install "pybi-ray[pbix]"      # adds pbixray, which reads the data inside a .pbix
+pybi run "Sales Report.pbix"
+```
+
+Or click **Open** in the studio and pick the file. The report layout is read by PyBI itself; the data model (tables, relationships, DAX measures) is read with [pbixray](https://github.com/Hugoberry/pbixray). `.pbit` templates import their model without data. Reports with a live connection to a Power BI dataset import their layout only. After the import PyBI lists everything it could not carry over exactly.
+
+```python
+from pybi.pbix import read_pbix
+imp = read_pbix("Sales Report.pbix")
+imp.tables          # {"Sales": DataFrame, ...}
+imp.report          # the PyBI report definition
+imp.warnings        # what to check
+```
+
 ## How it works
 
 * **Python** (Flask + pandas) serves the studio, loads and transforms data (query steps are replayable and stored in the project), saves `.pybi` projects (a zip of raw data, steps and the report definition), and builds PPTX/PDF/HTML exports.
@@ -174,7 +194,7 @@ Sales[Cost] = Sales[Quantity] * RELATED(Products[UnitCost])
 
 ## Limitations (v0.1)
 
-PyBI is not a Microsoft product and does not open `.pbix` files. Data is held in memory, which works well up to a few million rows depending on your machine. Not every DAX function is implemented; unsupported functions show a clear error in the formula editor.
+PyBI is not a Microsoft product. It can open `.pbix` files (see below), but maps, custom visuals, buttons, bookmarks, Top N filters and row-level security are not carried over yet. Data is held in memory, which works well up to a few million rows depending on your machine. Not every DAX function is implemented; unsupported functions show a clear error in the formula editor.
 
 ## Contributing
 

@@ -63,6 +63,8 @@ else
   "${PIP[@]}" --upgrade pip setuptools wheel
   "${PIP[@]}" "$PACKAGE_SPEC"
   [ -f "$INST/requirements-extra.txt" ] && "${PIP[@]}" -r "$INST/requirements-extra.txt"
+  # Power BI (.pbix) data support. Optional: a missing wheel must never break the build.
+  "${PIP[@]}" --only-binary=:all: "pbixray>=0.15" || echo "::warning::pbixray could not be installed - .pbix files will open without their data."
   "$PY" -c "import pybi; print('pybi', getattr(pybi, '__version__', '?'), 'from', pybi.__file__)"
   "$PY" -m compileall -q -j 0 "$RT/lib" > /dev/null || true
   # Console-script shims (pip, pybi, ...) hard-code this build folder; python3 -m works everywhere.

@@ -141,9 +141,9 @@
     let w = $("#welcome");
     if (empty && !Object.keys(S.tables).length) {
       if (!w) {
-        w = h("div", { id: "welcome", class: "welcome" }, '<div class="card"><h1>Welcome to PyBI</h1><p>Open-source business intelligence that runs on your own computer. Connect data, model it, write DAX-style measures and design interactive dashboards.</p><div class="acts"><button class="btn primary" data-a="get">⊕ Get data</button><button class="btn" data-a="sample">☷ Try the demo dashboard</button><button class="btn" data-a="open">📂 Open .pybi file</button></div><div class="credit">PyBI · created by Muhammad Rafay Shaikh, from Pakistan</div></div>');
+        w = h("div", { id: "welcome", class: "welcome" }, '<div class="card"><h1>Welcome to PyBI</h1><p>Open-source business intelligence that runs on your own computer. Connect data, model it, write DAX-style measures and design interactive dashboards.</p><div class="acts"><button class="btn primary" data-a="get">⊕ Get data</button><button class="btn" data-a="sample">☷ Try the demo dashboard</button><button class="btn" data-a="open">📂 Open .pybi file</button><button class="btn" data-a="pbix">📊 Open Power BI file (.pbix)</button></div><div class="credit">PyBI · created by Muhammad Rafay Shaikh, from Pakistan</div></div>');
         $("#reportView").appendChild(w);
-        w.addEventListener("click", (e) => { const a = e.target.dataset.a; if (a === "get") openGetData(); if (a === "sample") loadSample(); if (a === "open") openProject(); });
+        w.addEventListener("click", (e) => { const a = e.target.dataset.a; if (a === "get") openGetData(); if (a === "sample") loadSample(); if (a === "open") openProject(); if (a === "pbix") openProject(".pbix,.pbit"); });
       }
     } else if (w) w.remove();
   }
@@ -627,6 +627,7 @@
     const t = v.type; const f = v.format || {};
     const chart = ["clusteredColumn", "stackedColumn", "percentColumn", "clusteredBar", "stackedBar", "line", "area", "stackedArea", "lineColumn", "ribbon"].includes(t);
     const S1 = [];
+    if (t === "image") S1.push({ title: "Image", rows: [["Image URL", "src", "text"], ["Fit", "fit", "select", "contain", [["contain", "Fit"], ["cover", "Fill"], ["none", "Actual size"]]]] });
     S1.push({ title: "Title", rows: [["Title text", "@title", "text"], ["Show title", "showTitle", "toggle", true], ["Font size", "titleSize", "number", 13], ["Colour", "titleColor", "color", RT.theme.text], ["Alignment", "titleAlign", "select", "left", ["left", "center", "right"]]] });
     if (chart) S1.push({ title: "Chart", rows: [["Legend", "legend", "toggle", true], ["Data labels", "dataLabels", "toggle", false], ["Gridlines", "gridlines", "toggle", true], ["Axis titles", "axisTitles", "toggle", true], ["Rounded bars", "rounded", "toggle", true],
       ["Sort", "sort", "select", "", [["", "Auto"], ["value-desc", "Value ↓"], ["value-asc", "Value ↑"], ["category-asc", "Category A→Z"], ["category-desc", "Category Z→A"]]], ["Top N (0 = all)", "topN", "number", 0]].concat(["line", "area", "stackedArea"].includes(t) ? [["Smooth lines", "smooth", "toggle", true], ["Markers", "markers", "toggle", true], ["Line width", "lineWidth", "number", 2.4]] : []) });
@@ -1000,7 +1001,7 @@
       let list = q ? cat.connectors.filter((c) => (c.name + " " + c.category + " " + c.description + " " + c.id).toLowerCase().includes(q))
         : current === "All" ? cat.connectors : current === "Popular" ? POPULAR.map((id) => byId[id]).filter(Boolean) : cat.connectors.filter((c) => c.category === current);
       let html = "";
-      if (!q && current === "Popular") html += '<button class="gd-tile" data-special="sample"><span class="gd-badge" style="background:#F2C811;color:#111">☷</span><span class="gd-txt"><b>Demo sales dataset</b><small>A ready-made 3-page dashboard to explore</small></span></button><button class="gd-tile" data-special="paste"><span class="gd-badge" style="background:#605e5c">✎</span><span class="gd-txt"><b>Enter / paste data</b><small>Type a small table or paste from Excel</small></span></button><button class="gd-tile" data-special="pybi"><span class="gd-badge" style="background:#111827">.pb</span><span class="gd-txt"><b>Open .pybi project</b><small>A saved PyBI report</small></span></button>';
+      if (!q && current === "Popular") html += '<button class="gd-tile" data-special="sample"><span class="gd-badge" style="background:#F2C811;color:#111">☷</span><span class="gd-txt"><b>Demo sales dataset</b><small>A ready-made 3-page dashboard to explore</small></span></button><button class="gd-tile" data-special="pbix"><span class="gd-badge" style="background:#F2C811;color:#111">P</span><span class="gd-txt"><b>Power BI file (.pbix)</b><small>Open a Power BI report with its pages, visuals, model and data</small></span></button><button class="gd-tile" data-special="paste"><span class="gd-badge" style="background:#605e5c">✎</span><span class="gd-txt"><b>Enter / paste data</b><small>Type a small table or paste from Excel</small></span></button><button class="gd-tile" data-special="pybi"><span class="gd-badge" style="background:#111827">.pb</span><span class="gd-txt"><b>Open .pybi project</b><small>A saved PyBI report</small></span></button>';
       html += list.map(tile).join("");
       main.innerHTML = '<div class="gd-head"><h3>' + esc(q ? list.length + " result(s) for “" + q + "”" : current) + '</h3><span>' + cat.count + ' connectors · drop a file anywhere here to load it</span></div><div class="gd-grid">' + (html || '<div class="empty">No connector matches. Try “REST API”, “ODBC” or “Python script”.</div>') + "</div>";
       $$(".gd-tile[data-id]", main).forEach((b) => (b.onclick = () => openConnector(byId[b.dataset.id])));
@@ -1008,6 +1009,7 @@
         const k = b.dataset.special;
         if (k === "sample") { m.close(); loadSample(); }
         if (k === "pybi") { m.close(); openProject(); }
+        if (k === "pbix") { m.close(); openProject(".pbix,.pbit"); }
         if (k === "paste") { const r = await form("Enter data", [{ key: "name", label: "Table name", value: "Table" }, { key: "text", label: "Paste rows from Excel or type CSV (first row = headers)", type: "textarea" }]); if (r) await busy("Creating table…", async () => { applyState(await api("/api/paste", r)); m.close(); }); }
       }));
     }
@@ -1017,6 +1019,8 @@
     main.addEventListener("dragleave", () => main.classList.remove("over"));
     main.addEventListener("drop", async (e) => {
       e.preventDefault(); main.classList.remove("over"); const files = Array.from(e.dataTransfer.files); if (!files.length) return;
+      const pbi = files.find((f) => /\.(pbix|pbit)$/i.test(f.name));
+      if (pbi) { m.close(); return openPowerBI(pbi); }
       const fd = new FormData(); files.forEach((f) => fd.append("file", f));
       await busy("Loading " + files.length + " file(s)…", async () => { const st = await api("/api/upload", fd); applyState(st); m.close(); toast("Loaded: " + (st.added || []).join(", ")); if (Object.keys(S.tables).length > 1) autodetectRelationships(); });
     });
@@ -1294,15 +1298,35 @@
   function openTheme() {
     const html = '<div class="getdata">' + Object.entries(V.THEMES).map(([k, t]) => '<button data-t="' + k + '" style="' + (S.report.theme === k ? "border-color:#118dff;background:#e8f3ff" : "") + '"><div style="display:flex;gap:2px">' + t.palette.slice(0, 6).map((c) => '<span style="width:16px;height:22px;background:' + c + ';display:inline-block;border-radius:2px"></span>').join("") + '</div><span style="font-size:12px">' + esc(t.name) + '</span><span style="width:60px;height:10px;background:' + t.page + ';border:1px solid #ddd"></span></button>').join("") + "</div>";
     const m = modal("Report theme", html, [["Close"]]);
-    $$("button[data-t]", m).forEach((b) => (b.onclick = () => { S.report.theme = b.dataset.t; commit(); m.close(); }));
+    $$("button[data-t]", m).forEach((b) => (b.onclick = () => { S.report.theme = b.dataset.t; delete S.report.customTheme; commit(); m.close(); }));
   }
 
   // ================================================================ file & export
   async function newReport() { if (!confirm("Start a new, empty report? Unsaved changes in the current one will be lost (an autosave is kept in ~/.pybi).")) return; await busy("Creating…", async () => { applyState(await api("/api/new", {})); S.history = []; }); }
-  function openProject() {
-    const fi = h("input", { type: "file", accept: ".pybi" });
-    fi.onchange = async () => { const fd = new FormData(); fd.append("file", fi.files[0]); await busy("Opening…", async () => { applyState(await api("/api/open", fd)); S.history = []; toast("Opened " + fi.files[0].name); }); };
+  function openProject(accept) {
+    const fi = h("input", { type: "file", accept: accept || ".pybi,.pbix,.pbit" });
+    fi.onchange = async () => {
+      const file = fi.files[0]; if (!file) return;
+      if (/\.(pbix|pbit)$/i.test(file.name)) return openPowerBI(file);
+      const fd = new FormData(); fd.append("file", file); await busy("Opening…", async () => { applyState(await api("/api/open", fd)); S.history = []; toast("Opened " + file.name); });
+    };
     fi.click();
+  }
+  async function openPowerBI(file) {
+    if (Object.keys(S.tables).length && !confirm("Open “" + file.name + "”? It replaces the current report (an autosave is kept in ~/.pybi).")) return;
+    const fd = new FormData(); fd.append("file", file);
+    await busy("Importing " + file.name + " — reading pages, model and data…", async () => {
+      const st = await api("/api/open", fd); applyState(st); S.history = []; showImportReport(st.pbix || {}, file.name);
+    });
+  }
+  function showImportReport(r, name) {
+    const i = r.info || {}; const w = r.warnings || [];
+    const n = (x, one, many) => (x || 0).toLocaleString() + " " + ((x || 0) === 1 ? one : many);
+    const stats = [n(i.pages, "page", "pages"), n(i.visuals, "visual", "visuals"), n(i.tables, "table", "tables"), n(i.rows, "row", "rows"), n(i.measures, "measure", "measures"), n(i.relationships, "relationship", "relationships")];
+    const html = '<p style="margin:0 0 10px">Imported <b>' + esc(name) + "</b>: " + stats.map(esc).join(" · ") + ".</p>" +
+      (w.length ? '<p style="margin:0 0 6px;font-weight:600">Please check:</p><ul style="margin:0;padding-left:18px;line-height:1.5">' + w.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ul>"
+        : '<p style="margin:0;color:#107c10">Everything was imported. Save it as a .pybi project to keep it.</p>');
+    modal("Power BI file imported", html, [["OK", null, "primary"]]);
   }
   async function saveProject() {
     await busy("Saving…", async () => {

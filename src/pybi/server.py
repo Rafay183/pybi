@@ -20,6 +20,7 @@ from .connectors import BY_ID, ConnectorError, catalog_json
 from .connectors import discover as discover_tables
 from .connectors import run as run_connector
 from .exporters import export_html, export_pdf, export_pptx
+from .pbix import PbixError, is_power_bi_file, project_from_pbix
 from .project import Project, read_sqlite, read_upload, table_payload
 from .sample import calendar_table, sample_report, sample_tables
 from .transform import STEP_LABELS, StepError, profile
@@ -476,16 +477,26 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
     @app.post("/api/open")
     def open_project():
         f = request.files.get("file")
+        path = None if f else request.get_json(force=True)["path"]
+        fname = f.filename if f else path
+        imported = None
         try:
-            other = Project.from_bytes(f.read()) if f else Project.load(request.get_json(force=True)["path"])
+            if is_power_bi_file(fname):
+                other, imp = project_from_pbix(f.read() if f else Path(path).read_bytes(), Path(fname).name)
+                imported = {"info": imp.info, "warnings": imp.warnings}
+            else:
+                other = Project.from_bytes(f.read()) if f else Project.load(path)
+        except PbixError as exc:
+            return err(str(exc))
         except Exception as exc:  # noqa: BLE001
-            return err(f"Not a valid .pybi file: {exc}")
+            kind = "Power BI" if is_power_bi_file(fname) else ".pybi"
+            return err(f"Could not open this {kind} file: {exc}")
         with proj.lock:
             proj.sources, proj.report = other.sources, other.report
             proj.path = other.path
             proj._cache.clear()
         bump()
-        return ok()
+        return ok(pbix=imported) if imported else ok()
 
     @app.get("/api/recent")
     def recent():
@@ -544,7 +555,15 @@ BANNER = r"""
 
 def serve(project: str | None = None, host: str = "0.0.0.0", port: int = 8050, open_browser: bool = True,
           dataframes: dict | None = None, sample: bool = False) -> None:
-    proj = Project.load(project) if project and Path(project).exists() else Project()
+    if project and is_power_bi_file(project) and Path(project).exists():
+        proj, imp = project_from_pbix(project)
+        proj.path = Path(project).with_suffix(".pybi")
+        print(f"  Imported Power BI file {Path(project).name}: {imp.info['pages']} pages, {imp.info['visuals']} visuals, "
+              f"{imp.info['tables']} tables, {imp.info['measures']} measures.")
+        for w in imp.warnings:
+            print(f"  ! {w}")
+    else:
+        proj = Project.load(project) if project and Path(project).exists() else Project()
     if project and not Path(project).exists():
         proj.path = Path(project).with_suffix(".pybi")
     if dataframes:
