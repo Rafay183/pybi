@@ -678,7 +678,10 @@ def file_engine(c: Connector, params: dict, file: FileArg = None, preview=False,
         link = c.config.get("link")
         if link:
             url = SHARE_LINKS[link](url)
-        r = http("GET", url, headers={"Accept": "*/*"})
+        headers = {"Accept": "*/*"}
+        if link == "github" and params.get("token") and url.startswith("https://raw.githubusercontent.com/"):
+            headers["Authorization"] = f"token {params['token']}"  # private repositories, via GitHub sign-in
+        r = http("GET", url, headers=headers)
         fname = _filename_from(url, c.config.get("ext", ".csv"), r.headers.get("content-type", ""))
         if c.config.get("ext") and Path(fname).suffix.lower() not in SUPPORTED:
             fname = Path(fname).stem + c.config["ext"]

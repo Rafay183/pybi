@@ -20,6 +20,7 @@ from .connectors import BY_ID, ConnectorError, catalog_json
 from .connectors import discover as discover_tables
 from .connectors import run as run_connector
 from .exporters import export_html, export_pdf, export_pptx
+from .github import GitHub, GitHubError
 from .pbix import PbixError, is_power_bi_file, project_from_pbix
 from .project import Project, read_sqlite, read_upload, table_payload
 from .sample import calendar_table, sample_report, sample_tables
@@ -65,6 +66,11 @@ class Credentials:
         except OSError:
             pass
 
+    def delete(self, source: str):
+        data = self._load()
+        if data.pop(source, None) is not None:
+            self.path.write_text(json.dumps(data, indent=1), "utf-8")
+
     def rename(self, old: str, new: str):
         data = self._load()
         if old in data:
@@ -94,6 +100,17 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
             return False
 
     creds = Credentials(HOME)
+    gh = GitHub(creds)
+    app.config["GITHUB"] = gh
+    GH_CONNECTORS = {"github", "github_file"}
+
+    def with_github(c, params: dict) -> dict:
+        """GitHub connectors use the signed-in account when no token was typed (never stored with the source)."""
+        if c.id in GH_CONNECTORS and not params.get("token"):
+            tok = gh.token()
+            if tok:
+                return dict(params, token=tok)
+        return params
 
     def connector_request(cid):
         c = BY_ID.get(cid)
@@ -119,6 +136,10 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
 
     @app.before_request
     def guard():
+        # Web pages from other sites must not be able to drive the local studio (cross-site request forgery).
+        origin = request.headers.get("Origin")
+        if origin and request.method not in ("GET", "HEAD", "OPTIONS") and origin.split("://", 1)[-1] != request.host:
+            abort(403)
         # Anyone on the network may *view*; only the machine running PyBI may *edit*.
         if not is_local() and not request.path.startswith(VIEW_OK):
             if request.path == "/":
@@ -286,7 +307,7 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
     def conn_discover(cid):
         c, params, _, _, file, _ = connector_request(cid)
         try:
-            names = discover_tables(c, params, file)
+            names = discover_tables(c, with_github(c, params), file)
         except ConnectorError as exc:
             return conn_err(exc)
         except Exception as exc:  # noqa: BLE001
@@ -297,7 +318,7 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
     def conn_preview(cid):
         c, params, tables, _, file, _ = connector_request(cid)
         try:
-            dfs = run_connector(c, params, file, preview=True, tables=tables[:1] if tables else None)
+            dfs = run_connector(c, with_github(c, params), file, preview=True, tables=tables[:1] if tables else None)
         except ConnectorError as exc:
             return conn_err(exc)
         except Exception as exc:  # noqa: BLE001
@@ -311,7 +332,7 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
     def conn_load(cid):
         c, params, tables, name, file, remember = connector_request(cid)
         try:
-            dfs = run_connector(c, params, file, preview=False, tables=tables)
+            dfs = run_connector(c, with_github(c, params), file, preview=False, tables=tables)
         except ConnectorError as exc:
             return conn_err(exc)
         except Exception as exc:  # noqa: BLE001
@@ -351,7 +372,7 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
         c = BY_ID.get(meta["id"])
         if not c:
             raise ConnectorError(f"Connector '{meta['id']}' is not available in this PyBI version")
-        params = dict(meta.get("params") or {}, **creds.get(src.name))
+        params = with_github(c, dict(meta.get("params") or {}, **creds.get(src.name)))
         dfs = run_connector(c, params, None, preview=False, tables=[meta["table"]] if c.multi and meta.get("table") else None)
         df = dfs.get(meta.get("table")) if meta.get("table") in dfs else next(iter(dfs.values()))
         proj.replace_raw(src.name, df)
@@ -503,6 +524,74 @@ def create_app(project: Project | None = None, host: str = "127.0.0.1", port: in
         files = sorted(Path.cwd().glob("*.pybi"), key=lambda p: p.stat().st_mtime, reverse=True)[:12]
         auto = HOME / "autosave.pybi"
         return jsonify({"files": [str(p) for p in files], "autosave": str(auto) if auto.exists() else None})
+
+    # ---------------------------------------------------------------- GitHub sign-in and reports on GitHub
+    def gh_call(fn):
+        try:
+            return jsonify(fn())
+        except GitHubError as exc:
+            return jsonify({"error": str(exc), "status": exc.status}), exc.status if 400 <= exc.status < 600 else 400
+
+    @app.get("/api/github/status")
+    def gh_status():
+        if request.args.get("refresh"):
+            return gh_call(lambda: dict(gh.status(), user=gh.refresh_profile()) if gh.token() else gh.status())
+        return jsonify(gh.status())
+
+    @app.post("/api/github/start")
+    def gh_start():
+        body = request.get_json(silent=True) or {}
+        return gh_call(lambda: gh.start(private=body.get("private", True) is not False))
+
+    @app.post("/api/github/poll")
+    def gh_poll():
+        return gh_call(lambda: gh.poll((request.get_json(silent=True) or {}).get("flow", "")))
+
+    @app.post("/api/github/cancel")
+    def gh_cancel():
+        gh.cancel((request.get_json(silent=True) or {}).get("flow", ""))
+        return jsonify({"ok": True})
+
+    @app.post("/api/github/signout")
+    def gh_signout():
+        gh.sign_out()
+        return jsonify(gh.status())
+
+    @app.post("/api/github/save")
+    def gh_save():
+        body = request.get_json(silent=True) or {}
+        if body.get("report"):
+            proj.report = body["report"]
+        name = body.get("name") or (proj.path.stem if proj.path else proj.report.get("title", "report"))
+        html = export_html(proj.state()).encode("utf-8") if body.get("html") else None
+        return gh_call(lambda: gh.save_report(name, proj.to_bytes(), html))
+
+    @app.get("/api/github/reports")
+    def gh_reports():
+        return gh_call(lambda: {"reports": gh.list_reports()})
+
+    @app.post("/api/github/open")
+    def gh_open():
+        path = (request.get_json(silent=True) or {}).get("path", "")
+        try:
+            other = Project.from_bytes(gh.download_report(path))
+        except GitHubError as exc:
+            return jsonify({"error": str(exc)}), exc.status if 400 <= exc.status < 600 else 400
+        except Exception as exc:  # noqa: BLE001
+            return err(f"Could not open this report: {exc}")
+        with proj.lock:
+            proj.sources, proj.report, proj.path = other.sources, other.report, None
+            proj._cache.clear()
+        bump()
+        return ok()
+
+    @app.post("/api/github/publish")
+    def gh_publish():
+        body = request.get_json(silent=True) or {}
+        if body.get("report"):
+            proj.report = body["report"]
+        html = export_html(proj.state()).encode("utf-8")
+        return gh_call(lambda: gh.publish_dashboard(body.get("name") or proj.report.get("title", "dashboard"), html))
 
     # ---------------------------------------------------------------- exports
     @app.post("/api/export/html")

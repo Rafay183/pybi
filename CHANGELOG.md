@@ -4,6 +4,15 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+- **Sign in with GitHub** (title bar). Uses GitHub's device sign-in: PyBI shows a one-time code, you approve it on github.com, and PyBI never sees your password. People without a GitHub account get a step-by-step guide to create one. The access key stays on this computer (system keychain when `keyring` is installed, otherwise `~/.pybi`) and never goes into report files, exports or the network view. Sign out at any time.
+- The GitHub connectors use your sign-in, so no personal access token is needed, private repositories included.
+- **Save report to GitHub** / **Open report from GitHub**: keeps `.pybi` reports (and optionally the interactive HTML dashboard) in your own `pybi-reports` repository, private when you allowed private repositories, with GitHub's version history.
+- **Publish dashboard as a web page** with GitHub Pages (public `pybi-dashboards` repository; PyBI asks you to confirm the data will be public).
+
+### Security
+- The studio's API rejects write requests coming from other websites (cross-site request forgery protection).
+
 ## [0.1.4] - 2026-11-23
 
 ### Added
