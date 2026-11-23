@@ -21,7 +21,17 @@ case "$(dpkg --print-architecture 2>/dev/null || uname -m)" in
 esac
 
 FILE="PyBI-Linux-$ARCH.deb"
-URL="https://github.com/$REPO/releases/latest/download/$FILE"
+# The highest released version that has this file (not GitHub's "Latest" label, which an older
+# release can briefly carry while it is being published).
+newest_url() {
+  api="https://api.github.com/repos/$REPO/releases?per_page=30"
+  if command -v curl >/dev/null 2>&1; then list=$(curl -fsSL "$api" 2>/dev/null || true)
+  else list=$(wget -qO- "$api" 2>/dev/null || true); fi
+  printf '%s\n' "$list" | grep -o "\"browser_download_url\": *\"https://github.com/[^\"]*/releases/download/v[0-9][0-9.]*/$FILE\"" \
+    | sed 's/.*"\(https:[^"]*\)"$/\1/' | sort -u | sort -t/ -k8,8V | tail -n 1
+}
+URL="$(newest_url)"
+[ -n "$URL" ] || URL="https://github.com/$REPO/releases/latest/download/$FILE"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 chmod 755 "$TMP"
@@ -32,7 +42,7 @@ fetch() {
   else die "neither curl nor wget is installed. Run: sudo apt-get install -y curl"; fi
 }
 
-say "Downloading PyBI for $ARCH"
+say "Downloading PyBI $(printf %s "$URL" | sed -n 's#.*/download/v\([^/]*\)/.*#\1#p') for $ARCH"
 fetch "$URL" "$TMP/$FILE" || die "download failed. Check your internet connection and try again."
 fetch "$URL.sha256" "$TMP/$FILE.sha256" || die "could not download the checksum."
 say "Checking the download"

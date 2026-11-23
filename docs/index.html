@@ -1143,5 +1143,25 @@ pybi demo</code></pre></div>
 })();
 
 </script>
+<script>
+/* Download buttons point at the highest released version that has each file, not GitHub's "Latest"
+   label (an older release can carry that label for a moment while it is being published). */
+(function () {
+  var links = document.querySelectorAll('a[href*="/releases/latest/download/"]');
+  if (!links.length || !window.fetch) return;
+  fetch("https://api.github.com/repos/rafay183/pybi/releases?per_page=30").then(function (r) { return r.ok ? r.json() : []; }).then(function (rels) {
+    var num = function (t) { var m = /^v?(\d+)\.(\d+)\.(\d+)$/.exec(t || ""); return m ? [+m[1], +m[2], +m[3]] : null; };
+    var newer = function (a, b) { for (var i = 0; i < 3; i++) { if (a[i] !== b[i]) return a[i] > b[i]; } return false; };
+    links.forEach(function (a) {
+      var file = a.getAttribute("href").split("/").pop(), best = null, url = null;
+      rels.forEach(function (rel) {
+        var v = num(rel.tag_name); if (!v || rel.draft || rel.prerelease) return;
+        (rel.assets || []).forEach(function (as) { if (as.name === file && (!best || newer(v, best))) { best = v; url = as.browser_download_url; } });
+      });
+      if (url) a.setAttribute("href", url);
+    });
+  }).catch(function () { /* keep the plain links */ });
+})();
+</script>
 </body>
 </html>
