@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy · PyBI</title>
+<meta name="description" content="How PyBI handles your data: it runs on your own computer and collects nothing.">
+<link rel="icon" href="images/pybi-icon.png">
+<style>
+  body { margin: 0; font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2a30; background: #f7f8f7; }
+  header { background: #0a6c6c; color: #fff; padding: 18px 24px; }
+  header a { color: #fff; text-decoration: none; font-weight: 700; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 24px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; }
+  h2 { font-size: 1.2rem; margin: 32px 0 8px; color: #0a6c6c; }
+  .muted { color: #5c6b70; font-size: .95rem; }
+  code { background: #e9eeee; padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+  a { color: #0a6c6c; }
+  .box { background: #fff; border: 1px solid #dde4e4; border-radius: 10px; padding: 14px 18px; }
+</style>
+</head>
+<body>
+<header><a href="./">← PyBI documentation</a></header>
+<main>
+  <h1>Privacy policy</h1>
+  <p class="muted">PyBI (Python package <code>pybi-ray</code> and the PyBI desktop apps) · Last updated 24 November 2026</p>
+
+  <div class="box"><b>In short:</b> PyBI runs on your own computer. It does not collect, send or sell any information about you or your data. There are no analytics, tracking or ads. The people who make PyBI never see your data.</div>
+
+  <h2>Your data stays on your computer</h2>
+  <p>Reports, data you load, and project files (<code>.pybi</code>) are processed and stored on your computer. PyBI only contacts another service when you ask it to, for example when you connect to a database, an online data source or GitHub. That connection goes directly from your computer to that service, under that service's own privacy policy.</p>
+
+  <h2>Passwords and access keys</h2>
+  <p>Passwords and tokens you enter for data sources, and the access key from <b>Sign in with GitHub</b>, are stored only on your computer: in your system keychain when available, otherwise in <code>~/.pybi/credentials.json</code>, readable only by your user account. They are never written into report files or exports and never shown in the network view.</p>
+
+  <h2>Sign in with GitHub</h2>
+  <p>Sign-in uses GitHub's device flow: you approve PyBI on github.com and PyBI never sees your GitHub password. When you are signed in, PyBI uses your access key, from your computer only, to:</p>
+  <ul>
+    <li>show your GitHub name and picture in the app;</li>
+    <li>load data from repositories you choose in the GitHub connectors;</li>
+    <li>save and open reports in a <code>pybi-reports</code> repository in your account, when you click Save or Open;</li>
+    <li>publish a dashboard to a public <code>pybi-dashboards</code> repository with GitHub Pages, only when you click Publish and confirm that the page and its data will be public.</li>
+  </ul>
+  <p>Sign out in PyBI at any time to delete the key from your computer. To remove PyBI's access completely, go to GitHub → Settings → Applications → Authorized OAuth Apps → PyBI → Revoke.</p>
+
+  <h2>Sharing on your network</h2>
+  <p>When you start PyBI normally, people on the same local network can open a read-only view of your report at the link PyBI shows. Start PyBI with <code>--private</code> to turn this off.</p>
+
+  <h2>Updates</h2>
+  <p>The desktop apps check GitHub Releases for new versions about every six hours. This request contains no personal data. You can turn automatic checks off in the PyBI launcher window.</p>
+
+  <h2>Children</h2>
+  <p>PyBI does not knowingly collect any personal information from anyone, including children.</p>
+
+  <h2>Changes and contact</h2>
+  <p>Changes to this policy are published on this page and in the project's history on GitHub. Questions: open an issue at <a href="https://github.com/rafay183/pybi/issues">github.com/rafay183/pybi/issues</a>.</p>
+</main>
+</body>
+</html>
