@@ -13,6 +13,11 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 ### Security
 - The studio's API rejects write requests coming from other websites (cross-site request forgery protection).
 
+## [0.1.5] - 2026-11-23
+
+### Fixed
+- The **Sign in with GitHub** button, GitHub items in Share and Export, and the GitHub note in the connector form stay hidden until GitHub sign-in is set up in PyBI (0.1.4 showed a button that could only say "not set up").
+
 ## [0.1.4] - 2026-11-23
 
 ### Added
