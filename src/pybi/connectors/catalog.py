@@ -43,6 +43,9 @@ FILE_SRC = [P("file", "Upload a file", "file"), P("path", "…or a path on this 
 
 # ================================================================== FILES
 FILES = "File"
+add(Connector("pbix", "Power BI file (.pbix / .pbit)", FILES, "pbix", FILE_SRC, {},
+              "Open a Power BI Desktop report: pages, visuals, filters, theme, tables, relationships and DAX measures.",
+              "pbixray", multi=True, tags="power bi pbix pbit powerbi desktop report template microsoft"))
 for cid, name, fmt, extra, install, desc in [
     ("csv", "Text / CSV", ".csv", [P("delimiter", "Delimiter (blank = auto)", advanced=True), P("skiprows", "Skip first rows", "number", advanced=True)], None, "Comma, semicolon, tab or pipe separated text files."),
     ("tsv", "Tab-separated (TSV)", ".tsv", [], None, "Tab-delimited text."),

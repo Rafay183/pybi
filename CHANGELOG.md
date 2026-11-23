@@ -4,7 +4,11 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-23
+
 ### Added
+- **Power BI file (.pbix / .pbit)** connector in Get data (File category, and first in Popular).
+- The PyBI version is shown in the studio title bar, the welcome screen and the network viewer.
 - Open Power BI files (`.pbix`, `.pbit`) from **Open**, **Get data → Power BI file**, drag and drop, `pybi run report.pbix` or the new `pybi convert` command. PyBI imports pages, visuals with their positions, fields and formatting, report/page/visual filters, slicer selections, theme colours, images and shapes, and the data model (tables with data, relationships, DAX measures with formats, calculated columns, hidden fields, sort-by columns). Both report formats are read (`Report/Layout` and the newer PBIR folder format). After the import, PyBI lists anything it could not carry over (maps, custom visuals, buttons, Top N filters, DAX functions the engine does not support yet).
 - New optional extra `pybi-ray[pbix]` (installs `pbixray`, which reads the data inside a .pbix). The desktop apps include it.
 - Image visual, and reports can carry their own colour theme (`customTheme`).

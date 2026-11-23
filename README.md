@@ -49,7 +49,7 @@ Created by **Muhammad Rafay Shaikh, from Pakistan**.
 
 <details><summary><b>More screenshots</b></summary>
 
-| Get data (214 connectors) | Navigator & preview |
+| Get data (215 connectors) | Navigator & preview |
 |---|---|
 | ![Get data](https://raw.githubusercontent.com/rafay183/pybi/main/docs/images/get-data.png) | ![Navigator](https://raw.githubusercontent.com/rafay183/pybi/main/docs/images/navigator.png) |
 | **Query editor** | **Model view** |
@@ -63,7 +63,7 @@ Created by **Muhammad Rafay Shaikh, from Pakistan**.
 
 | Area | What you get |
 |---|---|
-| **Get data** | **214 connectors**: files (Excel, CSV, JSON, XML, Parquet, PDF tables, SAS/SPSS/Stata…), 50 databases (SQL Server, PostgreSQL, MySQL, Oracle, Snowflake, BigQuery, Databricks…), NoSQL, cloud storage (S3, Azure, GCS, SFTP), 70+ SaaS apps (Salesforce, HubSpot, Stripe, Shopify, Jira, Notion…), public data (World Bank, FRED, Eurostat…), REST/GraphQL/OData/Python — with preview, navigator and refresh |
+| **Get data** | **215 connectors**: files (Excel, CSV, JSON, XML, Parquet, PDF tables, SAS/SPSS/Stata…), 50 databases (SQL Server, PostgreSQL, MySQL, Oracle, Snowflake, BigQuery, Databricks…), NoSQL, cloud storage (S3, Azure, GCS, SFTP), 70+ SaaS apps (Salesforce, HubSpot, Stripe, Shopify, Jira, Notion…), public data (World Bank, FRED, Eurostat…), REST/GraphQL/OData/Python — with preview, navigator and refresh |
 | **Query editor** (Power Query style) | Applied steps with live preview and column quality bars: choose/remove columns, promote headers, change type, filter rows, replace values, fill up/down, remove duplicates/blanks, keep top rows, custom column, conditional column, split column, text formatting, date parts, round, group by, unpivot, merge queries, append queries, plus a JSON advanced editor |
 | **Model view** | Drag-and-drop relationships, many-to-one with single or **both** cross-filter direction, active/inactive, autodetect, one-click date table |
 | **DAX-style formulas** | Measures and calculated columns with `VAR … RETURN`, `CALCULATE`, `FILTER`, `ALL`, `ALLEXCEPT`, `ALLSELECTED`, `REMOVEFILTERS`, `KEEPFILTERS`, `VALUES`, `SELECTEDVALUE`, `RELATED`, `RELATEDTABLE`, `LOOKUPVALUE`, iterators (`SUMX`, `AVERAGEX`, `RANKX`, `TOPN`, `CONCATENATEX`), time intelligence (`TOTALYTD`, `DATESYTD`, `SAMEPERIODLASTYEAR`, `DATEADD`, `PARALLELPERIOD`, `PREVIOUSMONTH`, `DATESBETWEEN`, …), logic, math, text and date functions |
@@ -75,13 +75,13 @@ Created by **Muhammad Rafay Shaikh, from Pakistan**.
 | **Open Power BI files** | Open `.pbix` / `.pbit` reports: pages, visuals (positions, fields, formatting), filters, slicer selections, theme, images, tables with data, relationships and DAX measures. Anything that can't be carried over is listed after the import |
 | **Export** | PNG (page or all pages), PowerPoint `.pptx`, PDF, **interactive HTML** (one offline file with data, slicers and cross-filtering), `.pybi` project file, CSV/Excel of any table |
 
-## Connectors (214)
+## Connectors (215)
 
 Open **Get data** to search the catalog. Each connector shows a form, a live preview, and (for databases, workbooks, folders, buckets) a **Navigator** to pick tables. Loaded sources remember how they were connected, so **Refresh** re-pulls fresh data while keeping your query steps. Passwords and tokens are stored only on your computer in `~/.pybi/credentials.json` — never inside `.pybi` files.
 
 Connectors marked † need an extra driver (`pip install …` — PyBI tells you the exact command).
 
-**File (23)** — Text / CSV, Tab-separated (TSV), Fixed-width text, Excel workbook, Excel 97-2003 (.xls) †, Excel binary (.xlsb) †, OpenDocument spreadsheet †, JSON, JSON Lines / NDJSON, XML, HTML file, Parquet †, Feather / Arrow IPC †, ORC †, Avro †, SAS (.sas7bdat / .xpt), SPSS (.sav) †, Stata (.dta), HDF5 †, YAML, PDF tables, ZIP archive, Folder (combine files)
+**File (24)** — Power BI file (.pbix / .pbit) †, Text / CSV, Tab-separated (TSV), Fixed-width text, Excel workbook, Excel 97-2003 (.xls) †, Excel binary (.xlsb) †, OpenDocument spreadsheet †, JSON, JSON Lines / NDJSON, XML, HTML file, Parquet †, Feather / Arrow IPC †, ORC †, Avro †, SAS (.sas7bdat / .xpt), SPSS (.sav) †, Stata (.dta), HDF5 †, YAML, PDF tables, ZIP archive, Folder (combine files)
 
 **Database (50)** — SQLite database, PostgreSQL †, TimescaleDB †, Greenplum †, YugabyteDB †, Supabase (Postgres) †, Neon (serverless Postgres) †, Google Cloud SQL for PostgreSQL †, Amazon Aurora / RDS PostgreSQL †, Azure Database for PostgreSQL †, Google AlloyDB †, MySQL †, MariaDB †, PlanetScale †, TiDB †, Google Cloud SQL for MySQL †, Amazon Aurora / RDS MySQL †, Azure Database for MySQL †, Microsoft SQL Server †, Azure SQL Database †, Azure Synapse Analytics (SQL) †, Microsoft Fabric Warehouse (SQL endpoint) †, Oracle Database †, IBM Db2 †, SAP HANA †, Teradata †, Vertica †, CockroachDB †, SingleStore †, Exasol †, Firebird †, ClickHouse †, Trino †, Presto †, Apache Hive †, Spark SQL (Thrift server) †, Apache Impala †, Apache Druid †, Apache Pinot †, Dremio †, Snowflake †, Amazon Redshift †, Google BigQuery †, Amazon Athena †, Databricks SQL †, DuckDB †, MotherDuck †, Microsoft Access †, ODBC (any driver) †, Other SQL database (SQLAlchemy URL) †
 
