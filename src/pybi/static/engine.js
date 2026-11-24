@@ -900,7 +900,13 @@
       let rows = [];
       if (dims.length) {
         // combinations of dimension values present in the filtered data (from the most granular table)
-        const base = dims.reduce((best, d) => (model.tables[d.table].rows > model.tables[best].rows ? d.table : best), dims[0].table);
+        let base = dims.reduce((best, d) => (model.tables[d.table].rows > model.tables[best].rows ? d.table : best), dims[0].table);
+        // dimensions from different lookup tables (e.g. Customers + Products) are only related through a fact table:
+        // walk from the most granular table that reaches every dimension
+        if (dims.some((d) => !model.getter(base, d.table, d.column, d.level))) {
+          const reach = Object.keys(model.tables).sort((a, b) => model.tables[b].rows - model.tables[a].rows).find((t) => dims.every((d) => model.getter(t, d.table, d.column, d.level)));
+          if (reach) base = reach;
+        }
         const baseRows = model.rowsFor(base, filters);
         const getters = dims.map((d) => model.getter(base, d.table, d.column, d.level) || (() => null));
         const seen = new Map();

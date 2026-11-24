@@ -486,6 +486,7 @@
     if (f.kind === "measure") return { measure: f.measure };
     const ref = { table: f.table, column: f.column };
     const accepts = role[3];
+    if (accepts === "raw") return ref;  // row-level numbers for statistical visuals: never aggregated
     if (accepts === "value") ref.agg = f.type === "number" && !keyLike(f.column) ? "sum" : f.type === "number" ? "count" : "count";
     if (accepts === "any" && f.type === "number" && !keyLike(f.column)) ref.agg = "sum";
     return ref;
@@ -496,6 +497,7 @@
     const roles = meta.roles;
     const has = (r) => (v.fields[r[0]] || []).length;
     const pick = (pred) => roles.find((r) => pred(r) && has(r) < r[2]);
+    if (f.kind !== "measure" && f.type === "number") { const raw = pick((r) => r[3] === "raw"); if (raw) return raw; }
     if (value) return pick((r) => r[3] === "value") || pick((r) => r[3] === "any") || pick((r) => r[3] === "dim");
     return pick((r) => r[3] === "dim") || pick((r) => r[3] === "any") || pick((r) => r[3] === "value");
   }
@@ -534,12 +536,28 @@
     if (S.collapsed.vizPane) return;
     const v = selVisual();
     const grid = h("div", { class: "vgrid" });
-    for (const [t, meta] of Object.entries(V.TYPES)) {
-      const b = h("button", { class: v && v.type === t ? "on" : "", title: meta.label }, V.icon(t));
-      b.onclick = () => { if (v) convertVisual(v, t); else newVisual(t); };
-      grid.appendChild(b);
-    }
+    const vbtn = (t, meta) => { const b = h("button", { class: v && v.type === t ? "on" : "", title: meta.label + (meta.group ? " — " + meta.group : "") }, V.icon(t)); b.onclick = () => { if (v) convertVisual(v, t); else newVisual(t); }; return b; };
+    const plus = Object.entries(V.TYPES).filter(([, m]) => m.plus);
+    for (const [t, meta] of Object.entries(V.TYPES)) if (!meta.plus) grid.appendChild(vbtn(t, meta));
     body.appendChild(grid);
+    if (plus.length) {
+      const gal = h("details", { class: "vgal" }); gal.open = S.galleryOpen !== false || (v && V.TYPES[v.type].plus);
+      gal.innerHTML = '<summary>✨ More visuals <small>(' + plus.length + ')</small></summary><input class="vgal-q" type="search" placeholder="Search visuals… e.g. sankey, violin">';
+      gal.addEventListener("toggle", () => { S.galleryOpen = gal.open; });
+      const list = h("div", { class: "vgal-list" }); gal.appendChild(list);
+      const draw = (q) => {
+        list.innerHTML = ""; q = (q || "").toLowerCase().trim();
+        (V.PLUS_GROUPS || []).forEach((g) => {
+          const items = plus.filter(([t, m]) => m.group === g && (!q || (m.label + " " + t + " " + g).toLowerCase().includes(q)));
+          if (!items.length) return;
+          list.appendChild(h("div", { class: "vgal-h" }, esc(g)));
+          const gg = h("div", { class: "vgrid vgal-grid" }); items.forEach(([t, m]) => { const b = vbtn(t, m); b.innerHTML += '<span>' + esc(m.label) + "</span>"; gg.appendChild(b); }); list.appendChild(gg);
+        });
+        if (!list.children.length) list.appendChild(h("div", { class: "vgal-h" }, "No visual matches “" + esc(q) + "”"));
+      };
+      const qi = $(".vgal-q", gal); qi.value = S.galleryQ || ""; qi.oninput = () => { S.galleryQ = qi.value; draw(qi.value); };
+      draw(qi.value); body.appendChild(gal);
+    }
     if (!v) { body.appendChild(h("div", { class: "empty", style: "height:auto;padding:16px 4px" }, "Select a visual on the canvas to edit its fields and format, or click a visual type to add one.<br><br>Tip: drag a field from the Data pane straight onto the canvas.")); return; }
     const tabs = h("div", { class: "tabs" }, '<button data-t="build">Build</button><button data-t="format">Format</button><button data-t="analytics">General</button>');
     $$("button", tabs).forEach((b) => { b.classList.toggle("on", b.dataset.t === S.vizTab); b.onclick = () => { S.vizTab = b.dataset.t; renderVizPane(); }; });
@@ -554,7 +572,8 @@
     const meta = V.TYPES[t];
     for (const ref of all) {
       const isVal = E.isValueField(ref);
-      const role = meta.roles.find((r) => (isVal ? r[3] === "value" || r[3] === "any" : r[3] === "dim" || r[3] === "any") && (v.fields[r[0]] || []).length < r[2]);
+      const role = meta.roles.find((r) => ((isVal ? r[3] === "value" || r[3] === "any" : r[3] === "dim" || r[3] === "any") || (r[3] === "raw" && !ref.measure)) && (v.fields[r[0]] || []).length < r[2]);
+      if (role && role[3] === "raw") delete ref.agg;
       if (role) { v.fields[role[0]] = v.fields[role[0]] || []; v.fields[role[0]].push(ref); }
     }
     if (t === "textbox") v.format = Object.assign({ text: "Text", fontSize: 18 }, v.format);
@@ -645,6 +664,11 @@
       const r = RT.results[v.id]; const names = r && r.series ? r.series.concat(r.lines || []).map((s) => s.name) : r && r.categories && ["pie", "donut", "treemap"].includes(t) ? r.categories.map(String) : [];
       if (["pie", "donut", "treemap"].includes(t) && r && r.categories) names.splice(0, names.length, ...r.categories.map((c) => E.fmtValue(c)));
       S1.push({ title: "Colours", rows: names.slice(0, 12).map((n, i) => [n, "colors." + i, "color", RT.theme.palette[i % RT.theme.palette.length]]).concat([["Reset colours", "colors", "reset"]]) });
+    }
+    const pm = V.TYPES[t];
+    if (pm && pm.plus) {
+      if ((pm.format || []).length) S1.push({ title: pm.label, rows: pm.format });
+      S1.push({ title: "Colours", rows: RT.theme.palette.slice(0, 8).map((c, i) => ["Colour " + (i + 1), "colors." + i, "color", c]).concat([["Reset colours", "colors", "reset"]]) });
     }
     S1.push({ title: "Visual background & border", rows: [["Background", "background", "color", RT.theme.card], ["Transparent background", "background:transparent", "toggle", f.background === "transparent"], ["Border", "border", "toggle", false], ["Border colour", "borderColor", "color", RT.theme.grid], ["Corner radius", "radius", "number", 6], ["Shadow", "shadow", "toggle", true]] });
     return S1;

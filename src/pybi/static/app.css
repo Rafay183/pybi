@@ -375,3 +375,14 @@ body.viewer-mode { background: #e9e8e6; }
 .gh-list small { color: #8a8886; margin-left: 6px; }
 .gh-note { display: flex; align-items: center; gap: 8px; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 8px 10px; font-size: 12.5px; margin: 8px 0; }
 .gh-note .btn { margin-left: auto; }
+
+/* "More visuals" gallery */
+.vgal { margin: 0 0 8px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+.vgal > summary { cursor: pointer; padding: 6px 8px; font-weight: 600; font-size: 12px; list-style: none; }
+.vgal > summary small { color: #8a8886; font-weight: 400; }
+.vgal-q { width: calc(100% - 16px); margin: 0 8px 6px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 3px; font-size: 12px; }
+.vgal-list { max-height: 340px; overflow: auto; padding: 0 6px 6px; }
+.vgal-h { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: #8a8886; margin: 6px 2px 3px; }
+.vgal-grid { grid-template-columns: repeat(3, 1fr); margin-bottom: 2px; }
+.vgal-grid button { height: auto; min-height: 50px; flex-direction: column; gap: 2px; padding: 4px 2px; }
+.vgal-grid button span { font-size: 9.5px; line-height: 1.15; text-align: center; color: #605e5c; }

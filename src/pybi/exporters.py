@@ -27,7 +27,7 @@ def export_html(state: dict, title: str | None = None) -> str:
     title = title or state["report"].get("title") or "PyBI report"
     html = html.replace("{{TITLE}}", title.replace("<", "&lt;"))
     html = html.replace('<link rel="stylesheet" href="/static/app.css">', "<style>\n" + _static("app.css") + "\n</style>")
-    for js in ("d3.min.js", "engine.js", "visuals.js", "runtime.js", "viewer.js"):
+    for js in ("d3.min.js", "engine.js", "visuals.js", "visuals_plus.js", "runtime.js", "viewer.js"):
         html = html.replace(f'<script src="/static/{js}"></script>', "<script>\n" + _static(js).replace("</script", "<\\/script") + "\n</script>")
     html = html.replace("<!--EMBED-->", "<script>window.PYBI_EMBED = " + _safe_json(payload) + ";</script>")
     return html

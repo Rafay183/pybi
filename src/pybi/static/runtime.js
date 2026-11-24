@@ -64,7 +64,8 @@
       const missing = [];
       for (const list of Object.values(v.fields || {})) for (const f of list || []) if (f && f.table && !this.model.tables[f.table] && !missing.includes(f.table)) missing.push(f.table);
       if (missing.length) return { empty: false, errors: ["No data loaded for table " + missing.map((t) => "'" + t + "'").join(", ")] };
-      try { return E.query(this.model, v, filters, this.report); }
+      const meta = V.TYPES[v.type];
+      try { return meta && meta.query ? meta.query(this.model, v, filters, this.report) : E.query(this.model, v, filters, this.report); }
       catch (e) { console.error(e); return { empty: false, errors: [e.message] }; }
     }
 

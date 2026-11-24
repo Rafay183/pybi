@@ -686,6 +686,11 @@
     }
     if (r.errors && r.errors.length && !hasData(r)) { el.innerHTML = '<div class="empty err">⚠ ' + esc(r.errors[0]) + "</div>"; return; }
     if (r.categories && !r.categories.length && v.type !== "narrative") { el.innerHTML = '<div class="empty">No data for the current filters</div>'; return; }
+    const meta = TYPES[v.type];
+    if (meta && meta.render) {  // visuals added by visuals_plus.js
+      try { return meta.render(el, v, r, o); }
+      catch (e) { console.error(e); el.innerHTML = '<div class="empty err">⚠ ' + esc(e.message) + "</div>"; return; }
+    }
     try {
       switch (v.type) {
         case "pie": case "donut": return renderPie(el, v, r, o);
@@ -709,7 +714,7 @@
       el.innerHTML = '<div class="empty err">⚠ ' + esc(e.message) + "</div>";
     }
   }
-  function hasData(r) { return (r.categories && r.categories.length) || (r.rows && r.rows.length) || (r.points && r.points.length) || r.value != null || (r.items && r.items.length); }
+  function hasData(r) { return (r.categories && r.categories.length) || (r.rows && r.rows.length) || (r.points && r.points.length) || r.value != null || (r.items && r.items.length) || (r.recs && r.recs.length) || r.n > 0; }
 
   // ------------------------------------------------------------ page export (SVG -> PNG)
   function htmlVisualSVG(v, r, w, h, theme) {
@@ -812,5 +817,6 @@
     const a = document.createElement("a"); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove();
   }
 
-  global.PyBIVisuals = { THEMES, TYPES, ICONS, icon, render, pageSVG, svgToPNG, download, esc, hideTip, FONT };
+  global.PyBIVisuals = { THEMES, TYPES, ICONS, icon, render, pageSVG, svgToPNG, download, esc, hideTip, FONT,
+    showTip, colorsFor, makeSvg, legend, axisStyle, selectedOpacity, truncate, measureText };
 })(typeof window !== "undefined" ? window : globalThis);
