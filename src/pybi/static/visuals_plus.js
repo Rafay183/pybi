@@ -1221,8 +1221,10 @@
       const nd = fr.g.append("g").selectAll("rect").data(lay.nodes).join("rect").attr("x", (n) => n.x0).attr("y", (n) => n.y0).attr("width", (n) => n.x1 - n.x0).attr("height", (n) => n.y1 - n.y0).attr("fill", nodeColor).attr("rx", 2)
         .style("cursor", (n) => (n.level === 0 ? "pointer" : null)).on("click", (ev, n) => { if (n.level === 0) { const rec = r.recs.find((x) => catName(x.category[0]) === n.name); if (rec) pick(o, rec.category[0])(ev); } else ev.stopPropagation(); });
       tip(nd, (n) => [[n.name, full(Math.max(n.inV, n.outV), fm), nodeColor(n)], ["Stage", (r.labels.category || [])[n.level] || ""]]);
-      if (f.dataLabels !== false) fr.g.append("g").selectAll("text").data(lay.nodes.filter((n) => n.y1 - n.y0 > 9)).join("text").attr("x", (n) => (n.x0 < fr.w / 2 ? n.x1 + 5 : n.x0 - 5)).attr("y", (n) => (n.y0 + n.y1) / 2).attr("dy", "0.35em").attr("text-anchor", (n) => (n.x0 < fr.w / 2 ? "start" : "end"))
-        .attr("font-size", 10.5).attr("fill", o.theme.text).text((n) => V.truncate(n.name, 18) + "  " + nf(Math.max(n.inV, n.outV), fm));
+      const labNodes = lay.nodes.filter((n) => n.y1 - n.y0 > 4);
+      d3.groups(labNodes, (n) => n.level).forEach(([, ns]) => { const ys = dodge(ns.map((n) => (n.y0 + n.y1) / 2), 12, 6, fr.h - 4); ns.forEach((n, i) => (n.ly = ys[i])); });
+      if (f.dataLabels !== false) fr.g.append("g").selectAll("text").data(labNodes).join("text").attr("x", (n) => (n.x0 < fr.w / 2 ? n.x1 + 5 : n.x0 - 5)).attr("y", (n) => n.ly).attr("dy", "0.35em").attr("text-anchor", (n) => (n.x0 < fr.w / 2 ? "start" : "end"))
+        .attr("font-size", 10.5).attr("fill", o.theme.text).text((n) => { const room = (depth > 2 ? fr.w / (depth - 1) / 2 : fr.w / 2) - 26, txt = n.name + "  " + nf(Math.max(n.inV, n.outV), fm); return V.measureText(txt, 10.5) <= room ? txt : V.truncate(n.name, Math.max(4, Math.floor(room / 6.2))); });
       (r.labels.category || []).forEach((lab, l) => label(fr.svg, 6 + (depth === 1 ? 0 : (l * (fr.w - 14)) / (depth - 1)) + 7, 12, lab, o, { size: 10, weight: 600, anchor: l === 0 ? "start" : l === depth - 1 ? "end" : "middle" }));
     } }));
 
@@ -1560,7 +1562,8 @@
       g.append("text").attr("text-anchor", "middle").attr("dy", "0.35em").attr("font-size", fs).attr("font-weight", 700).attr("fill", contrast(c)).attr("clip-path", "url(#" + clip + ")").text(txt)
         .attr("style", "clip-path:url(#" + clip + ")");
       g.select("text:last-child");
-      label(g, 0, fs * 0.75, nf(r.value, r.fmt) + (r.target ? " of " + nf(r.target, r.fmt) : ""), o, { size: Math.max(9, R0 * 0.11) });
+      const subY = fs * 0.75;
+      label(g, 0, subY, nf(r.value, r.fmt) + (r.target ? " of " + nf(r.target, r.fmt) : ""), o, { size: Math.max(9, R0 * 0.11), color: subY > level ? contrast(c) : o.theme.sub });
       tip(g, () => [[r.label, full(r.value, r.fmt), c]].concat(r.target ? [[r.targetLabel || "Target", full(r.target, r.fmt)], ["Achieved", d3.format(".1%")(n0(r.value) / r.target)]] : []));
       // the text inside the liquid uses the contrast colour above the fill line only where the liquid is
       const lc = lq.append("text").attr("text-anchor", "middle").attr("dy", "0.35em").attr("font-size", fs).attr("font-weight", 700).attr("fill", contrast(c)).text(txt);
