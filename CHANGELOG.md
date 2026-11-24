@@ -4,6 +4,22 @@ All notable changes to PyBI are documented here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-11-25
+
+### Added
+- **56 new visuals** in a searchable **✨ More visuals** gallery in the Visualizations pane, grouped the way analysts think:
+  - *Statistics & distribution* — histogram, box & whisker, violin, raincloud, density (KDE), ridgeline, beeswarm, strip / jitter, ECDF, Q-Q plot, dot histogram, correlation matrix, hexbin, 2D density contours, scatter + trend line (with equation and R²). These work on row-level numbers, like R / ggplot2 and seaborn.
+  - *Comparison & ranking* — lollipop, dumbbell, slope, bullet, Cleveland dot plot, diverging bar, butterfly / tornado, bump chart, Pareto (80/20), Marimekko, radar, small multiples.
+  - *Circular & radial* — radial bar, circular barplot, Nightingale rose, parliament, sunburst, chord diagram.
+  - *Part-to-whole* — waffle, pictogram, circle packing, icicle, nested treemap, packed bubbles.
+  - *Flow & network* — Sankey, arc diagram, force-directed network, heatmap, punch card.
+  - *Time & finance* — calendar heatmap, streamgraph, horizon chart, candlestick (OHLC), Gantt, step line, range band, sparkline table, event timeline.
+  - *KPI & text* — liquid fill gauge, progress rings, word cloud.
+- Every new visual cross-filters the report when clicked, has tooltips, follows the report theme, has its own Format options and colours, and works in the viewer, the network view and exported HTML / PNG / PowerPoint.
+
+### Fixed
+- Tables, matrices and visuals that combine fields from two lookup tables (for example Customers[Region] and Products[Category]) now show the combinations found in the fact table instead of an empty result.
+
 ## [0.1.7] - 2026-11-24
 
 ### Fixed

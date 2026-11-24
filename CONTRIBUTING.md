@@ -56,7 +56,8 @@ src/pybi/
 │   └── catalog.py      # The connector catalog (one small spec per connector)
 └── static/             # The browser app (no build step, plain JS)
     ├── engine.js       # Data model, relationships, filter context, DAX-style language
-    ├── visuals.js      # d3 renderers for every visual + PNG export
+    ├── visuals.js      # d3 renderers for the core visuals + PNG export
+    ├── visuals_plus.js # the ✨ More visuals gallery (56 statistical, flow, radial, time… visuals)
     ├── runtime.js      # Page rendering, slicers, cross-filtering (shared by editor & viewer)
     ├── app.js          # The studio (editor) UI
     ├── viewer.js       # Read-only viewer & exported HTML
@@ -102,6 +103,20 @@ node -e "require('./src/pybi/static/engine.js'); const E=globalThis.PyBIEngine; 
 ```
 
 ### Add a visual
+
+The easiest way is one `def(...)` call in `visuals_plus.js`, which gives you the field wells, the gallery entry, an icon, format options and a data query in one place:
+
+```js
+def("myChart", "My chart", CMP, R.cat, {
+  query: "cat",                 // "cat" (categories × values), "rows" (one record per row of a table query),
+                                // "gauge", or raw: ["values"] for row-level numbers (statistics)
+  format: [F.labels, ["Bar colour", "color", "color", null]],
+  icon: '<rect x="3" y="10" width="4" height="10"/>',   // 24×24 SVG
+  render(el, v, r, o) { /* draw with d3 – use frame(), tip(), pick(o, value) for cross-filtering */ },
+});
+```
+
+Then add field mappings for it to the gallery check (`tests/test_visuals_plus.py` counts and loads every type). For a core visual:
 
 1. Add the type with its field wells to `TYPES` in `visuals.js` and an icon in `ICONS`.
 2. Write a `renderX(el, visual, result, opts)` function and add it to `render()`.
